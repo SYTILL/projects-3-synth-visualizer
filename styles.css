@@ -6,25 +6,42 @@ canvas {
 
 * {
     font-family: sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
-
-.body-outer{
+html,
+body {
     width: 100%;
     height: 100%;
+    margin: 0;
+    overflow: hidden;
+}
+
+.body-seperator,
+.body-outer {
     margin: 15px;
     border: 1px solid black;
     border-radius: 10px;
 }
 
-.body-seperator{
+
+.body-seperator {
     @extend .body-outer;
-    width: 10vw;
-    height: 10vh;
-    margin: 15px;
-    border: 1px solid black;
-    border-radius: 10px;
+    flex: 1;
+    min-width: 500px;
+    min-height: 100px;
 }
+
+
+
+
+
+
+
+
+
+
 
 
 .wrapper {
