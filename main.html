@@ -10,19 +10,19 @@
 
 <body>
     <div class="body-outer">
-        <div class="body-seperator">
-            <div class="top-logo">
+        <div class="separator top-body">
+            <div class="body-inner logo">
 
             </div>
-            <div class="select-control">
+            <div class="body-inner select-control">
 
             </div>
-            <div class="volume-control">
+            <div class="body-inner volume-control">
 
             </div>
         </div>
-        <div class="body-seperator">
-            <div class="ocs-extra">
+        <div class="separator mid-body">
+            <div class="mid-extra">
                 <div class="body-inner" id="ocs-sub">
 
                 </div>
@@ -36,19 +36,28 @@
             <div class="body-inner" id="osc-main" data-id="B">
 
             </div>
-            <div class="body-inner" id="filter-body">
+            <div class="body-inner filter-body">
 
             </div>
         </div>
-        <div class="body-seperator">
+        <div class="separator bot-body">
+            <div class="body-inner ENV-body">
 
+            </div>
+            <div class="body-inner LFO-body">
+
+            </div>
+            <div class="body-inner bot-extra">
+
+            </div>
         </div>
         
-        <div class="body-seperator">
+        <div class="piano-body">
             <div class="wrapper">
                 <header>
                     <div class="column keys-checkbox">
-                        <span>Show Keys</span><input type="checkbox" checked>
+                        <input type="checkbox" checked>
+                        <span>Show Keys</span>
                     </div>
                 </header>
                 <ul class="piano-keys">
@@ -121,7 +130,6 @@
         pianoKeys.forEach(key => {
             allKeys.push(key.dataset.key);
             key.addEventListener("click", () => {
-                console.log("asdf");
                 keyboard._addKey({ keyCode: key.dataset.key.toUpperCase().charCodeAt(0) });
                 keyboard._removeKey({ keyCode: key.dataset.key.toUpperCase().charCodeAt(0) });
             });

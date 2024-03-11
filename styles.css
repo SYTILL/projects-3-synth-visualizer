@@ -16,53 +16,113 @@ body {
     height: 100%;
     margin: 0;
     overflow: hidden;
+    display: flex;
 }
 
-.body-seperator,
 .body-outer {
+    flex: 1;
     margin: 15px;
     border: 1px solid black;
     border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-left: 10px;
+    padding-top: 10px;
 }
 
 
-.body-seperator {
-    @extend .body-outer;
+
+/* body seperators */
+.separator{
+    display: flex;
+}
+
+.top-body {
+    height: 80px;
+}
+
+.mid-body {
     flex: 1;
-    min-width: 500px;
-    min-height: 100px;
+}
+
+.bot-body {
+    flex: 0.8;
+}
+
+.piano-body {
+    flex: 0;
+    border: 1px solid black;
+    border-radius: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;
 }
 
 
 
+/* mid body */
+.mid-extra{
+    display: flex;
+    flex-direction: column;
+    flex: 0.4;
+}
+
+.body-inner {
+    border: 1px solid black;
+    border-radius: 10px;
+    flex: 0.7;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.filter-body{
+    flex: 0.5;
+}
+
+
+/* top body */
+.logo{
+    flex: 0;
+    min-width: 160px;
+}
+
+/* bot body */
+.ENV-body{
+    flex: 0.6;
+}
+
+.LFO-body{
+    flex: 0.7;
+}
+
+.bot-extra{
+    flex: 0.2;
+}
 
 
 
-
-
-
-
-
-
+/* piano body */
 .wrapper {
+    display: flex;
+    align-items: top;
     padding: 35px 40px;
-    border-radius: 20px;
-    background: #141414;
+    border-radius: 10px;
+    /* background: #141414; */
 }
 
 .wrapper header {
     display: flex;
+    flex: 1;
+    margin-right: 10px;
     color: #B2B2B2;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     justify-content: space-between;
-}
-
-header h2 {
-    font-size: 1.6rem;
 }
 
 header .column {
     display: flex;
+    flex-direction: column;
     align-items: center;
 }
 
@@ -94,9 +154,9 @@ header input {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #8c8c8c;
     transform: translateY(-50%);
     transition: all 0.3s ease;
+    background: #8c8c8c;
 }
 
 .keys-checkbox input:checked::before {
@@ -106,8 +166,8 @@ header input {
 
 .piano-keys {
     display: flex;
+    flex: 0;
     list-style: none;
-    margin-top: 40px;
 }
 
 .piano-keys .key {
