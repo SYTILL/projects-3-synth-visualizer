@@ -170,26 +170,48 @@
 
     <script>
 
-        //piano visual
-        const keysCheckbox = document.querySelector(".keys-checkbox input");
-        const pianoKeys = document.querySelectorAll(".piano-keys .key");
-        const showHideKeys = () => {
-            pianoKeys.forEach(key => key.classList.toggle("hide"));
-        }
-
-        keysCheckbox.addEventListener("click", showHideKeys);
-
-
 
         //tone
         const synth = new Tone.Synth().toDestination();
-
-        const keyboard = new AudioKeys({ rows: 2 });
+        const keyboard = new AudioKeys({ rows: 1 });
 
         keyboard.down((key) => {
-            console.log(key);
-            synth.triggerAttackRelease(key.frequency, "8n");
+            console.log('qwerqwre');
+            playSynth(key);
         });
+
+        const playSynth = (key) => {
+            const clickedKey = document.querySelector(`[data-key="${String.fromCharCode(key.keyCode).toLowerCase()}"]`);
+            clickedKey.classList.add("active");
+            setTimeout(() => {
+                clickedKey.classList.remove("active");
+            }, 150);
+            synth.triggerAttackRelease(key.frequency, "8n");
+        };
+
+
+        //piano visual
+        const keysCheckbox = document.querySelector(".keys-checkbox input");
+        const pianoKeys = document.querySelectorAll(".piano-keys .key");
+        let allKeys = [];
+
+        //hide key texts
+        const showHideKeys = () => {
+            pianoKeys.forEach(key => key.classList.toggle("hide"));
+        }
+        keysCheckbox.addEventListener("click", showHideKeys);
+
+        //piano pressed effect - click
+        pianoKeys.forEach(key => {
+            allKeys.push(key.dataset.key);
+            key.addEventListener("click", () => {
+                console.log("asdf");
+                keyboard._addKey({ keyCode: key.dataset.key.toUpperCase().charCodeAt(0) });
+                keyboard._removeKey({ keyCode: key.dataset.key.toUpperCase().charCodeAt(0) });
+            });
+        });
+
+
     </script>
 </body>
 
