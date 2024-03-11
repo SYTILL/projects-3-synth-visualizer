@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WEB SYNTH</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        * {
+            font-family: sans-serif;
+        }
+
+        .wrapper {
+            padding: 35px 40px;
+            border-radius: 20px;
+            background: #141414;
+        }
+
+        .wrapper header {
+            display: flex;
+            color: #B2B2B2;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        header h2 {
+            font-size: 1.6rem;
+        }
+
+        header .column {
+            display: flex;
+            align-items: center;
+        }
+
+        header span {
+            font-weight: 500;
+            margin-right: 15px;
+            font-size: 1.19rem;
+        }
+
+        header input {
+            outline: none;
+            border-radius: 30px;
+        }
+
+        .keys-checkbox input {
+            height: 30px;
+            width: 60px;
+            cursor: pointer;
+            appearance: none;
+            position: relative;
+            background: #4B4B4B
+        }
+
+        .keys-checkbox input::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #8c8c8c;
+            transform: translateY(-50%);
+            transition: all 0.3s ease;
+        }
+
+        .keys-checkbox input:checked::before {
+            left: 35px;
+            background: #fff;
+        }
+
+        .piano-keys {
+            display: flex;
+            list-style: none;
+            margin-top: 40px;
+        }
+
+        .piano-keys .key {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            text-transform: uppercase;
+        }
+
+        .piano-keys .black {
+            z-index: 2;
+            width: 44px;
+            height: 140px;
+            margin: 0 -22px 0 -22px;
+            border-radius: 0 0 5px 5px;
+            background: linear-gradient(#333, #000);
+        }
+
+        .piano-keys .black.active {
+            box-shadow: inset -5px -10px 10px rgba(255, 255, 255, 0.1);
+            background: linear-gradient(to bottom, #000, #434343);
+        }
+
+        .piano-keys .white {
+            height: 230px;
+            width: 70px;
+            border-radius: 8px;
+            border: 1px solid #000;
+            background: linear-gradient(#fff 96%, #eee 4%);
+        }
+
+        .piano-keys .white.active {
+            box-shadow: inset -5px 5px 20px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(to bottom, #fff 0%, #eee 100%);
+        }
+
+        .piano-keys .key span {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            color: #A2A2A2;
+            font-size: 1.13rem;
+            text-align: center;
+        }
+
+        .piano-keys .key.hide span {
+            display: none;
+        }
+
+        .piano-keys .black span {
+            bottom: 13px;
+            color: #888888;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <header>
+            <div class="column keys-checkbox">
+                <span>Show Keys</span><input type="checkbox" checked>
+            </div>
+        </header>
+        <ul class="piano-keys">
+            <li class="key white" data-key="a"><span>a</span></li>
+            <li class="key black" data-key="w"><span>w</span></li>
+            <li class="key white" data-key="s"><span>s</span></li>
+            <li class="key black" data-key="e"><span>e</span></li>
+            <li class="key white" data-key="d"><span>d</span></li>
+            <li class="key white" data-key="f"><span>f</span></li>
+            <li class="key black" data-key="t"><span>t</span></li>
+            <li class="key white" data-key="g"><span>g</span></li>
+            <li class="key black" data-key="y"><span>y</span></li>
+            <li class="key white" data-key="h"><span>h</span></li>
+            <li class="key black" data-key="u"><span>u</span></li>
+            <li class="key white" data-key="j"><span>j</span></li>
+            <li class="key white" data-key="k"><span>k</span></li>
+            <li class="key black" data-key="o"><span>o</span></li>
+            <li class="key white" data-key="l"><span>l</span></li>
+            <li class="key black" data-key="p"><span>p</span></li>
+            <li class="key white" data-key=";"><span>;</span></li>
+        </ul>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.37/Tone.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/audiokeys@0.1.1/dist/audiokeys.min.js"></script>
+
+
+    <script>
+
+        //piano visual
+        const keysCheckbox = document.querySelector(".keys-checkbox input");
+        const pianoKeys = document.querySelectorAll(".piano-keys .key");
+        const showHideKeys = () => {
+            pianoKeys.forEach(key => key.classList.toggle("hide"));
+        }
+
+        keysCheckbox.addEventListener("click", showHideKeys);
+
+
+
+        //tone
+        const synth = new Tone.Synth().toDestination();
+
+        const keyboard = new AudioKeys({ rows: 2 });
+
+        keyboard.down((key) => {
+            console.log(key);
+            synth.triggerAttackRelease(key.frequency, "8n");
+        });
+    </script>
+</body>
+
+</html>
