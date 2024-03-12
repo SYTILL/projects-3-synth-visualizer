@@ -42,6 +42,18 @@
                     <input class="title-checkbox" type="checkbox">
                     <span class="title-text">OCS A</span>
                 </div>
+                <div class="wavetable-body">
+                    <canvas class="wavetable wavetable-A"></canvas>
+                    <div class="wavetable-selection">
+                        <input class="wavetable-selection-presets" type="checkbox" id="">
+                    </div>
+                </div>
+                <div class="knobs-row">
+
+                </div>
+                <div class="knobs-row">
+
+                </div>
             </div>
             <div class="body-inner" id="osc-main" data-id="B">
                 <div class="title">
@@ -67,7 +79,7 @@
 
             </div>
         </div>
-        
+
         <div class="piano-body">
             <div class="wrapper">
                 <header>
@@ -150,7 +162,6 @@
                 keyboard._removeKey({ keyCode: key.dataset.key.toUpperCase().charCodeAt(0) });
             });
         });
-
 
     </script>
 </body>

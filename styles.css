@@ -39,7 +39,8 @@ body {
 }
 
 .top-body {
-    height: 80px;
+    flex: 0.2;
+    min-height: 60px;
 }
 
 .mid-body {
@@ -51,7 +52,8 @@ body {
 }
 
 .piano-body {
-    flex: 0;
+    display: flex;
+    flex: 0.8;
     border: 1px solid black;
     border-radius: 10px;
 
@@ -87,6 +89,9 @@ body {
 }
 
 .body-inner {
+    display: flex;
+    align-items: start;
+    flex-direction: column;
     border: 1px solid black;
     border-radius: 10px;
     flex: 0.7;
@@ -99,12 +104,56 @@ body {
     flex: 0.5;
 }
 
+.wavetable-body{
+    flex: 1;
+
+    display: flex;
+    flex-direction: row-reverse;
+    width: 100%;
+}
+
+.wavetable-selection{
+    flex: 1;
+    border: 1px solid rgb(255, 3, 3);
+    margin-left: 10px;
+    max-width: 20%;
+    max-height: 100%;
+}
+
+.wavetable-selection-presets{
+    
+}
+
+.wavetable {
+    flex: 1;
+    margin-right: 10px;
+    margin-bottom: 0px;
+
+    max-width: 80%;
+    max-height: 100%;
+}
+
+
+.knobs-row{
+    flex: 0.7;
+    width: 100%;
+    border: 1px solid rgb(255, 3, 3);
+}
+
+
+
 
 /* top body */
 .logo{
     flex: 0;
     min-width: 160px;
 }
+
+
+
+
+
+
 
 /* bot body */
 .ENV-body{
@@ -121,9 +170,20 @@ body {
 
 
 
+
+
+
+
+
+
+
+
+
+
 /* piano body */
 .wrapper {
     display: flex;
+    flex: 1;
     align-items: top;
     padding: 35px 40px;
     border-radius: 10px;
@@ -142,6 +202,7 @@ body {
 
 header .column {
     display: flex;
+    flex:1;
     flex-direction: column;
     align-items: center;
 }
@@ -184,9 +245,10 @@ header input {
     background: #fff;
 }
 
+
+
 .piano-keys {
     display: flex;
-    flex: 0;
     list-style: none;
 }
 
@@ -200,7 +262,7 @@ header input {
 .piano-keys .black {
     z-index: 2;
     width: 44px;
-    height: 140px;
+    height: 60%;
     margin: 0 -22px 0 -22px;
     border-radius: 0 0 5px 5px;
     background: linear-gradient(#333, #000);
@@ -212,7 +274,7 @@ header input {
 }
 
 .piano-keys .white {
-    height: 230px;
+    height: 100%;
     width: 70px;
     border-radius: 8px;
     border: 1px solid #000;
