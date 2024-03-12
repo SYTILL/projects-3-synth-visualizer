@@ -17,6 +17,7 @@ body {
     margin: 0;
     overflow: hidden;
     display: flex;
+    justify-content: center;
 }
 
 .body-outer {
@@ -29,6 +30,8 @@ body {
     justify-content: space-between;
     padding-left: 10px;
     padding-top: 10px;
+    max-width: 1200px;
+    max-height: 1200px;
 }
 
 
@@ -118,10 +121,13 @@ body {
     margin-left: 10px;
     max-width: 20%;
     max-height: 100%;
+
+    display: flex;
+    flex-direction: column;
 }
 
 .wavetable-selection-presets{
-    
+    flex:1;
 }
 
 .wavetable {
