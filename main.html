@@ -43,8 +43,8 @@
                     <span class="title-text">OCS A</span>
                 </div>
                 <div class="wavetable-body">
-                    <canvas class="wavetable wavetable-A" id="wavetable-canvas-A"></canvas>
-                    <div class="wavetable-selection"></div>
+                    <canvas class="wavetable" id="wavetable-canvas-A"></canvas>
+                    <div class="wavetable-selection" id="wavetable-selection-A"></div>
                 </div>
                 <div class="knobs-row">
 
@@ -57,6 +57,16 @@
                 <div class="title">
                     <input class="title-checkbox" type="checkbox" checked>
                     <span class="title-text">OCS B</span>
+                </div>
+                <div class="wavetable-body">
+                    <canvas class="wavetable" id="wavetable-canvas-B"></canvas>
+                    <div class="wavetable-selection" id="wavetable-selection-B"></div>
+                </div>
+                <div class="knobs-row">
+
+                </div>
+                <div class="knobs-row">
+
                 </div>
             </div>
             <div class="body-inner filter-body">
@@ -123,18 +133,27 @@
 
         //-------------------#add wavetable images #images #wavetable------------------
 
-        const waveTablesTypes = ['sine-wave', 'triangle-wave', 'sawtooth-wave', 'square-wave'];
-        const wavetableContainerA = document.querySelector('.wavetable-selection');
+        const waveTablesTypes = ['sine', 'triangle', 'sawtooth', 'square'];
 
-        let selectedOscA = new Tone.Oscillator(440, "sine");
+        const createOSC = (selectionBody, canvasBody) => {
+            return {
+                body: document.getElementById(selectionBody),
+                oscillator: new Tone.Oscillator(440, "sine"),
+                canvas: document.getElementById(canvasBody),
+            };
+        };
+        oscA = createOSC('wavetable-selection-A', 'wavetable-canvas-A');
+        oscB = createOSC('wavetable-selection-B', 'wavetable-canvas-B');
 
-        const canvas = document.getElementById('wavetable-canvas-A');
-        const ctx = canvas.getContext('2d');
+        //------------#draw #canvas ----------------------------
+        async function drawWaveform(oscBody) {
+            oscillator = oscBody.oscillator;
+            canvas = oscBody.canvas;
+            ctx = canvas.getContext('2d');
 
-        async function drawWaveform() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            const waveform = await selectedOscA.asArray(1024);
+            const waveform = await oscillator.asArray(1024);
 
             ctx.strokeStyle = 'blue';
             ctx.lineWidth = 2;
@@ -149,24 +168,27 @@
         }
 
         //-----------#disable all --------- if one wavetable is selected----------
-        const selectWavetable = (selectionBody, selectedImg) => {
+        const selectWavetable = async (oscBody, selectedImg) => {
+            const selectionBody = oscBody.body;
             const images = selectionBody.querySelectorAll('img');
 
             images.forEach(img => {
                 img.style.margin = '1px';
-                img.src = `src/images/${img.alt}-off.png`;
+                img.src = `src/images/${img.alt}-wave-off.png`;
                 img.setAttribute('data-onoff', false);
 
-                drawWaveform();
             });
 
             selectedImg.style.margin = '0px';
-            selectedImg.src = `src/images/${selectedImg.alt}.png`;
+            selectedImg.src = `src/images/${selectedImg.alt}-wave.png`;
             selectedImg.setAttribute('data-onoff', true);
+
+            oscBody.oscillator.type = selectedImg.alt;
+            await drawWaveform(oscBody);
         };
 
         //------------#create------------ wavetables in selection Body
-        const addWavetablesSelection = (container) => {
+        const addWavetablesSelection = async (oscBody) => {
             let first = true;
             waveTablesTypes.forEach(name => {
                 const img = document.createElement('img');
@@ -176,19 +198,19 @@
                 img.setAttribute('data-onoff', false);
 
                 img.addEventListener("click", () => {
-                    selectWavetable(container, img);
+                    selectWavetable(oscBody, img);
                 });
-                container.appendChild(img);
+                oscBody.body.appendChild(img);
 
                 if (first === true) {
                     first = img;
                 }
             });
-            console.log(first);
-            selectWavetable(container, first);
-
+            await selectWavetable(oscBody, first);
         };
-        addWavetablesSelection(wavetableContainerA);
+
+        addWavetablesSelection(oscA);
+        addWavetablesSelection(oscB);
 
 
 
@@ -200,7 +222,6 @@
         const keyboard = new AudioKeys({ rows: 1 });
 
         keyboard.down((key) => {
-            console.log('qwerqwre');
             playSynth(key);
         });
 
@@ -214,12 +235,15 @@
         };
 
 
-        //piano visual
+
+
+
+        //---------------piano visual-------------------
         const keysCheckbox = document.querySelector(".keys-checkbox input");
         const pianoKeys = document.querySelectorAll(".piano-keys .key");
         let allKeys = [];
 
-        //hide key texts
+        //[Show-Keys] checkbox function
         const showHideKeys = () => {
             pianoKeys.forEach(key => key.classList.toggle("hide"));
         }
