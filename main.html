@@ -26,30 +26,25 @@
             <div class="mid-extra">
                 <div class="body-inner" id="ocs-sub">
                     <div class="title">
-                        <input class="title-checkbox" type="checkbox">
+                        <input class="title-checkbox" type="checkbox" checked>
                         <span class="title-text">SUB</span>
                     </div>
                 </div>
                 <div class="body-inner" id="ocs-noise">
                     <div class="title">
-                        <input class="title-checkbox" type="checkbox">
+                        <input class="title-checkbox" type="checkbox" checked>
                         <span class="title-text">NOISE</span>
                     </div>
                 </div>
             </div>
             <div class="body-inner" id="osc-main" data-id="A">
                 <div class="title">
-                    <input class="title-checkbox" type="checkbox">
+                    <input class="title-checkbox" type="checkbox" checked>
                     <span class="title-text">OCS A</span>
                 </div>
                 <div class="wavetable-body">
-                    <canvas class="wavetable wavetable-A"></canvas>
-                    <div class="wavetable-selection">
-                        <input class="wavetable-selection-presets" type="checkbox" id="sine-wave">
-                        <input class="wavetable-selection-presets" type="checkbox" id="triangle-wave">
-                        <input class="wavetable-selection-presets" type="checkbox" id="sawtooth-wave">
-                        <input class="wavetable-selection-presets" type="checkbox" id="square-wave">
-                    </div>
+                    <canvas class="wavetable wavetable-A" id="wavetable-canvas-A"></canvas>
+                    <div class="wavetable-selection"></div>
                 </div>
                 <div class="knobs-row">
 
@@ -60,13 +55,13 @@
             </div>
             <div class="body-inner" id="osc-main" data-id="B">
                 <div class="title">
-                    <input class="title-checkbox" type="checkbox">
+                    <input class="title-checkbox" type="checkbox" checked>
                     <span class="title-text">OCS B</span>
                 </div>
             </div>
             <div class="body-inner filter-body">
                 <div class="title">
-                    <input class="title-checkbox" type="checkbox">
+                    <input class="title-checkbox" type="checkbox" checked>
                     <span class="title-text">FILTER</span>
                 </div>
             </div>
@@ -125,6 +120,79 @@
 
 
     <script>
+
+        //-------------------#add wavetable images #images #wavetable------------------
+
+        const waveTablesTypes = ['sine-wave', 'triangle-wave', 'sawtooth-wave', 'square-wave'];
+        const wavetableContainerA = document.querySelector('.wavetable-selection');
+
+        let selectedOscA = new Tone.Oscillator(440, "sine");
+
+        const canvas = document.getElementById('wavetable-canvas-A');
+        const ctx = canvas.getContext('2d');
+
+        async function drawWaveform() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const waveform = await selectedOscA.asArray(1024);
+
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height / 2);
+            for (let i = 0; i < waveform.length; i++) {
+                const x = (i / waveform.length) * canvas.width;
+                const y = ((waveform[i] + 1) / 2) * canvas.height;
+                ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+        }
+
+        //-----------#disable all --------- if one wavetable is selected----------
+        const selectWavetable = (selectionBody, selectedImg) => {
+            const images = selectionBody.querySelectorAll('img');
+
+            images.forEach(img => {
+                img.style.margin = '1px';
+                img.src = `src/images/${img.alt}-off.png`;
+                img.setAttribute('data-onoff', false);
+
+                drawWaveform();
+            });
+
+            selectedImg.style.margin = '0px';
+            selectedImg.src = `src/images/${selectedImg.alt}.png`;
+            selectedImg.setAttribute('data-onoff', true);
+        };
+
+        //------------#create------------ wavetables in selection Body
+        const addWavetablesSelection = (container) => {
+            let first = true;
+            waveTablesTypes.forEach(name => {
+                const img = document.createElement('img');
+                img.classList.add('wavetable-selection-presets');
+                img.src = `src/images/${name}-off.png`;
+                img.alt = name;
+                img.setAttribute('data-onoff', false);
+
+                img.addEventListener("click", () => {
+                    selectWavetable(container, img);
+                });
+                container.appendChild(img);
+
+                if (first === true) {
+                    first = img;
+                }
+            });
+            console.log(first);
+            selectWavetable(container, first);
+
+        };
+        addWavetablesSelection(wavetableContainerA);
+
+
+
+
 
 
         //tone

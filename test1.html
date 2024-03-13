@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wave Table Selection</title>
+<style>
+    .wavetable-selection img {
+        width: 100px;
+        height: auto;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+
+<div class="wavetable-selection">
+    <!-- Use JavaScript to generate the images -->
+</div>
+
+<script>
+    // Array of wave table names
+    const waveTables = ['sine-wave', 'triangle-wave', 'sawtooth-wave', 'square-wave'];
+
+    // Container for the wave table images
+    const wavetableContainer = document.querySelector('.wavetable-selection');
+
+    // Function to create an image element for each wave table
+    const createImage = name => {
+        const img = document.createElement('img');
+        img.classList.add('wavetable-selection-presets');
+        img.src = `src/images/${name}.png`;
+        img.alt = name;
+        img.setAttribute('data-active', `src/images/${name}-off.png`);
+        return img;
+    };
+
+    // Add images to the container
+    waveTables.forEach(name => {
+        const img = createImage(name);
+        wavetableContainer.appendChild(img);
+    });
+
+    // Event listener to toggle image source and disable others
+    wavetableContainer.addEventListener('click', function(event) {
+        if (event.target && event.target.nodeName === 'IMG') {
+            const clickedImg = event.target;
+            const activeSrc = clickedImg.getAttribute('data-active');
+            
+            // Iterate over all images
+            const images = document.querySelectorAll('.wavetable-selection img');
+            images.forEach(img => {
+                // Disable all other images except the clicked one
+                if (img !== clickedImg) {
+                    img.classList.remove('active');
+                    const currentSrc = img.src;
+                    img.src = img.getAttribute('data-active');
+                    img.setAttribute('data-active', currentSrc);
+                } else {
+                    // Toggle the clicked image
+                    clickedImg.classList.toggle('active');
+                    const currentSrc = clickedImg.src;
+                    clickedImg.src = activeSrc;
+                    clickedImg.setAttribute('data-active', currentSrc);
+                }
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
