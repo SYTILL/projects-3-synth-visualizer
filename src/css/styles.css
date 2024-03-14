@@ -144,13 +144,24 @@ body {
 }
 
 
-.knobs-row {
-    flex: 0.6;
+.knobs-background{
+    flex: 1.2;
     width: 100%;
+    background-color: #2c2d2f;
+    border-radius: 8px;
+
+
+    display: flex;
+    flex-direction: column;
+}
+
+.knobs-row {
+    flex: 1;
+    margin: 5px;
+    margin-top: 0;
 
     display: flex;
     flex-direction: row;
-    padding-left: 5px;
 }
 
 

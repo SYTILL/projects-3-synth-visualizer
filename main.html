@@ -49,75 +49,79 @@
                     <div class="wavetable-selection" id="wavetable-selection-A"></div>
                 </div>
 
-                <div class="knobs-row" @mouseUp="unselectKnobs">
-                    <div class="rela-inline knob">
-                        <div class="knob-active-light"
-                            :style="{'background-color': knobs[10].active?knobs[10].color:'#888'}"
-                            @click="knobs[10].active = !knobs[10].active"></div>
+                <div class="knobs-background">
+                    <div class="knobs-row" @mouseUp="unselectKnobs">
+                        <div class="rela-inline knob">
+                            <div class="knob-active-light"
+                                :style="{'background-color': knobs[10].active?knobs[10].color:'#888'}"
+                                @click="knobs[10].active = !knobs[10].active"></div>
 
-                        <div class="rela-block" :style="{'color':knobs[10].active?knobs[10].color:'#888'}">
-                            <div class="knob-updown-body">
-                                <div class="knob-updown-text"
-                                    @mouseDown="knobs[10].selected = true; app.currentY = event.pageY; event.preventDefault()">
-                                    {{knobs[10].value.cur}}</div>
-                                <div class="knob-updown-button-body">
-                                    <div class="knob-updown-button" @click="updownCounter(knobs[10].value, 1);">
-                                        <div style="transform: translateY(-4px);">▲</div>
-                                    </div>
-                                    <div class="knob-updown-button" @click="updownCounter(knobs[10].value, -1);">
-                                        <div style="transform: translateY(-3px);">▼</div>
+                            <div class="rela-block" :style="{'color':knobs[10].active?knobs[10].color:'#888'}">
+                                <div class="knob-updown-body">
+                                    <div class="knob-updown-text"
+                                        @mouseDown="knobs[10].selected = true; app.currentY = event.pageY; event.preventDefault()">
+                                        {{knobs[10].value.cur}}</div>
+                                    <div class="knob-updown-button-body">
+                                        <div class="knob-updown-button" @click="updownCounter(knobs[10].value, 1);">
+                                            <div style="transform: translateY(-4px);">▲</div>
+                                        </div>
+                                        <div class="knob-updown-button" @click="updownCounter(knobs[10].value, -1);">
+                                            <div style="transform: translateY(-3px);">▼</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="rela-block knob-label" :style="{'color':knobs[10].active?'#E4E8EA':'#888'}">
+                                {{knobs[10].label}}</div>
                         </div>
 
-                        <div class="rela-block knob-label" :style="{'color':knobs[10].active?'#E4E8EA':'#888'}">
-                            {{knobs[10].label}}</div>
-                    </div>
+                        <div v-for="knob in [knobs[11],knobs[12],knobs[13]]" class="rela-inline knob style3">
+                            <div class="knob-active-light" :style="{'background-color': knob.active?knob.color:'#888'}"
+                                @click="knob.active = !knob.active"></div>
 
-                    <div v-for="knob in [knobs[11],knobs[12],knobs[13]]" class="rela-inline knob style3">
-                        <div class="knob-active-light" :style="{'background-color': knob.active?knob.color:'#888'}"
-                            @click="knob.active = !knob.active"></div>
-
-                        <div class="rela-block knob-dial" :style="{'color':knob.active?knob.color:'#888'}">
-                            <div class="abs-center dial-grip"
-                                :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
-                                @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
+                            <div class="rela-block knob-dial" :style="{'color':knob.active?knob.color:'#888'}">
+                                <div class="abs-center dial-grip"
+                                    :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
+                                    @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
+                                </div>
+                                <svg class="dial-svg" viewBox="0 0 100 100">
+                                    <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
+                                    <path d="M20,76 A 40 40 0 1 1 80 76" fill="none"
+                                        :stroke="knob.active?knob.color:'#888'"
+                                        :style="{'stroke-dashoffset':184 - 184*((knob.rotation*1 + 132)/264)}" />
+                                </svg>
                             </div>
-                            <svg class="dial-svg" viewBox="0 0 100 100">
-                                <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
-                                <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" :stroke="knob.active?knob.color:'#888'"
-                                    :style="{'stroke-dashoffset':184 - 184*((knob.rotation*1 + 132)/264)}" />
-                            </svg>
+
+                            <div class="rela-block knob-label" :style="{'color':knob.active?'#E4E8EA':'#888'}">
+                                {{knob.label}}</div>
+
+                            <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
                         </div>
-
-                        <div class="rela-block knob-label" :style="{'color':knob.active?'#E4E8EA':'#888'}">
-                            {{knob.label}}</div>
-
-                        <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
                     </div>
-                </div>
-                <div class="knobs-row">
-                    <div v-for="knob in [knobs[14]]" class="rela-inline knob style3">
-                        <div class="knob-active-light" :style="{'background-color': knob.active?knob.color:'#888'}"
-                            @click="knob.active = !knob.active"></div>
+                    <div class="knobs-row">
+                        <div v-for="knob in [knobs[14]]" class="rela-inline knob style3">
+                            <div class="knob-active-light" :style="{'background-color': knob.active?knob.color:'#888'}"
+                                @click="knob.active = !knob.active"></div>
 
-                        <div class="rela-block knob-dial" :style="{'color':knob.active?knob.color:'#888'}">
-                            <div class="abs-center dial-grip"
-                                :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
-                                @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
+                            <div class="rela-block knob-dial" :style="{'color':knob.active?knob.color:'#888'}">
+                                <div class="abs-center dial-grip"
+                                    :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
+                                    @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
+                                </div>
+                                <svg class="dial-svg" viewBox="0 0 100 100">
+                                    <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
+                                    <path d="M20,76 A 40 40 0 1 1 80 76" fill="none"
+                                        :stroke="knob.active?knob.color:'#888'"
+                                        :style="{'stroke-dashoffset':184 - 184*((knob.rotation*1 + 132)/264)}" />
+                                </svg>
                             </div>
-                            <svg class="dial-svg" viewBox="0 0 100 100">
-                                <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
-                                <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" :stroke="knob.active?knob.color:'#888'"
-                                    :style="{'stroke-dashoffset':184 - 184*((knob.rotation*1 + 132)/264)}" />
-                            </svg>
+
+                            <div class="rela-block knob-label" :style="{'color':knob.active?'#E4E8EA':'#888'}">
+                                {{knob.label}}</div>
+
+                            <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
                         </div>
-
-                        <div class="rela-block knob-label" :style="{'color':knob.active?'#E4E8EA':'#888'}">
-                            {{knob.label}}</div>
-
-                        <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
                     </div>
                 </div>
             </div>
@@ -290,8 +294,8 @@
                 canvas: document.getElementById(canvasBody),
             };
         };
-        oscA = createOSC('checkbox-osc-A','wavetable-selection-A', 'wavetable-canvas-A');
-        oscB = createOSC('checkbox-osc-B','wavetable-selection-B', 'wavetable-canvas-B');
+        oscA = createOSC('checkbox-osc-A', 'wavetable-selection-A', 'wavetable-canvas-A');
+        oscB = createOSC('checkbox-osc-B', 'wavetable-selection-B', 'wavetable-canvas-B');
 
 
 
@@ -409,15 +413,15 @@
         const startOSC = (key) => {
             if (oscA.checkBox.checked) {
                 let oscTEMP = new Tone.Oscillator(key.frequency, oscA.oscillator.type).toDestination();
-                oscTEMP.volume.value = 40 * Math.log10((app.knobs[14].value.cur + 80)/160);
-                
+                oscTEMP.volume.value = 40 * Math.log10((app.knobs[14].value.cur + 80) / 160);
+
                 oscTEMP.start();
                 activeNoteA[key.note] = oscTEMP;
             }
             if (oscB.checkBox.checked) {
                 let oscTEMP = new Tone.Oscillator(key.frequency, oscB.oscillator.type).toDestination();
-                oscTEMP.volume.value = 40 * Math.log10((app.knobs[4].value.cur + 80)/160);
-                
+                oscTEMP.volume.value = 40 * Math.log10((app.knobs[4].value.cur + 80) / 160);
+
                 oscTEMP.start();
                 activeNoteB[key.note] = oscTEMP;
             }
