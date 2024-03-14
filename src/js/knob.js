@@ -9,6 +9,7 @@ let app = new Vue({
                     knobType: "updown",
                     label: 'Unison',
                     value: {
+                        real: 1.0,
                         cur: 1,
                         low: 1,
                         high: 16
@@ -53,17 +54,36 @@ let app = new Vue({
             let selectedKnob = app.knobs.filter(function (i) { return i.selected === true; })[0];
 
             if (selectedKnob) {
-                // Knob Rotation
-                if (e.pageY - app.currentY !== 0) { selectedKnob.rotation -= (e.pageY - app.currentY); }
-                app.currentY = e.pageY;
+                if (selectedKnob.knobType == "updown") {
+                    console.log("updown selected");
+                    // Knob Rotation
+                    if (e.pageY - app.currentY !== 0) { 
+                        selectedKnob.value.real -= (e.pageY - app.currentY) / 10; 
+                    }
+                    app.currentY = e.pageY;
 
-                // Setting Max rotation
-                if (selectedKnob.rotation >= 132) { selectedKnob.rotation = 132; }
-                else if (selectedKnob.rotation <= -132) { selectedKnob.rotation = -132; }
+                    updownCounter(selectedKnob.value, 0);
+                }
+                else {
+                    // Knob Rotation
+                    if (e.pageY - app.currentY !== 0) { selectedKnob.rotation -= (e.pageY - app.currentY); }
+                    app.currentY = e.pageY;
 
-                // Knob method to update parameters based on the know rotation
-                // selectedKnob.method(selectedKnob.rotation, selectedKnob.modifier);
+                    // Setting Max rotation
+                    if (selectedKnob.rotation >= 132) { selectedKnob.rotation = 132; }
+                    else if (selectedKnob.rotation <= -132) { selectedKnob.rotation = -132; }
+                }
             }
+        },
+        updownCounter: function (value, amount){
+            value.real += amount;
+            if (value.real >= value.high) { 
+                value.real = value.high; 
+            }
+            else if (value.real <= value.low) { 
+                value.real = value.low; 
+            }
+            value.cur = Math.round(value.real);
         },
     },
     methods: {

@@ -70,15 +70,15 @@
                             :style="{'background-color': knobs[0].active?knobs[0].color:'#888'}"
                             @click="knobs[0].active = !knobs[0].active"></div>
 
-                        <div class="rela-block" :style="{'color':knobs[0].active?knobs[0].color:'#888'}"
-                            @mouseDown="knobs[0].selected = true; app.currentY = event.pageY; event.preventDefault()">
-                            <div class="knob-updown-body">
-                                <div class="knob-updown-text">{{knobs[0].value.cur}}</div>
+                        <div class="rela-block" :style="{'color':knobs[0].active?knobs[0].color:'#888'}">
+                            <div class="knob-updown-body" >
+                                <div class="knob-updown-text" 
+                                @mouseDown="knobs[0].selected = true; app.currentY = event.pageY; event.preventDefault()">{{knobs[0].value.cur}}</div>
                                 <div class="knob-updown-button-body">
-                                    <div class="knob-updown-button">
+                                    <div class="knob-updown-button" @click="updownCounter(knobs[0].value, 1);">
                                         <div style="transform: translateY(-4px);">▲</div>
                                     </div>
-                                    <div class="knob-updown-button">
+                                    <div class="knob-updown-button" @click="updownCounter(knobs[0].value, -1);">
                                         <div style="transform: translateY(-3px);">▼</div>
                                     </div>
                                 </div>
