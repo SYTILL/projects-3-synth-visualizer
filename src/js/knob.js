@@ -24,6 +24,12 @@ let app = new Vue({
                     knobType: "circle",
                     label: 'Detune',
                     rotation: -132,
+                    value: {
+                        real: 1.0,
+                        cur: 1,
+                        low: 1,
+                        high: 16
+                    },
                     color: '#0060df',
                     active: true,
                     selected: false,
@@ -34,6 +40,12 @@ let app = new Vue({
                     knobType: "circle",
                     label: 'Blend',
                     rotation: -132,
+                    value: {
+                        real: 1.0,
+                        cur: 1,
+                        low: 1,
+                        high: 16
+                    },
                     color: '#0060df',
                     active: true,
                     selected: false,
@@ -44,6 +56,12 @@ let app = new Vue({
                     knobType: "circle",
                     label: 'Pitch',
                     rotation: -132,
+                    value: {
+                        real: 1.0,
+                        cur: 1,
+                        low: 1,
+                        high: 16
+                    },
                     color: '#0060df',
                     active: true,
                     selected: false,
@@ -55,14 +73,8 @@ let app = new Vue({
 
             if (selectedKnob) {
                 if (selectedKnob.knobType == "updown") {
-                    console.log("updown selected");
-                    // Knob Rotation
-                    if (e.pageY - app.currentY !== 0) { 
-                        selectedKnob.value.real -= (e.pageY - app.currentY) / 10; 
-                    }
+                    app.updownCounter(selectedKnob.value, -(e.pageY - app.currentY) / 10);
                     app.currentY = e.pageY;
-
-                    updownCounter(selectedKnob.value, 0);
                 }
                 else {
                     // Knob Rotation
@@ -72,16 +84,31 @@ let app = new Vue({
                     // Setting Max rotation
                     if (selectedKnob.rotation >= 132) { selectedKnob.rotation = 132; }
                     else if (selectedKnob.rotation <= -132) { selectedKnob.rotation = -132; }
+
+                    // Calculate value.cur based on rotation
+                    let range = selectedKnob.value.high - selectedKnob.value.low;
+                    let valueRange = 264; // 132 (max rotation) - (-132) (min rotation)
+                    let rotationRatio = (selectedKnob.rotation + 132) / valueRange; // Normalize rotation to range [0, 1]
+                    selectedKnob.value.cur = Math.round(selectedKnob.value.low + rotationRatio * range);
+
+                    // Ensure value.cur stays within bounds
+                    if (selectedKnob.value.cur > selectedKnob.value.high) {
+                        selectedKnob.value.cur = selectedKnob.value.high;
+                    } else if (selectedKnob.value.cur < selectedKnob.value.low) {
+                        selectedKnob.value.cur = selectedKnob.value.low;
+                    }
                 }
+
+
             }
         },
-        updownCounter: function (value, amount){
+        updownCounter: (value, amount) => {
             value.real += amount;
-            if (value.real >= value.high) { 
-                value.real = value.high; 
+            if (value.real >= value.high) {
+                value.real = value.high;
             }
-            else if (value.real <= value.low) { 
-                value.real = value.low; 
+            else if (value.real <= value.low) {
+                value.real = value.low;
             }
             value.cur = Math.round(value.real);
         },

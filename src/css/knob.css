@@ -126,6 +126,7 @@
 .dial-grip {
   border-radius: 100%;
   transition: 0s;
+  cursor: ns-resize;
 }
 .dial-grip::after {
   content: "";
@@ -188,6 +189,7 @@
 
 .knob-updown-text{
   width: 32px;
+  cursor: ns-resize;
 
   color: white;
   font-size: 12px;
@@ -208,6 +210,7 @@
 .knob-updown-button{
   color: white;
   font-size: 12px;
+  cursor: pointer;
   
   border-radius: 3px;
   height: 9px;

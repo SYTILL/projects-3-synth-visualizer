@@ -71,9 +71,10 @@
                             @click="knobs[0].active = !knobs[0].active"></div>
 
                         <div class="rela-block" :style="{'color':knobs[0].active?knobs[0].color:'#888'}">
-                            <div class="knob-updown-body" >
-                                <div class="knob-updown-text" 
-                                @mouseDown="knobs[0].selected = true; app.currentY = event.pageY; event.preventDefault()">{{knobs[0].value.cur}}</div>
+                            <div class="knob-updown-body">
+                                <div class="knob-updown-text"
+                                    @mouseDown="knobs[0].selected = true; app.currentY = event.pageY; event.preventDefault()">
+                                    {{knobs[0].value.cur}}</div>
                                 <div class="knob-updown-button-body">
                                     <div class="knob-updown-button" @click="updownCounter(knobs[0].value, 1);">
                                         <div style="transform: translateY(-4px);">▲</div>
@@ -111,7 +112,7 @@
                         <div class="rela-block knob-label" :style="{'color':knob.active?'#E4E8EA':'#888'}">
                             {{knob.label}}</div>
 
-                        <div class="knob-hover-text" v-if="knob.selected">{{knob.rotation}}</div>
+                        <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
                     </div>
                 </div>
                 <div class="knobs-row">
@@ -186,13 +187,16 @@
 
         const createOSC = (selectionBody, canvasBody) => {
             return {
+                onOff: true,
                 body: document.getElementById(selectionBody),
-                oscillator: new Tone.Oscillator(440, "sine"),
+                oscillator: new Tone.Oscillator(440, "sine").toDestination(),
                 canvas: document.getElementById(canvasBody),
             };
         };
         oscA = createOSC('wavetable-selection-A', 'wavetable-canvas-A');
         oscB = createOSC('wavetable-selection-B', 'wavetable-canvas-B');
+
+
 
         //------------#draw #canvas ----------------------------
         const drawLine = (ctx, x1, y1, x2, y2) => {
@@ -231,7 +235,7 @@
             const waveform = await oscillator.asArray(1024);
 
             ctx.strokeStyle = 'red';
-            ctx.lineWidth = 5;
+            ctx.lineWidth = 3;
             ctx.beginPath();
             ctx.moveTo(0, canvas.height / 2);
             for (let i = 0; i < waveform.length; i++) {
@@ -301,24 +305,57 @@
 
 
         //tone
-        const synth = new Tone.Synth().toDestination();
-        const keyboard = new AudioKeys({ rows: 1 });
+        let activeNoteA = {};
+        let activeNoteB = {};
 
-        keyboard.down((key) => {
-            playSynth(key);
-        });
-
-        const playSynth = (key) => {
-            const clickedKey = document.querySelector(`[data-key="${String.fromCharCode(key.keyCode).toLowerCase()}"]`);
-            clickedKey.classList.add("active");
-            setTimeout(() => {
-                clickedKey.classList.remove("active");
-            }, 150);
-            synth.triggerAttackRelease(key.frequency, "8n");
+        const startOSC = (key) => {
+            if (oscA.onOff) {
+                let oscTEMP = new Tone.Oscillator(key.frequency, oscA.oscillator.type).toDestination();
+                oscTEMP.start();
+                activeNoteA[key.note] = oscTEMP;
+            }
+            if (oscB.onOff) {
+                let oscTEMP = new Tone.Oscillator(key.frequency, oscB.oscillator.type).toDestination();
+                oscTEMP.start();
+                activeNoteB[key.note] = oscTEMP;
+            }
         };
 
 
+        const stopOSC = (key) => {
+            if(activeNoteA){
+                activeNoteA[key.note].stop();
+                delete activeNoteA[key.note];
+            }
+            if(activeNoteB){
+                activeNoteB[key.note].stop();
+                delete activeNoteB[key.note];
+            }
+        }
 
+        const keyboard = new AudioKeys({ rows: 1});
+
+        keyboard.down(async (key) => {
+            await Tone.start();
+            playSynth(key);
+        });
+        keyboard.up((key) => {
+            stopSynth(key);
+        });
+
+        //piano pressed visual + sound
+        const playSynth = (key) => {
+            const clickedKey = document.querySelector(`[data-key="${String.fromCharCode(key.keyCode).toLowerCase()}"]`);
+            clickedKey.classList.add("active");
+            console.log(key);
+            startOSC(key);
+        };
+
+        const stopSynth = (key) => {
+            const clickedKey = document.querySelector(`[data-key="${String.fromCharCode(key.keyCode).toLowerCase()}"]`);
+            clickedKey.classList.remove("active");
+            stopOSC(key);
+        };
 
 
         //---------------piano visual-------------------
@@ -335,8 +372,10 @@
         //piano pressed effect - click
         pianoKeys.forEach(key => {
             allKeys.push(key.dataset.key);
-            key.addEventListener("click", () => {
+            key.addEventListener("mousedown", () => {
                 keyboard._addKey({ keyCode: key.dataset.key.toUpperCase().charCodeAt(0) });
+            });
+            key.addEventListener("mouseup", () => {
                 keyboard._removeKey({ keyCode: key.dataset.key.toUpperCase().charCodeAt(0) });
             });
         });
