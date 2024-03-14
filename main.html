@@ -11,7 +11,7 @@
 </head>
 
 <body>
-    <div class="body-outer">
+    <div class="body-outer" id="app">
         <div class="separator top-body">
             <div class="body-inner logo">
 
@@ -23,7 +23,7 @@
 
             </div>
         </div>
-        <div class="separator mid-body" id="app">
+        <div class="separator mid-body">
             <div class="mid-extra">
                 <div class="body-inner" id="ocs-sub">
                     <div class="title">
@@ -49,32 +49,33 @@
                 </div>
 
                 <div class="knobs-row" @mouseUp="unselectKnobs">
-                    <div class="rela-inline knob">
+                    <div v-for="knob in knobs.filter(function (i) { return i.id === 10 })" class="rela-inline knob">
                         <div class="knob-active-light"
-                            :style="{'background-color': knobs[0].active?knobs[0].color:'#888'}"
-                            @click="knobs[0].active = !knobs[0].active"></div>
+                            :style="{'background-color': knob.active?knob.color:'#888'}"
+                            @click="knob.active = !knob.active"></div>
 
-                        <div class="rela-block" :style="{'color':knobs[0].active?knobs[0].color:'#888'}">
+                        <div class="rela-block" :style="{'color':knob.active?knob.color:'#888'}">
                             <div class="knob-updown-body">
                                 <div class="knob-updown-text"
-                                    @mouseDown="knobs[0].selected = true; app.currentY = event.pageY; event.preventDefault()">
-                                    {{knobs[0].value.cur}}</div>
+                                    @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
+                                    {{knob.value.cur}}</div>
                                 <div class="knob-updown-button-body">
-                                    <div class="knob-updown-button" @click="updownCounter(knobs[0].value, 1);">
+                                    <div class="knob-updown-button" @click="updownCounter(knob.value, 1);">
                                         <div style="transform: translateY(-4px);">▲</div>
                                     </div>
-                                    <div class="knob-updown-button" @click="updownCounter(knobs[0].value, -1);">
+                                    <div class="knob-updown-button" @click="updownCounter(knob.value, -1);">
                                         <div style="transform: translateY(-3px);">▼</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="rela-block knob-label" :style="{'color':knobs[0].active?'#E4E8EA':'#888'}">
-                            {{knobs[0].label}}</div>
+                        <div class="rela-block knob-label" :style="{'color':knob.active?'#E4E8EA':'#888'}">
+                            {{knob.label}}</div>
                     </div>
 
-                    <div v-for="knob in knobs.filter(function (i) { return i.knobType === 'circle' && i.osc == 'A'; })" class="rela-inline knob style3">
+                    <div v-for="knob in knobs.filter(function (i) { return i.knobType === 'circle' && i.osc == 'A'; })"
+                        class="rela-inline knob style3">
                         <div class="knob-active-light" :style="{'background-color': knob.active?knob.color:'#888'}"
                             @click="knob.active = !knob.active"></div>
 
@@ -142,7 +143,7 @@
 
                     </div>
 
-                    <div v-for="knob in knobs.filter(function (i) { return i.knobType === 'circle' && i.osc === 'A'; })"
+                    <div v-for="knob in knobs.filter(function (i) { return i.knobType === 'circle' && i.osc === 'B'; })"
                         class="rela-inline knob style3">
                         <div class="knob-active-light" :style="{'background-color': knob.active?knob.color:'#888'}"
                             @click="knob.active = !knob.active"></div>
@@ -229,6 +230,9 @@
     <script src="https://cdn.jsdelivr.net/npm/audiokeys@0.1.1/dist/audiokeys.min.js"></script>
 
 
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.1.10/vue.min.js'></script>
+    <script src="src/js/knob.js"></script>
+
     <script>
 
         //-------------------#add wavetable images #images #wavetable------------------
@@ -305,7 +309,6 @@
                 img.style.margin = '1px';
                 img.src = `src/images/${img.alt}-wave-off.png`;
                 img.setAttribute('data-onoff', false);
-
             });
 
             selectedImg.style.margin = '0px';
@@ -432,8 +435,6 @@
 
     </script>
 
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.1.10/vue.min.js'></script>
-    <script src="src/js/knob.js"></script>
 
 </body>
 

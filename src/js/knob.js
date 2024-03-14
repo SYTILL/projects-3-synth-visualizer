@@ -37,8 +37,6 @@ let app = new Vue({
                     active: true, selected: false,
                 },
 
-
-
                 {
                     label: 'Unison', id: 10,
                     osc: "A", knobType: "updown",
