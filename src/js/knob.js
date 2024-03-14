@@ -4,30 +4,39 @@ let app = new Vue({
         knobs: [
             {
                 id: 0,
-                label: 'Test Knob',
+                label: 'Unison',
                 rotation: -132,
-                color: '#FA9C34',
+                color: '#0060df',
                 active: true,
                 selected: false,
-                style: 1
+                style: 3
+            },
+            {
+                id: 0,
+                label: 'Detune',
+                rotation: -132,
+                color: '#0060df',
+                active: true,
+                selected: false,
+                style: 3
             },
             {
                 id: 2,
-                label: 'Test Knob 3',
+                label: 'Belend',
                 rotation: -132,
-                color: '#ED31A2',
+                color: '#0060df',
                 active: true,
                 selected: false,
                 style: 3
             },
             {
                 id: 4,
-                label: 'Test Knob 5',
+                label: 'Pitch',
                 rotation: -132,
-                color: '#23CDE8',
+                color: '#0060df',
                 active: true,
                 selected: false,
-                style: 2
+                style: 3
             }, 
         ],
         currentY: 0,
@@ -52,6 +61,15 @@ let app = new Vue({
         unselectKnobs: function() {
             for(var i in this.knobs) { this.knobs[i].selected = false; }
         }
-    }
+    },
+    mounted() {
+        // Bind mousemove and mouseup events to the window
+        window.addEventListener('mousemove', this.mousemoveFunction);
+        window.addEventListener('mouseup', this.unselectKnobs);
+    },
+    beforeDestroy() {
+        // Unbind mousemove and mouseup events when the component is destroyed
+        window.removeEventListener('mousemove', this.mousemoveFunction);
+        window.removeEventListener('mouseup', this.unselectKnobs);
+    },
 });
-window.addEventListener('mousemove', app.mousemoveFunction);

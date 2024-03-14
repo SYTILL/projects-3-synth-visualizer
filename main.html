@@ -63,30 +63,29 @@
                     <canvas class="wavetable" id="wavetable-canvas-B"></canvas>
                     <div class="wavetable-selection" id="wavetable-selection-B"></div>
                 </div>
-                <div class="knobs-row">
 
-                    <div id="app" @mouseUp="unselectKnobs">
-                        <div class="page-container">
-                            <div class="rela-block container">
-                    
-                                <div v-for="knob in knobs" :class="['rela-inline', 'knob', 'style'+knob.style]">
-                                    <div class="knob-active-light" :style="{'background-color': knob.active?knob.color:'#888'}" @click="knob.active = !knob.active"></div>
-                                    <div class="rela-block knob-dial" :style="{'color':knob.active?knob.color:'#888'}">
-                                        <div class="abs-center dial-grip" :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}" 
-                                             @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()"></div>
-                                        <svg class="dial-svg" viewBox="0 0 100 100">
-                                            <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C"/>
-                                            <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" :stroke="knob.active?knob.color:'#888'" 
-                                                  :style="{'stroke-dashoffset':184 - 184*((knob.rotation*1 + 132)/264)}"/>
-                                        </svg>
-                                    </div>
-                                    <div class="rela-block knob-label" :style="{'color':knob.active?'#E4E8EA':'#888'}">{{knob.label}}</div>
-                                </div>
-                                
+                <div class="knobs-row" id="app" @mouseUp="unselectKnobs">
+                    <div v-for="knob in knobs" :class="['rela-inline', 'knob', 'style'+knob.style]">
+                        <div class="knob-active-light" :style="{'background-color': knob.active?knob.color:'#888'}"
+                            @click="knob.active = !knob.active"></div>
+
+                        <div class="rela-block knob-dial" :style="{'color':knob.active?knob.color:'#888'}">
+                            <div class="abs-center dial-grip"
+                                :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
+                                @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
                             </div>
+                            <svg class="dial-svg" viewBox="0 0 100 100">
+                                <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
+                                <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" :stroke="knob.active?knob.color:'#888'"
+                                    :style="{'stroke-dashoffset':184 - 184*((knob.rotation*1 + 132)/264)}" />
+                            </svg>
                         </div>
-                    </div>
 
+                        <div class="rela-block knob-label" :style="{'color':knob.active?'#E4E8EA':'#888'}">
+                            {{knob.label}}</div>
+                            
+                        <div class="knob-hover-text" v-if="knob.selected">{{knob.rotation}}</div>
+                    </div>
                 </div>
                 <div class="knobs-row">
                     <div v-for="knob in knobs"></div>
@@ -174,11 +173,12 @@
             canvas = oscBody.canvas;
             ctx = canvas.getContext('2d');
 
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#535559';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             const waveform = await oscillator.asArray(1024);
 
-            ctx.strokeStyle = 'blue';
+            ctx.strokeStyle = 'red';
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(0, canvas.height / 2);
