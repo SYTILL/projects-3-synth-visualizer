@@ -38,10 +38,11 @@
                     </div>
                 </div>
             </div>
+
             <div class="body-inner" id="osc-main" data-id="A">
                 <div class="title">
-                    <input class="title-checkbox" type="checkbox" checked>
-                    <span class="title-text">OCS A</span>
+                    <input class="title-checkbox" id="checkbox-osc-A" type="checkbox" checked>
+                    <span class="title-text">OSC A</span>
                 </div>
                 <div class="wavetable-body">
                     <canvas class="wavetable" id="wavetable-canvas-A"></canvas>
@@ -49,33 +50,32 @@
                 </div>
 
                 <div class="knobs-row" @mouseUp="unselectKnobs">
-                    <div v-for="knob in knobs.filter(function (i) { return i.id === 10 })" class="rela-inline knob">
+                    <div class="rela-inline knob">
                         <div class="knob-active-light"
-                            :style="{'background-color': knob.active?knob.color:'#888'}"
-                            @click="knob.active = !knob.active"></div>
+                            :style="{'background-color': knobs[10].active?knobs[10].color:'#888'}"
+                            @click="knobs[10].active = !knobs[10].active"></div>
 
-                        <div class="rela-block" :style="{'color':knob.active?knob.color:'#888'}">
+                        <div class="rela-block" :style="{'color':knobs[10].active?knobs[10].color:'#888'}">
                             <div class="knob-updown-body">
                                 <div class="knob-updown-text"
-                                    @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
-                                    {{knob.value.cur}}</div>
+                                    @mouseDown="knobs[10].selected = true; app.currentY = event.pageY; event.preventDefault()">
+                                    {{knobs[10].value.cur}}</div>
                                 <div class="knob-updown-button-body">
-                                    <div class="knob-updown-button" @click="updownCounter(knob.value, 1);">
+                                    <div class="knob-updown-button" @click="updownCounter(knobs[10].value, 1);">
                                         <div style="transform: translateY(-4px);">▲</div>
                                     </div>
-                                    <div class="knob-updown-button" @click="updownCounter(knob.value, -1);">
+                                    <div class="knob-updown-button" @click="updownCounter(knobs[10].value, -1);">
                                         <div style="transform: translateY(-3px);">▼</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="rela-block knob-label" :style="{'color':knob.active?'#E4E8EA':'#888'}">
-                            {{knob.label}}</div>
+                        <div class="rela-block knob-label" :style="{'color':knobs[10].active?'#E4E8EA':'#888'}">
+                            {{knobs[10].label}}</div>
                     </div>
 
-                    <div v-for="knob in knobs.filter(function (i) { return i.knobType === 'circle' && i.osc == 'A'; })"
-                        class="rela-inline knob style3">
+                    <div v-for="knob in [knobs[1],knobs[2],knobs[3]]" class="rela-inline knob style3">
                         <div class="knob-active-light" :style="{'background-color': knob.active?knob.color:'#888'}"
                             @click="knob.active = !knob.active"></div>
 
@@ -107,8 +107,8 @@
 
             <div class="body-inner" id="osc-main" data-id="B">
                 <div class="title">
-                    <input class="title-checkbox" type="checkbox" checked>
-                    <span class="title-text">OCS B</span>
+                    <input class="title-checkbox" id="checkbox-osc-B" type="checkbox" checked>
+                    <span class="title-text">OSC B</span>
                 </div>
                 <div class="wavetable-body">
                     <canvas class="wavetable" id="wavetable-canvas-B"></canvas>
@@ -143,8 +143,7 @@
 
                     </div>
 
-                    <div v-for="knob in knobs.filter(function (i) { return i.knobType === 'circle' && i.osc === 'B'; })"
-                        class="rela-inline knob style3">
+                    <div v-for="knob in [knobs[11],knobs[12],knobs[13]]" class="rela-inline knob style3">
                         <div class="knob-active-light" :style="{'background-color': knob.active?knob.color:'#888'}"
                             @click="knob.active = !knob.active"></div>
 
@@ -167,7 +166,27 @@
                     </div>
                 </div>
                 <div class="knobs-row">
-                    <div v-for="knob in knobs"></div>
+                    <div v-for="knob in [knobs[4]]" class="rela-inline knob style3">
+                        <div class="knob-active-light" :style="{'background-color': knob.active?knob.color:'#888'}"
+                            @click="knob.active = !knob.active"></div>
+
+                        <div class="rela-block knob-dial" :style="{'color':knob.active?knob.color:'#888'}">
+                            <div class="abs-center dial-grip"
+                                :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
+                                @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
+                            </div>
+                            <svg class="dial-svg" viewBox="0 0 100 100">
+                                <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
+                                <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" :stroke="knob.active?knob.color:'#888'"
+                                    :style="{'stroke-dashoffset':184 - 184*((knob.rotation*1 + 132)/264)}" />
+                            </svg>
+                        </div>
+
+                        <div class="rela-block knob-label" :style="{'color':knob.active?'#E4E8EA':'#888'}">
+                            {{knob.label}}</div>
+
+                        <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
+                    </div>
                 </div>
             </div>
             <div class="body-inner filter-body">
@@ -239,16 +258,22 @@
 
         const waveTablesTypes = ['sine', 'triangle', 'sawtooth', 'square'];
 
-        const createOSC = (selectionBody, canvasBody) => {
+        const createOSC = (checkBox, selectionBody, canvasBody) => {
             return {
                 onOff: true,
+                checkBox: document.getElementById(checkBox),
                 body: document.getElementById(selectionBody),
-                oscillator: new Tone.Oscillator(440, "sine").toDestination(),
+                oscillator: new Tone.Oscillator({
+                    type: "sine",
+                    frequency: 440
+                }).toDestination(),
                 canvas: document.getElementById(canvasBody),
             };
         };
-        oscA = createOSC('wavetable-selection-A', 'wavetable-canvas-A');
-        oscB = createOSC('wavetable-selection-B', 'wavetable-canvas-B');
+        oscA = createOSC('checkbox-osc-A','wavetable-selection-A', 'wavetable-canvas-A');
+        oscB = createOSC('checkbox-osc-B','wavetable-selection-B', 'wavetable-canvas-B');
+
+
 
 
 
@@ -362,26 +387,29 @@
         let activeNoteB = {};
 
         const startOSC = (key) => {
-            if (oscA.onOff) {
+            if (oscA.checkBox.checked) {
                 let oscTEMP = new Tone.Oscillator(key.frequency, oscA.oscillator.type).toDestination();
                 oscTEMP.start();
                 activeNoteA[key.note] = oscTEMP;
             }
-            if (oscB.onOff) {
+            if (oscB.checkBox.checked) {
                 let oscTEMP = new Tone.Oscillator(key.frequency, oscB.oscillator.type).toDestination();
+                oscTEMP.volume.value = 40 * Math.log10((app.knobs[4].value.cur + 80)/160);
+                
                 oscTEMP.start();
                 activeNoteB[key.note] = oscTEMP;
             }
         };
 
 
-        const stopOSC = (key) => {
-            if (activeNoteA) {
-                activeNoteA[key.note].stop();
+        const stopOSC = async (key) => {
+            if (Object.keys(activeNoteA).length != 0) {
+                console.log(activeNoteA);
+                await activeNoteA[key.note].stop();
                 delete activeNoteA[key.note];
             }
-            if (activeNoteB) {
-                activeNoteB[key.note].stop();
+            if (Object.keys(activeNoteB).length != 0) {
+                await activeNoteB[key.note].stop();
                 delete activeNoteB[key.note];
             }
         }
@@ -390,17 +418,17 @@
 
         keyboard.down(async (key) => {
             await Tone.start();
-            playSynth(key);
+            await playSynth(key);
         });
-        keyboard.up((key) => {
-            stopSynth(key);
+
+        keyboard.up(async (key) => {
+            await stopSynth(key);
         });
 
         //piano pressed visual + sound
         const playSynth = (key) => {
             const clickedKey = document.querySelector(`[data-key="${String.fromCharCode(key.keyCode).toLowerCase()}"]`);
             clickedKey.classList.add("active");
-            console.log(key);
             startOSC(key);
         };
 

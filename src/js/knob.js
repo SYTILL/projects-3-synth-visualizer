@@ -2,80 +2,89 @@ let app = new Vue({
     el: '#app',
     data: {
         knobs:
-            [
-                {
-                    label: 'Unison', id: 0,
-                    osc: "B", knobType: "updown",
+            {
+                0: {
+                    label: 'Unison',
+                    osc: "B", knobType: "updown", row: "upper",
                     value: { real: 1.0, cur: 1, low: 1, high: 16 },
                     color: '#0060df',
                     active: true,
                     selected: false,
                 },
-                {
-                    label: 'Detune', id: 1,
-                    osc: "B", knobType: "circle",
+                1: {
+                    label: 'Detune',
+                    osc: "B", knobType: "circle", row: "upper",
                     rotation: -132,
                     value: { cur: 2, low: 0, high: 48 },
                     color: '#0060df',
                     active: true,
                     selected: false,
                 },
-                {
-                    label: 'Blend', id: 2,
-                    osc: "B", knobType: "circle",
+                2: {
+                    label: 'Blend',
+                    osc: "B", knobType: "circle", row: "upper",
                     rotation: -132,
                     value: { cur: 1, low: 1, high: 16 },
                     color: '#0060df',
                     active: true, selected: false,
                 },
-                {
-                    label: 'Pitch', id: 3,
-                    osc: "B", knobType: "circle",
+                3: {
+                    label: 'Pitch',
+                    osc: "B", knobType: "circle", row: "upper",
                     rotation: -132,
                     value: { cur: 1, low: 1, high: 16 },
+                    color: '#0060df',
+                    active: true, selected: false,
+                },
+                4: {
+                    label: 'Volume',
+                    osc: "B", knobType: "circle", row: "lower",
+                    rotation: 0,
+                    value: { cur: 0, low: -80, high: 80 },
                     color: '#0060df',
                     active: true, selected: false,
                 },
 
-                {
-                    label: 'Unison', id: 10,
-                    osc: "A", knobType: "updown",
+                10: {
+                    label: 'Unison',
+                    osc: "A", knobType: "updown", row: "upper",
                     value: { real: 1.0, cur: 1, low: 1, high: 16 },
                     color: '#0060df',
                     active: true,
                     selected: false,
                 },
-                {
-                    label: 'Detune', id: 11,
-                    osc: "A", knobType: "circle",
+                11: {
+                    label: 'Detune',
+                    osc: "A", knobType: "circle", row: "upper",
                     rotation: -132,
                     value: { cur: 2, low: 0, high: 48 },
                     color: '#0060df',
                     active: true,
                     selected: false,
                 },
-                {
-                    label: 'Blend', id: 12,
-                    osc: "A", knobType: "circle",
+                12: {
+                    label: 'Blend',
+                    osc: "A", knobType: "circle", row: "upper",
                     rotation: -132,
                     value: { cur: 1, low: 1, high: 16 },
                     color: '#0060df',
                     active: true, selected: false,
                 },
-                {
-                    label: 'Pitch', id: 13,
-                    osc: "A", knobType: "circle",
+                13: {
+                    label: 'Pitch',
+                    osc: "A", knobType: "circle", row: "upper",
                     rotation: -132,
                     value: { cur: 1, low: 1, high: 16 },
                     color: '#0060df',
                     active: true, selected: false,
                 },
-            ],
+            },
         currentY: 0,
         mousemoveFunction: function (e) {
-            let selectedKnob = app.knobs.filter(function (i) { return i.selected === true; })[0];
+            let selectedKnob = Object.entries(app.knobs).filter(function (i) { return i[1].selected === true; })[0][1];
 
             if (selectedKnob) {
+                console.log(selectedKnob);
                 if (selectedKnob.knobType == "updown") {
                     app.updownCounter(selectedKnob.value, -(e.pageY - app.currentY) / 10);
                     app.currentY = e.pageY;
@@ -102,8 +111,6 @@ let app = new Vue({
                         selectedKnob.value.cur = selectedKnob.value.low;
                     }
                 }
-
-
             }
         },
         updownCounter: (value, amount) => {
