@@ -5,7 +5,7 @@ canvas {
 }
 
 * {
-    font-family: "Anta","sans-serif";
+    font-family: "Anta", "sans-serif";
     margin: 0;
     padding: 0;
 }
@@ -37,7 +37,7 @@ body {
 
 
 /* body seperators */
-.separator{
+.separator {
     display: flex;
 }
 
@@ -66,26 +66,26 @@ body {
 
 
 /* commmon components */
-.title{
+.title {
     display: flex;
     margin: 5px;
     align-items: center;
 }
 
-.title-text{
+.title-text {
     font-size: small;
     font-weight: bold;
     margin-left: 5px;
 }
 
-.title-checkbox{
+.title-checkbox {
     width: 12px;
     height: 12px;
     margin-left: 1px;
 }
 
 /* mid body */
-.mid-extra{
+.mid-extra {
     display: flex;
     flex-direction: column;
     flex: 0.4;
@@ -103,11 +103,11 @@ body {
     margin-bottom: 10px;
 }
 
-.filter-body{
+.filter-body {
     flex: 0.5;
 }
 
-.wavetable-body{
+.wavetable-body {
     flex: 1;
 
     display: flex;
@@ -115,7 +115,7 @@ body {
     width: 100%;
 }
 
-.wavetable-selection{
+.wavetable-selection {
     flex: 1;
     border: 1px solid rgb(0, 0, 0);
     margin-left: 10px;
@@ -126,8 +126,8 @@ body {
     flex-direction: column;
 }
 
-.wavetable-selection-presets{
-    flex:1;
+.wavetable-selection-presets {
+    flex: 1;
     max-width: 100%;
     margin: 1px;
     cursor: pointer;
@@ -143,17 +143,30 @@ body {
 }
 
 
-.knobs-row{
-    flex: 0.7;
+.knobs-row {
+    flex: 0.6;
     width: 100%;
-    border: 1px solid rgb(255, 3, 3);
+
+    display: flex;
+}
+
+.knob {
+    flex: 1;
+    min-width: 40px;
+    min-height: 40px;
+    border: 1px solid rgb(37, 21, 97);
+    margin: 3px 0px 3px 0px;
+}
+
+.knob-seperate{
+    margin-left: 5px;
 }
 
 
 
 
 /* top body */
-.logo{
+.logo {
     flex: 0;
     min-width: 160px;
 }
@@ -165,15 +178,15 @@ body {
 
 
 /* bot body */
-.ENV-body{
+.ENV-body {
     flex: 0.6;
 }
 
-.LFO-body{
+.LFO-body {
     flex: 0.7;
 }
 
-.bot-extra{
+.bot-extra {
     flex: 0.2;
 }
 
@@ -211,7 +224,7 @@ body {
 
 header .column {
     display: flex;
-    flex:1;
+    flex: 1;
     flex-direction: column;
     align-items: center;
 }
