@@ -66,23 +66,33 @@
 
                 <div class="knobs-row" id="app" @mouseUp="unselectKnobs">
                     <div class="rela-inline knob">
-                        <div class="knob-active-light" :style="{'background-color': knobs[0].active?knobs[0].color:'#888'}"
+                        <div class="knob-active-light"
+                            :style="{'background-color': knobs[0].active?knobs[0].color:'#888'}"
                             @click="knobs[0].active = !knobs[0].active"></div>
 
                         <div class="rela-block" :style="{'color':knobs[0].active?knobs[0].color:'#888'}"
                             @mouseDown="knobs[0].selected = true; app.currentY = event.pageY; event.preventDefault()">
-                            <div class="knob-updown-bar">
-
+                            <div class="knob-updown-body">
+                                <div class="knob-updown-text">{{knobs[0].value.cur}}</div>
+                                <div class="knob-updown-button-body">
+                                    <div class="knob-updown-button">
+                                        <div style="transform: translateY(-4px);">▲</div>
+                                    </div>
+                                    <div class="knob-updown-button">
+                                        <div style="transform: translateY(-3px);">▼</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <div class="rela-block knob-label" :style="{'color':knobs[0].active?'#E4E8EA':'#888'}">
                             {{knobs[0].label}}</div>
 
-                        <div class="knob-hover-text" v-if="knobs[0].selected">{{knobs[0].value.cur}}</div>
+
                     </div>
 
-                    <div v-for="knob in knobs.filter(function (i) { return i.knobType === 'circle'; })" class="rela-inline knob style3">
+                    <div v-for="knob in knobs.filter(function (i) { return i.knobType === 'circle'; })"
+                        class="rela-inline knob style3">
                         <div class="knob-active-light" :style="{'background-color': knob.active?knob.color:'#888'}"
                             @click="knob.active = !knob.active"></div>
 
@@ -185,6 +195,13 @@
         oscB = createOSC('wavetable-selection-B', 'wavetable-canvas-B');
 
         //------------#draw #canvas ----------------------------
+        const drawLine = (ctx, x1, y1, x2, y2) => {
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+        }
+
         async function drawWaveform(oscBody) {
             oscillator = oscBody.oscillator;
             canvas = oscBody.canvas;
@@ -196,35 +213,20 @@
             // Set grid spacing and line color
             const gridLines = { x: 4, y: 4 };
             const gridColor = 'white';
+
             ctx.lineWidth = 1;
+            ctx.strokeStyle = gridColor;
 
-            // Draw horizontal grid lines
             for (let y = 0; y <= canvas.height; y += canvas.height / gridLines.x) {
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(canvas.width, y);
-                ctx.strokeStyle = gridColor;
-                ctx.stroke();
+                drawLine(ctx, 0, y, canvas.width, y); //horizontal grid lines
             }
-
-            // Draw vertical grid lines
             for (let x = 0; x <= canvas.width; x += canvas.width / gridLines.y) {
-                ctx.beginPath();
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, canvas.height);
-                ctx.strokeStyle = gridColor;
-                ctx.stroke();
+                drawLine(ctx, x, 0, x, canvas.height); //vertical grid lines
             }
 
             // Draw bold X axis
-            ctx.beginPath();
-            ctx.moveTo(0, canvas.height / 2);
-            ctx.lineTo(canvas.width, canvas.height / 2);
             ctx.lineWidth = 2;
-            ctx.stroke();
-
-
-
+            drawLine(ctx, 0, canvas.height / 2, canvas.width, canvas.height / 2);
 
             const waveform = await oscillator.asArray(1024);
 
