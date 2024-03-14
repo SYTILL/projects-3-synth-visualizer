@@ -78,13 +78,21 @@ let app = new Vue({
                     color: '#0060df',
                     active: true, selected: false,
                 },
+                14: {
+                    label: 'Volume',
+                    osc: "A", knobType: "circle", row: "lower",
+                    rotation: 0,
+                    value: { cur: 0, low: -80, high: 80 },
+                    color: '#0060df',
+                    active: true, selected: false,
+                },
             },
         currentY: 0,
         mousemoveFunction: function (e) {
-            let selectedKnob = Object.entries(app.knobs).filter(function (i) { return i[1].selected === true; })[0][1];
-
-            if (selectedKnob) {
-                console.log(selectedKnob);
+            let selectedKnob = Object.entries(app.knobs).filter(function (i) { return i[1].selected === true; });
+            
+            if (selectedKnob.length > 0) {
+                selectedKnob = selectedKnob[0][1];
                 if (selectedKnob.knobType == "updown") {
                     app.updownCounter(selectedKnob.value, -(e.pageY - app.currentY) / 10);
                     app.currentY = e.pageY;
