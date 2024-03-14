@@ -4,67 +4,73 @@ let app = new Vue({
         knobs:
             [
                 {
-                    id: 0,
-                    ocs: "B",
-                    knobType: "updown",
-                    label: 'Unison',
-                    value: {
-                        real: 1.0,
-                        cur: 1,
-                        low: 1,
-                        high: 16
-                    },
+                    label: 'Unison', id: 0,
+                    osc: "B", knobType: "updown",
+                    value: { real: 1.0, cur: 1, low: 1, high: 16 },
                     color: '#0060df',
                     active: true,
                     selected: false,
                 },
                 {
-                    id: 1,
-                    ocs: "B",
-                    knobType: "circle",
-                    label: 'Detune',
+                    label: 'Detune', id: 1,
+                    osc: "B", knobType: "circle",
                     rotation: -132,
-                    value: {
-                        real: 1.0,
-                        cur: 1,
-                        low: 1,
-                        high: 16
-                    },
+                    value: { cur: 2, low: 0, high: 48 },
                     color: '#0060df',
                     active: true,
                     selected: false,
                 },
                 {
-                    id: 2,
-                    ocs: "B",
-                    knobType: "circle",
-                    label: 'Blend',
+                    label: 'Blend', id: 2,
+                    osc: "B", knobType: "circle",
                     rotation: -132,
-                    value: {
-                        real: 1.0,
-                        cur: 1,
-                        low: 1,
-                        high: 16
-                    },
+                    value: { cur: 1, low: 1, high: 16 },
+                    color: '#0060df',
+                    active: true, selected: false,
+                },
+                {
+                    label: 'Pitch', id: 3,
+                    osc: "B", knobType: "circle",
+                    rotation: -132,
+                    value: { cur: 1, low: 1, high: 16 },
+                    color: '#0060df',
+                    active: true, selected: false,
+                },
+
+
+
+                {
+                    label: 'Unison', id: 10,
+                    osc: "A", knobType: "updown",
+                    value: { real: 1.0, cur: 1, low: 1, high: 16 },
                     color: '#0060df',
                     active: true,
                     selected: false,
                 },
                 {
-                    id: 3,
-                    ocs: "B",
-                    knobType: "circle",
-                    label: 'Pitch',
+                    label: 'Detune', id: 11,
+                    osc: "A", knobType: "circle",
                     rotation: -132,
-                    value: {
-                        real: 1.0,
-                        cur: 1,
-                        low: 1,
-                        high: 16
-                    },
+                    value: { cur: 2, low: 0, high: 48 },
                     color: '#0060df',
                     active: true,
                     selected: false,
+                },
+                {
+                    label: 'Blend', id: 12,
+                    osc: "A", knobType: "circle",
+                    rotation: -132,
+                    value: { cur: 1, low: 1, high: 16 },
+                    color: '#0060df',
+                    active: true, selected: false,
+                },
+                {
+                    label: 'Pitch', id: 13,
+                    osc: "A", knobType: "circle",
+                    rotation: -132,
+                    value: { cur: 1, low: 1, high: 16 },
+                    color: '#0060df',
+                    active: true, selected: false,
                 },
             ],
         currentY: 0,

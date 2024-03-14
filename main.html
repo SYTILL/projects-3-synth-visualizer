@@ -23,7 +23,7 @@
 
             </div>
         </div>
-        <div class="separator mid-body">
+        <div class="separator mid-body" id="app">
             <div class="mid-extra">
                 <div class="body-inner" id="ocs-sub">
                     <div class="title">
@@ -47,13 +47,63 @@
                     <canvas class="wavetable" id="wavetable-canvas-A"></canvas>
                     <div class="wavetable-selection" id="wavetable-selection-A"></div>
                 </div>
-                <div class="knobs-row">
 
+                <div class="knobs-row" @mouseUp="unselectKnobs">
+                    <div class="rela-inline knob">
+                        <div class="knob-active-light"
+                            :style="{'background-color': knobs[0].active?knobs[0].color:'#888'}"
+                            @click="knobs[0].active = !knobs[0].active"></div>
+
+                        <div class="rela-block" :style="{'color':knobs[0].active?knobs[0].color:'#888'}">
+                            <div class="knob-updown-body">
+                                <div class="knob-updown-text"
+                                    @mouseDown="knobs[0].selected = true; app.currentY = event.pageY; event.preventDefault()">
+                                    {{knobs[0].value.cur}}</div>
+                                <div class="knob-updown-button-body">
+                                    <div class="knob-updown-button" @click="updownCounter(knobs[0].value, 1);">
+                                        <div style="transform: translateY(-4px);">▲</div>
+                                    </div>
+                                    <div class="knob-updown-button" @click="updownCounter(knobs[0].value, -1);">
+                                        <div style="transform: translateY(-3px);">▼</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rela-block knob-label" :style="{'color':knobs[0].active?'#E4E8EA':'#888'}">
+                            {{knobs[0].label}}</div>
+                    </div>
+
+                    <div v-for="knob in knobs.filter(function (i) { return i.knobType === 'circle' && i.osc == 'A'; })" class="rela-inline knob style3">
+                        <div class="knob-active-light" :style="{'background-color': knob.active?knob.color:'#888'}"
+                            @click="knob.active = !knob.active"></div>
+
+                        <div class="rela-block knob-dial" :style="{'color':knob.active?knob.color:'#888'}">
+                            <div class="abs-center dial-grip"
+                                :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
+                                @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
+                            </div>
+                            <svg class="dial-svg" viewBox="0 0 100 100">
+                                <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
+                                <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" :stroke="knob.active?knob.color:'#888'"
+                                    :style="{'stroke-dashoffset':184 - 184*((knob.rotation*1 + 132)/264)}" />
+                            </svg>
+                        </div>
+
+                        <div class="rela-block knob-label" :style="{'color':knob.active?'#E4E8EA':'#888'}">
+                            {{knob.label}}</div>
+
+                        <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
+                    </div>
                 </div>
                 <div class="knobs-row">
-
+                    <div v-for="knob in knobs"></div>
                 </div>
             </div>
+
+
+
+
             <div class="body-inner" id="osc-main" data-id="B">
                 <div class="title">
                     <input class="title-checkbox" type="checkbox" checked>
@@ -64,7 +114,7 @@
                     <div class="wavetable-selection" id="wavetable-selection-B"></div>
                 </div>
 
-                <div class="knobs-row" id="app" @mouseUp="unselectKnobs">
+                <div class="knobs-row" @mouseUp="unselectKnobs">
                     <div class="rela-inline knob">
                         <div class="knob-active-light"
                             :style="{'background-color': knobs[0].active?knobs[0].color:'#888'}"
@@ -92,7 +142,7 @@
 
                     </div>
 
-                    <div v-for="knob in knobs.filter(function (i) { return i.knobType === 'circle'; })"
+                    <div v-for="knob in knobs.filter(function (i) { return i.knobType === 'circle' && i.osc === 'A'; })"
                         class="rela-inline knob style3">
                         <div class="knob-active-light" :style="{'background-color': knob.active?knob.color:'#888'}"
                             @click="knob.active = !knob.active"></div>
@@ -323,17 +373,17 @@
 
 
         const stopOSC = (key) => {
-            if(activeNoteA){
+            if (activeNoteA) {
                 activeNoteA[key.note].stop();
                 delete activeNoteA[key.note];
             }
-            if(activeNoteB){
+            if (activeNoteB) {
                 activeNoteB[key.note].stop();
                 delete activeNoteB[key.note];
             }
         }
 
-        const keyboard = new AudioKeys({ rows: 1});
+        const keyboard = new AudioKeys({ rows: 1 });
 
         keyboard.down(async (key) => {
             await Tone.start();
