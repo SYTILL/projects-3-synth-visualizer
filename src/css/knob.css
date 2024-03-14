@@ -23,6 +23,8 @@
 .rela-block {
   flex: 1;
   position: relative;
+
+  display: flex;
 }
 
 .rela-inline {
@@ -30,6 +32,7 @@
   height: 60px;
   display: flex;
   flex-direction: column;
+  align-items: center;
   position: relative;
   margin-top: auto;
   margin-bottom: auto;
@@ -154,7 +157,6 @@
           user-select: none;
 }
 
-
 .knob-hover-text{
   position: absolute;
   color: white;
@@ -163,4 +165,15 @@
   top: 40%;
   transform: translate(-50%, -50%);
   z-index: 5;
+}
+
+.knob-updown-bar{
+  background: #535559;
+  border: 1px solid white;
+  border-radius: 3px;
+  margin-top: auto;
+  margin-bottom: auto;
+  width: 46px;
+  height: 26px;
+  z-index: 3;
 }

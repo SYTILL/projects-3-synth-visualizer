@@ -65,7 +65,24 @@
                 </div>
 
                 <div class="knobs-row" id="app" @mouseUp="unselectKnobs">
-                    <div v-for="knob in knobs" :class="['rela-inline', 'knob', 'style'+knob.style]">
+                    <div class="rela-inline knob">
+                        <div class="knob-active-light" :style="{'background-color': knobs[0].active?knobs[0].color:'#888'}"
+                            @click="knobs[0].active = !knobs[0].active"></div>
+
+                        <div class="rela-block" :style="{'color':knobs[0].active?knobs[0].color:'#888'}"
+                            @mouseDown="knobs[0].selected = true; app.currentY = event.pageY; event.preventDefault()">
+                            <div class="knob-updown-bar">
+
+                            </div>
+                        </div>
+
+                        <div class="rela-block knob-label" :style="{'color':knobs[0].active?'#E4E8EA':'#888'}">
+                            {{knobs[0].label}}</div>
+
+                        <div class="knob-hover-text" v-if="knobs[0].selected">{{knobs[0].value.cur}}</div>
+                    </div>
+
+                    <div v-for="knob in knobs.filter(function (i) { return i.knobType === 'circle'; })" class="rela-inline knob style3">
                         <div class="knob-active-light" :style="{'background-color': knob.active?knob.color:'#888'}"
                             @click="knob.active = !knob.active"></div>
 
@@ -83,7 +100,7 @@
 
                         <div class="rela-block knob-label" :style="{'color':knob.active?'#E4E8EA':'#888'}">
                             {{knob.label}}</div>
-                            
+
                         <div class="knob-hover-text" v-if="knob.selected">{{knob.rotation}}</div>
                     </div>
                 </div>
@@ -176,10 +193,43 @@
             ctx.fillStyle = '#535559';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+            // Set grid spacing and line color
+            const gridLines = { x: 4, y: 4 };
+            const gridColor = 'white';
+            ctx.lineWidth = 1;
+
+            // Draw horizontal grid lines
+            for (let y = 0; y <= canvas.height; y += canvas.height / gridLines.x) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.strokeStyle = gridColor;
+                ctx.stroke();
+            }
+
+            // Draw vertical grid lines
+            for (let x = 0; x <= canvas.width; x += canvas.width / gridLines.y) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.strokeStyle = gridColor;
+                ctx.stroke();
+            }
+
+            // Draw bold X axis
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height / 2);
+            ctx.lineTo(canvas.width, canvas.height / 2);
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+
+
+
             const waveform = await oscillator.asArray(1024);
 
             ctx.strokeStyle = 'red';
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 5;
             ctx.beginPath();
             ctx.moveTo(0, canvas.height / 2);
             for (let i = 0; i < waveform.length; i++) {

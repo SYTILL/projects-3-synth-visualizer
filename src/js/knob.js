@@ -1,65 +1,74 @@
 let app = new Vue({
     el: '#app',
     data: {
-        knobs: [
-            {
-                id: 0,
-                label: 'Unison',
-                rotation: -132,
-                color: '#0060df',
-                active: true,
-                selected: false,
-                style: 3
-            },
-            {
-                id: 0,
-                label: 'Detune',
-                rotation: -132,
-                color: '#0060df',
-                active: true,
-                selected: false,
-                style: 3
-            },
-            {
-                id: 2,
-                label: 'Belend',
-                rotation: -132,
-                color: '#0060df',
-                active: true,
-                selected: false,
-                style: 3
-            },
-            {
-                id: 4,
-                label: 'Pitch',
-                rotation: -132,
-                color: '#0060df',
-                active: true,
-                selected: false,
-                style: 3
-            }, 
-        ],
+        knobs:
+            [
+                {
+                    id: 0,
+                    ocs: "B",
+                    knobType: "updown",
+                    label: 'Unison',
+                    value: {
+                        cur: 1,
+                        low: 1,
+                        high: 16
+                    },
+                    color: '#0060df',
+                    active: true,
+                    selected: false,
+                },
+                {
+                    id: 1,
+                    ocs: "B",
+                    knobType: "circle",
+                    label: 'Detune',
+                    rotation: -132,
+                    color: '#0060df',
+                    active: true,
+                    selected: false,
+                },
+                {
+                    id: 2,
+                    ocs: "B",
+                    knobType: "circle",
+                    label: 'Blend',
+                    rotation: -132,
+                    color: '#0060df',
+                    active: true,
+                    selected: false,
+                },
+                {
+                    id: 3,
+                    ocs: "B",
+                    knobType: "circle",
+                    label: 'Pitch',
+                    rotation: -132,
+                    color: '#0060df',
+                    active: true,
+                    selected: false,
+                },
+            ],
         currentY: 0,
-        mousemoveFunction: function(e) {
-            let selectedKnob = app.knobs.filter(function(i){return i.selected === true;})[0];
-            
-            if(selectedKnob) {
+        mousemoveFunction: function (e) {
+            let selectedKnob = app.knobs.filter(function (i) { return i.selected === true; })[0];
+
+            if (selectedKnob) {
                 // Knob Rotation
-                if(e.pageY - app.currentY !== 0) { selectedKnob.rotation -= (e.pageY - app.currentY); }
+                if (e.pageY - app.currentY !== 0) { selectedKnob.rotation -= (e.pageY - app.currentY); }
                 app.currentY = e.pageY;
-                
+
                 // Setting Max rotation
-                if(selectedKnob.rotation >= 132) { selectedKnob.rotation = 132; } 
-                else if(selectedKnob.rotation <= -132) { selectedKnob.rotation = -132; }
-                
+                if (selectedKnob.rotation >= 132) { selectedKnob.rotation = 132; }
+                else if (selectedKnob.rotation <= -132) { selectedKnob.rotation = -132; }
+
                 // Knob method to update parameters based on the know rotation
                 // selectedKnob.method(selectedKnob.rotation, selectedKnob.modifier);
             }
         },
     },
     methods: {
-        unselectKnobs: function() {
-            for(var i in this.knobs) { this.knobs[i].selected = false; }
+        unselectKnobs: function () {
+            for (var i in this.knobs) { this.knobs[i].selected = false; }
         }
     },
     mounted() {
