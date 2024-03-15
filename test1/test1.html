@@ -6,7 +6,7 @@
   <title>Volume Control</title>
 </head>
 <body>
-  <input type="range" min="0" max="1" step="any" value="0.0001" id="volumeSlider" />
+  <input type="range" min="-60" max="0" value="-20" step="0.1" id="volumeSlider" />
   <span id="volumeValue"></span> dB
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.26/Tone.js"></script>
   <script>
@@ -14,29 +14,35 @@
       const volumeSlider = document.getElementById('volumeSlider');
       const volumeValue = document.getElementById('volumeValue');
 
-      // Create a sine wave oscillator
+      // Create an oscillator
       const oscillator = new Tone.Oscillator({
         type: "sine",
-        frequency: 440, // A4 note frequency
-        volume: -20 // Initial volume
-      }).toDestination();
+        frequency: 440 // A4 note frequency
+      });
 
-      // Start the oscillator
-      oscillator.start();
+      // Create a volume control
+      const volumeControl = new Tone.Volume({
+        volume: -20 // Initial volume
+      });
+
+      // Connect the oscillator to the volume control
+      oscillator.connect(volumeControl);
+
+      // Connect the volume control to the destination
+      volumeControl.toDestination();
 
       // Event listener for slider change
       volumeSlider.addEventListener('input', function() {
         const volume = parseFloat(this.value);
-        console.log(volume);
-        const volumeInDB = 20 * Math.log10(volume); // Convert linear amplitude to dB
-        oscillator.volume.value = volumeInDB; // Update oscillator volume in dB
-        volumeValue.textContent = volumeInDB.toFixed(2); // Update displayed volume value
+        volumeControl.volume.value = volume; // Update volume control
+        volumeValue.textContent = volume; // Update displayed volume value
       });
 
       // Initial display of volume value
-      const initialVolume = parseFloat(volumeSlider.value);
-      const initialVolumeInDB = 20 * Math.log10(initialVolume); // Convert linear amplitude to dB
-      volumeValue.textContent = initialVolumeInDB.toFixed(2);
+      volumeValue.textContent = volumeSlider.value;
+      
+      // Start the oscillator
+      oscillator.start();
     });
   </script>
 </body>

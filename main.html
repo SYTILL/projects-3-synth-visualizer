@@ -287,7 +287,10 @@
                     type: "sine",
                     frequency: 440
                 }).toDestination(),
-                vol: new Tone.Volume(-12).toDestination(), 
+                volCenter: new Tone.Volume(-12).toDestination(),
+                volSide: new Tone.Volume(-12).toDestination(),
+                blend: 0.5,
+                vol: 0,
             };
         };
         oscA = createOSC('checkbox-osc-A', 'wavetable-selection-A', 'wavetable-canvas-A');
@@ -456,6 +459,7 @@
         let activeNoteB = {};
 
         const addOSC = (obj) => {
+
             osc = obj.osc;
 
             if (osc.checkBox.checked) {
@@ -470,20 +474,21 @@
 
                 obj.frequency = obj.frequency * Math.pow(2, obj.pitch / 12);
                 for (let i = 0; i < obj.unison; i++) {
-                    let oscTEMP = new Tone.Oscillator(obj.frequency, osc.oscillator.type).toDestination();
-
-                    let v = obj.blend;
-                    if (mid1 == i || mid2 == i) {
-                        v = (1 - obj.blend);
-                    }
-
-                    oscTEMP.volume.value = 80 * Math.log10(0.5 * v);
+                    let oscTEMP = new Tone.Oscillator(obj.frequency, osc.oscillator.type);
 
                     if (obj.unison > 1) {
                         oscTEMP.detune.value = i * (obj.detune * 2 / (obj.unison - 1)) - obj.detune;
                     }
 
-                    oscTEMP.connect(obj.osc.vol).start();
+                    if (mid1 == i || mid2 == i) {
+                        oscTEMP.connect(obj.osc.volCenter).start();
+                        console.log(obj.osc.volCenter.volume.value);
+                    }
+                    else{
+                        oscTEMP.connect(obj.osc.volSide).start();
+                        console.log(obj.osc.volSide.volume.value);
+                    }
+
                     oscTEMParray.push(oscTEMP);
                 }
                 obj.activeNote[obj.note] = oscTEMParray;

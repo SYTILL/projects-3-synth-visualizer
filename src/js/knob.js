@@ -136,6 +136,15 @@ let app = new Vue({
                         }
 
                         selectedKnob.value.cur = (selectedKnob.value.real / selectedKnob.value.ratio).toFixed(2);
+
+                        if (['Blend'].includes(selectedKnob.label)) {
+                            if (selectedKnob.osc == 'A') {
+                                oscA.blend = selectedKnob.value.cur;
+                            }
+                            else if (selectedKnob.osc == 'B') {
+                                oscB.blend = selectedKnob.value.cur;
+                            }
+                        }
                     }
                     else {
                         selectedKnob.value.cur = Math.round(selectedKnob.value.low + rotationRatio * range);
@@ -146,14 +155,26 @@ let app = new Vue({
                             selectedKnob.value.cur = selectedKnob.value.low;
                         }
 
+
                         if (['Volume'].includes(selectedKnob.label)) {
                             if (selectedKnob.osc == 'A') {
-                                oscA.vol.volume.value =  40 * Math.log10(((selectedKnob.value.cur + 80) / 160));
+                                oscA.vol = selectedKnob.value.cur;
                             }
                             else if (selectedKnob.osc == 'B') {
-                                oscB.vol.volume.value =  40 * Math.log10(((selectedKnob.value.cur + 80) / 160));
+                                oscB.vol = selectedKnob.value.cur;
                             }
                         }
+                    }
+                }
+
+                if (['Volume', 'Blend'].includes(selectedKnob.label)) {
+                    if (selectedKnob.osc == 'A') {
+                        oscA.volCenter.volume.value = 40 * Math.log10(((oscA.vol + 80) / 160) * (1 - oscA.blend));
+                        oscA.volSide.volume.value = 40 * Math.log10(((oscA.vol + 80) / 160) * (oscA.blend));
+                    }
+                    else if (selectedKnob.osc == 'B') {
+                        oscB.volCenter.volume.value = 40 * Math.log10(((oscB.vol + 80) / 160) * (1 - oscB.blend));
+                        oscB.volSide.volume.value = 40 * Math.log10(((oscB.vol + 80) / 160) * (oscB.blend));
                     }
                 }
 
