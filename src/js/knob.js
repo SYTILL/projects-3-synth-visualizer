@@ -1,9 +1,16 @@
 let app = new Vue({
     el: '#app',
     data: {
+        osc:{
+            A: {
+                onOff: true,
+            },
+            B: {
+                onOff: true,
+            }
+        },
         knobs:
         {
-
             10: {
                 label: 'Unison',
                 osc: "A", knobType: "updown", row: "upper",
@@ -15,8 +22,8 @@ let app = new Vue({
             11: {
                 label: 'Detune',
                 osc: "A", knobType: "circle", row: "upper",
-                rotation: -132,
-                value: { cur: 2, low: 0, high: 48 },
+                rotation: -110,
+                value: { cur: 4, low: 0, high: 48 },
                 color: '#0060df',
                 active: true,
                 selected: false,
@@ -58,8 +65,8 @@ let app = new Vue({
             1: {
                 label: 'Detune',
                 osc: "B", knobType: "circle", row: "upper",
-                rotation: -132,
-                value: { cur: 2, low: 0, high: 48 },
+                rotation: -110,
+                value: { cur: 4, low: 0, high: 48 },
                 color: '#0060df',
                 active: true,
                 selected: false,

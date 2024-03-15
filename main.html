@@ -25,13 +25,13 @@
         </div>
         <div class="separator mid-body">
             <div class="mid-extra">
-                <div class="body-inner" id="ocs-sub">
+                <div class="body-inner" id="osc-sub">
                     <div class="title">
                         <input class="title-checkbox" type="checkbox" checked>
                         <span class="title-text">SUB</span>
                     </div>
                 </div>
-                <div class="body-inner" id="ocs-noise">
+                <div class="body-inner" id="osc-noise">
                     <div class="title">
                         <input class="title-checkbox" type="checkbox" checked>
                         <span class="title-text">NOISE</span>
@@ -41,7 +41,8 @@
 
             <div class="body-inner" id="osc-main" data-id="A">
                 <div class="title">
-                    <input class="title-checkbox" id="checkbox-osc-A" type="checkbox" checked>
+                    <input class="title-checkbox" id="checkbox-osc-A" type="checkbox" checked
+                        @click="osc.A.onOff = !osc.A.onOff">
                     <span class="title-text">OSC A</span>
                 </div>
                 <div class="wavetable-body">
@@ -52,35 +53,30 @@
                 <div class="knobs-background">
                     <div class="knobs-row" @mouseUp="unselectKnobs">
                         <div class="rela-inline knob">
-                            <div class="knob-active-light"
-                                :style="{'background-color': knobs[10].active?knobs[10].color:'#888'}"
-                                @click="knobs[10].active = !knobs[10].active"></div>
-
-                            <div class="rela-block" :style="{'color':knobs[10].active?knobs[10].color:'#888'}">
+                            <div class="rela-block">
                                 <div class="knob-updown-body">
-                                    <div class="knob-updown-text"
+                                    <div class="knob-updown-text" :style="{'color':osc.A.onOff?'white':'#888'}"
                                         @mouseDown="knobs[10].selected = true; app.currentY = event.pageY; event.preventDefault()">
                                         {{knobs[10].value.cur}}</div>
                                     <div class="knob-updown-button-body">
-                                        <div class="knob-updown-button" @click="updownCounter(knobs[10].value, 1);">
+                                        <div class="knob-updown-button" :style="{'color':osc.A.onOff?'white':'#888'}"
+                                        @click="updownCounter(knobs[10].value, 1);">
                                             <div style="transform: translateY(-4px);">▲</div>
                                         </div>
-                                        <div class="knob-updown-button" @click="updownCounter(knobs[10].value, -1);">
+                                        <div class="knob-updown-button" :style="{'color':osc.A.onOff?'white':'#888'}"
+                                        @click="updownCounter(knobs[10].value, -1);">
                                             <div style="transform: translateY(-3px);">▼</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="rela-block knob-label" :style="{'color':knobs[10].active?'#E4E8EA':'#888'}">
+                            <div class="rela-block knob-label" :style="{'color':osc.A.onOff?'#E4E8EA':'#888'}">
                                 {{knobs[10].label}}</div>
                         </div>
 
                         <div v-for="knob in [knobs[11],knobs[12],knobs[13]]" class="rela-inline knob style3">
-                            <div class="knob-active-light" :style="{'background-color': knob.active?knob.color:'#888'}"
-                                @click="knob.active = !knob.active"></div>
-
-                            <div class="rela-block knob-dial" :style="{'color':knob.active?knob.color:'#888'}">
+                            <div class="rela-block knob-dial" :style="{'color':osc.A.onOff?knob.color:'#888'}">
                                 <div class="abs-center dial-grip"
                                     :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
                                     @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
@@ -88,12 +84,12 @@
                                 <svg class="dial-svg" viewBox="0 0 100 100">
                                     <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
                                     <path d="M20,76 A 40 40 0 1 1 80 76" fill="none"
-                                        :stroke="knob.active?knob.color:'#888'"
+                                        :stroke="osc.A.onOff?knob.color:'#888'"
                                         :style="{'stroke-dashoffset':184 - 184*((knob.rotation*1 + 132)/264)}" />
                                 </svg>
                             </div>
 
-                            <div class="rela-block knob-label" :style="{'color':knob.active?'#E4E8EA':'#888'}">
+                            <div class="rela-block knob-label" :style="{'color':osc.A.onOff?'#E4E8EA':'#888'}">
                                 {{knob.label}}</div>
 
                             <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
@@ -101,10 +97,7 @@
                     </div>
                     <div class="knobs-row">
                         <div v-for="knob in [knobs[14]]" class="rela-inline knob style3">
-                            <div class="knob-active-light" :style="{'background-color': knob.active?knob.color:'#888'}"
-                                @click="knob.active = !knob.active"></div>
-
-                            <div class="rela-block knob-dial" :style="{'color':knob.active?knob.color:'#888'}">
+                            <div class="rela-block knob-dial" :style="{'color':osc.A.onOff?knob.color:'#888'}">
                                 <div class="abs-center dial-grip"
                                     :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
                                     @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
@@ -112,12 +105,12 @@
                                 <svg class="dial-svg" viewBox="0 0 100 100">
                                     <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
                                     <path d="M20,76 A 40 40 0 1 1 80 76" fill="none"
-                                        :stroke="knob.active?knob.color:'#888'"
+                                        :stroke="osc.A.onOff?knob.color:'#888'"
                                         :style="{'stroke-dashoffset':184 - 184*((knob.rotation*1 + 132)/264)}" />
                                 </svg>
                             </div>
 
-                            <div class="rela-block knob-label" :style="{'color':knob.active?'#E4E8EA':'#888'}">
+                            <div class="rela-block knob-label" :style="{'color':osc.A.onOff?'#E4E8EA':'#888'}">
                                 {{knob.label}}</div>
 
                             <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
@@ -131,7 +124,8 @@
 
             <div class="body-inner" id="osc-main" data-id="B">
                 <div class="title">
-                    <input class="title-checkbox" id="checkbox-osc-B" type="checkbox" checked>
+                    <input class="title-checkbox" id="checkbox-osc-B" type="checkbox" checked
+                    @click="osc.B.onOff = !osc.B.onOff">
                     <span class="title-text">OSC B</span>
                 </div>
                 <div class="wavetable-body">
@@ -143,20 +137,19 @@
                 <div class="knobs-background">
                     <div class="knobs-row" @mouseUp="unselectKnobs">
                         <div class="rela-inline knob">
-                            <div class="knob-active-light"
-                                :style="{'background-color': knobs[0].active?knobs[0].color:'#888'}"
-                                @click="knobs[0].active = !knobs[0].active"></div>
 
-                            <div class="rela-block" :style="{'color':knobs[0].active?knobs[0].color:'#888'}">
+                            <div class="rela-block">
                                 <div class="knob-updown-body">
-                                    <div class="knob-updown-text"
+                                    <div class="knob-updown-text" :style="{'color':osc.B.onOff?'white':'#888'}"
                                         @mouseDown="knobs[0].selected = true; app.currentY = event.pageY; event.preventDefault()">
                                         {{knobs[0].value.cur}}</div>
                                     <div class="knob-updown-button-body">
-                                        <div class="knob-updown-button" @click="updownCounter(knobs[0].value, 1);">
+                                        <div class="knob-updown-button" :style="{'color':osc.B.onOff?'white':'#888'}"
+                                        @click="updownCounter(knobs[0].value, 1);">
                                             <div style="transform: translateY(-4px);">▲</div>
                                         </div>
-                                        <div class="knob-updown-button" @click="updownCounter(knobs[0].value, -1);">
+                                        <div class="knob-updown-button" :style="{'color':osc.B.onOff?'white':'#888'}"
+                                        @click="updownCounter(knobs[0].value, -1);">
                                             <div style="transform: translateY(-3px);">▼</div>
                                         </div>
                                     </div>
@@ -170,10 +163,8 @@
                         </div>
 
                         <div v-for="knob in [knobs[1],knobs[2],knobs[3]]" class="rela-inline knob style3">
-                            <div class="knob-active-light" :style="{'background-color': knob.active?knob.color:'#888'}"
-                                @click="knob.active = !knob.active"></div>
 
-                            <div class="rela-block knob-dial" :style="{'color':knob.active?knob.color:'#888'}">
+                            <div class="rela-block knob-dial" :style="{'color':osc.B.onOff?knob.color:'#888'}">
                                 <div class="abs-center dial-grip"
                                     :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
                                     @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
@@ -181,12 +172,12 @@
                                 <svg class="dial-svg" viewBox="0 0 100 100">
                                     <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
                                     <path d="M20,76 A 40 40 0 1 1 80 76" fill="none"
-                                        :stroke="knob.active?knob.color:'#888'"
+                                        :stroke="osc.B.onOff?knob.color:'#888'"
                                         :style="{'stroke-dashoffset':184 - 184*((knob.rotation*1 + 132)/264)}" />
                                 </svg>
                             </div>
 
-                            <div class="rela-block knob-label" :style="{'color':knob.active?'#E4E8EA':'#888'}">
+                            <div class="rela-block knob-label" :style="{'color':osc.B.onOff?'#E4E8EA':'#888'}">
                                 {{knob.label}}</div>
 
                             <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
@@ -194,10 +185,8 @@
                     </div>
                     <div class="knobs-row">
                         <div v-for="knob in [knobs[4]]" class="rela-inline knob style3">
-                            <div class="knob-active-light" :style="{'background-color': knob.active?knob.color:'#888'}"
-                                @click="knob.active = !knob.active"></div>
 
-                            <div class="rela-block knob-dial" :style="{'color':knob.active?knob.color:'#888'}">
+                            <div class="rela-block knob-dial" :style="{'color':osc.B.onOff?knob.color:'#888'}">
                                 <div class="abs-center dial-grip"
                                     :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
                                     @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
@@ -205,12 +194,12 @@
                                 <svg class="dial-svg" viewBox="0 0 100 100">
                                     <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
                                     <path d="M20,76 A 40 40 0 1 1 80 76" fill="none"
-                                        :stroke="knob.active?knob.color:'#888'"
+                                        :stroke="osc.B.onOff?knob.color:'#888'"
                                         :style="{'stroke-dashoffset':184 - 184*((knob.rotation*1 + 132)/264)}" />
                                 </svg>
                             </div>
 
-                            <div class="rela-block knob-label" :style="{'color':knob.active?'#E4E8EA':'#888'}">
+                            <div class="rela-block knob-label" :style="{'color':osc.B.onOff?'#E4E8EA':'#888'}">
                                 {{knob.label}}</div>
 
                             <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
