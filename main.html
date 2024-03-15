@@ -411,12 +411,44 @@
         let activeNoteB = {};
 
         const startOSC = (key) => {
-            if (oscA.checkBox.checked) {
-                let oscTEMP = new Tone.Oscillator(key.frequency, oscA.oscillator.type).toDestination();
-                oscTEMP.volume.value = 40 * Math.log10((app.knobs[14].value.cur + 80) / 160);
+            // if (oscA.checkBox.checked) {
+            //     let unison = app.knobs[10].value.cur;
+            //     let detune = app.knobs[11].value.cur;
+            //     //const oscTEMParray = [];
 
-                oscTEMP.start();
-                activeNoteA[key.note] = oscTEMP;
+            //     let oscSTART = new Tone.Oscillator(key.frequency, oscA.oscillator.type).toDestination();
+            //     oscSTART.volume.value = 40 * Math.log10((app.knobs[14].value.cur + 80) / 160);
+
+            //     for (let i = 0; i < unison-1; i++) {
+            //         let oscTEMP = new Tone.Oscillator(key.frequency, oscA.oscillator.type).toDestination();
+            //         oscTEMP.volume.value = 40 * Math.log10((app.knobs[14].value.cur + 80) / 160);
+
+            //         if (unison > 1) {
+            //             oscTEMP.detune.value = i * (detune * 2 / (unison - 1)) - detune;
+            //         }
+            //         oscTEMP.start();
+            //         oscTEMParray.push(oscTEMP);
+            //     }
+
+            //     activeNoteA[key.note] = oscTEMParray;
+            // }
+            if (oscA.checkBox.checked) {
+                let unison = app.knobs[10].value.cur;
+                let detune = app.knobs[11].value.cur;
+                const oscTEMParray = [];
+                for (let i = 0; i < unison; i++) {
+                    let oscTEMP = new Tone.Oscillator(key.frequency, oscA.oscillator.type).toDestination();
+                    oscTEMP.volume.value = 40 * Math.log10((app.knobs[14].value.cur + 80) / 160);
+
+                    if (unison > 1) {
+                        oscTEMP.detune.value = i * (detune * 2 / (unison - 1)) - detune;
+                    }
+                    oscTEMP.start();
+                    oscTEMParray.push(oscTEMP);
+                }
+                console.log(oscTEMParray);
+                activeNoteA[key.note] = oscTEMParray;
+                console.log(activeNoteA);
             }
             if (oscB.checkBox.checked) {
                 let oscTEMP = new Tone.Oscillator(key.frequency, oscB.oscillator.type).toDestination();
@@ -431,7 +463,9 @@
         const stopOSC = async (key) => {
             if (Object.keys(activeNoteA).length != 0) {
                 console.log(activeNoteA);
-                await activeNoteA[key.note].stop();
+                activeNoteA[key.note].forEach(async (oscTEMP) => {
+                    await oscTEMP.stop();
+                });
                 delete activeNoteA[key.note];
             }
             if (Object.keys(activeNoteB).length != 0) {
