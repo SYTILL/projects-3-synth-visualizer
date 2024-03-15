@@ -1,11 +1,17 @@
 let app = new Vue({
     el: '#app',
     data: {
-        osc:{
+        osc: {
             A: {
                 onOff: true,
             },
             B: {
+                onOff: true,
+            },
+            SUB: {
+                onOff: true,
+            },
+            NOISE: {
                 onOff: true,
             }
         },
@@ -40,7 +46,7 @@ let app = new Vue({
                 label: 'Pitch',
                 osc: "A", knobType: "circle", row: "upper",
                 rotation: 0,
-                value: { real: 0, cur: 0, low: -240, high: 240, ratio: 10},
+                value: { real: 0, cur: 0, low: -240, high: 240, ratio: 10 },
                 color: '#0060df',
                 active: true, selected: false,
             },
@@ -83,7 +89,7 @@ let app = new Vue({
                 label: 'Pitch',
                 osc: "B", knobType: "circle", row: "upper",
                 rotation: 0,
-                value: { real: 0, cur: 0, low: -240, high: 240, ratio: 10},
+                value: { real: 0, cur: 0, low: -240, high: 240, ratio: 10 },
                 color: '#0060df',
                 active: true, selected: false,
             },
@@ -120,7 +126,7 @@ let app = new Vue({
                     let valueRange = 264; // 132 (max rotation) - (-132) (min rotation)
                     let rotationRatio = (selectedKnob.rotation + 132) / valueRange; // Normalize rotation to range [0, 1]
 
-                    if (['Blend','Pitch'].includes(selectedKnob.label)) {
+                    if (['Blend', 'Pitch'].includes(selectedKnob.label)) {
                         selectedKnob.value.real = selectedKnob.value.low + rotationRatio * range;
 
                         if (selectedKnob.value.real > selectedKnob.value.high) {
@@ -138,6 +144,15 @@ let app = new Vue({
                             selectedKnob.value.cur = selectedKnob.value.high;
                         } else if (selectedKnob.value.cur < selectedKnob.value.low) {
                             selectedKnob.value.cur = selectedKnob.value.low;
+                        }
+
+                        if (['Volume'].includes(selectedKnob.label)) {
+                            if (selectedKnob.osc == 'A') {
+                                oscA.vol.volume.value =  40 * Math.log10(((selectedKnob.value.cur + 80) / 160));
+                            }
+                            else if (selectedKnob.osc == 'B') {
+                                oscB.vol.volume.value =  40 * Math.log10(((selectedKnob.value.cur + 80) / 160));
+                            }
                         }
                     }
                 }

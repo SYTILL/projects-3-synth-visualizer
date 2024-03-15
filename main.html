@@ -60,11 +60,11 @@
                                         {{knobs[10].value.cur}}</div>
                                     <div class="knob-updown-button-body">
                                         <div class="knob-updown-button" :style="{'color':osc.A.onOff?'white':'#888'}"
-                                        @click="updownCounter(knobs[10].value, 1);">
+                                            @click="updownCounter(knobs[10].value, 1);">
                                             <div style="transform: translateY(-4px);">▲</div>
                                         </div>
                                         <div class="knob-updown-button" :style="{'color':osc.A.onOff?'white':'#888'}"
-                                        @click="updownCounter(knobs[10].value, -1);">
+                                            @click="updownCounter(knobs[10].value, -1);">
                                             <div style="transform: translateY(-3px);">▼</div>
                                         </div>
                                     </div>
@@ -125,7 +125,7 @@
             <div class="body-inner" id="osc-main" data-id="B">
                 <div class="title">
                     <input class="title-checkbox" id="checkbox-osc-B" type="checkbox" checked
-                    @click="osc.B.onOff = !osc.B.onOff">
+                        @click="osc.B.onOff = !osc.B.onOff">
                     <span class="title-text">OSC B</span>
                 </div>
                 <div class="wavetable-body">
@@ -145,11 +145,11 @@
                                         {{knobs[0].value.cur}}</div>
                                     <div class="knob-updown-button-body">
                                         <div class="knob-updown-button" :style="{'color':osc.B.onOff?'white':'#888'}"
-                                        @click="updownCounter(knobs[0].value, 1);">
+                                            @click="updownCounter(knobs[0].value, 1);">
                                             <div style="transform: translateY(-4px);">▲</div>
                                         </div>
                                         <div class="knob-updown-button" :style="{'color':osc.B.onOff?'white':'#888'}"
-                                        @click="updownCounter(knobs[0].value, -1);">
+                                            @click="updownCounter(knobs[0].value, -1);">
                                             <div style="transform: translateY(-3px);">▼</div>
                                         </div>
                                     </div>
@@ -281,12 +281,13 @@
                 onOff: true,
                 checkBox: document.getElementById(checkBox),
                 body: document.getElementById(selectionBody),
+                canvas: document.getElementById(canvasBody),
+                waveform: null,
                 oscillator: new Tone.Oscillator({
                     type: "sine",
                     frequency: 440
                 }).toDestination(),
-                waveform: null,
-                canvas: document.getElementById(canvasBody),
+                vol: new Tone.Volume(-12).toDestination(), 
             };
         };
         oscA = createOSC('checkbox-osc-A', 'wavetable-selection-A', 'wavetable-canvas-A');
@@ -444,64 +445,75 @@
 
 
 
+
+
+
+
+
+
         //tone
         let activeNoteA = {};
         let activeNoteB = {};
 
-        const startOSC = (key) => {
-            if (oscA.checkBox.checked) {
-                let unison = app.knobs[10].value.cur;
-                let detune = app.knobs[11].value.cur;
-                let blend = app.knobs[12].value.cur;
-                let pitch = app.knobs[13].value.cur;
-                let volume = app.knobs[14].value.cur;
-                let frequency = key.frequency;
-                let type = oscA.oscillator.type;
+        const addOSC = (obj) => {
+            osc = obj.osc;
+
+            if (osc.checkBox.checked) {
                 const oscTEMParray = [];
 
-                let mid1 = Math.round((unison - 1) / 2);
+                let mid1 = Math.round((obj.unison - 1) / 2);
                 let mid2 = mid1;
-                if (unison % 2 == 0) {
-                    mid1 = Math.round(unison / 2);
-                    mid2 = Math.round(unison / 2 - 1);
+                if (obj.unison % 2 == 0) {
+                    mid1 = Math.round(obj.unison / 2);
+                    mid2 = Math.round(obj.unison / 2 - 1);
                 }
 
-                frequency = frequency * Math.pow(2, pitch / 12);
-                for (let i = 0; i < unison; i++) {
-                    let oscTEMP = new Tone.Oscillator(frequency, type).toDestination();
-                    
-                    let v = blend;
+                obj.frequency = obj.frequency * Math.pow(2, obj.pitch / 12);
+                for (let i = 0; i < obj.unison; i++) {
+                    let oscTEMP = new Tone.Oscillator(obj.frequency, osc.oscillator.type).toDestination();
+
+                    let v = obj.blend;
                     if (mid1 == i || mid2 == i) {
-                        v = (1 - blend);
+                        v = (1 - obj.blend);
                     }
-                    
-                    oscTEMP.volume.value = 40 * Math.log10(((volume + 80) / 160)*v);
 
-                    if (unison > 1) {
-                        oscTEMP.detune.value = i * (detune * 2 / (unison - 1)) - detune;
+                    oscTEMP.volume.value = 80 * Math.log10(0.5 * v);
+
+                    if (obj.unison > 1) {
+                        oscTEMP.detune.value = i * (obj.detune * 2 / (obj.unison - 1)) - obj.detune;
                     }
-                    oscTEMP.start();
+
+                    oscTEMP.connect(obj.osc.vol).start();
                     oscTEMParray.push(oscTEMP);
                 }
-                activeNoteA[key.note] = oscTEMParray;
+                obj.activeNote[obj.note] = oscTEMParray;
             }
+        }
 
-            if (oscB.checkBox.checked) {
-                let unison = app.knobs[0].value.cur;
-                let detune = app.knobs[1].value.cur;
-                const oscTEMParray = [];
-                for (let i = 0; i < unison; i++) {
-                    let oscTEMP = new Tone.Oscillator(key.frequency, oscB.oscillator.type).toDestination();
-                    oscTEMP.volume.value = 40 * Math.log10((app.knobs[4].value.cur + 80) / 160);
+        const startOSC = (key) => {
+            addOSC({
+                osc: oscA,
+                activeNote: activeNoteA,
+                unison: app.knobs[10].value.cur,
+                detune: app.knobs[11].value.cur,
+                blend: app.knobs[12].value.cur,
+                pitch: app.knobs[13].value.cur,
+                volume: app.knobs[14].value.cur,
+                frequency: key.frequency,
+                note: key.note,
+            });
 
-                    if (unison > 1) {
-                        oscTEMP.detune.value = i * (detune * 2 / (unison - 1)) - detune;
-                    }
-                    oscTEMP.start();
-                    oscTEMParray.push(oscTEMP);
-                }
-                activeNoteB[key.note] = oscTEMParray;
-            }
+            addOSC({
+                osc: oscB,
+                activeNote: activeNoteB,
+                unison: app.knobs[0].value.cur,
+                detune: app.knobs[1].value.cur,
+                blend: app.knobs[2].value.cur,
+                pitch: app.knobs[3].value.cur,
+                volume: app.knobs[4].value.cur,
+                frequency: key.frequency,
+                note: key.note,
+            });
         };
 
 
@@ -520,6 +532,14 @@
                 delete activeNoteB[key.note];
             }
         }
+
+
+
+
+
+
+
+
 
         const keyboard = new AudioKeys({ rows: 1 });
 
