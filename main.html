@@ -291,8 +291,28 @@
                 volSide: new Tone.Volume(-12).toDestination(),
                 blend: 0.5,
                 vol: 0,
+                env: {
+                    detune: 0,
+                    vol: 0,
+                    blend: 0,
+                    pitch: 0,
+                    volume: 0,
+                },
             };
         };
+
+        envs = [
+            null,
+            new Tone.AmplitudeEnvelope({
+                attack: 0.5,
+                decay: 0.5,
+                sustain: 0.5,
+                release: 0.5,
+            }),
+            new Tone.AmplitudeEnvelope(0.5, 0.5, 0.5, 0.5,),
+            new Tone.AmplitudeEnvelope(0.5, 0.5, 0.5, 0.5,),
+        ]
+
         oscA = createOSC('checkbox-osc-A', 'wavetable-selection-A', 'wavetable-canvas-A');
         oscB = createOSC('checkbox-osc-B', 'wavetable-selection-B', 'wavetable-canvas-B');
 
@@ -481,16 +501,23 @@
                     }
 
                     if (mid1 == i || mid2 == i) {
-                        oscTEMP.connect(obj.osc.volCenter).start();
-                        console.log(obj.osc.volCenter.volume.value);
+                        oscTEMP.connect(obj.osc.env);
+                        obj.osc.env.connect(obj.osc.volCenter);
+                        oscTEMP.start();
                     }
-                    else{
-                        oscTEMP.connect(obj.osc.volSide).start();
-                        console.log(obj.osc.volSide.volume.value);
+                    else {
+                        oscTEMP.connect(obj.osc.env);
+                        obj.osc.env.connect(obj.osc.volSide);
+                        oscTEMP.start();
                     }
 
                     oscTEMParray.push(oscTEMP);
                 }
+
+                envs.forEach((env) => {
+                    env.triggerAttack();
+                })
+
                 obj.activeNote[obj.note] = oscTEMParray;
             }
         }
@@ -523,19 +550,27 @@
 
 
         const stopOSC = async (key) => {
-            if (Object.keys(activeNoteA).length != 0) {
-                //console.log(activeNoteA);
-                activeNoteA[key.note].forEach(async (oscTEMP) => {
-                    await oscTEMP.stop();
-                });
-                delete activeNoteA[key.note];
-            }
-            if (Object.keys(activeNoteB).length != 0) {
-                activeNoteB[key.note].forEach(async (oscTEMP) => {
-                    await oscTEMP.stop();
-                });
-                delete activeNoteB[key.note];
-            }
+            let longest = 0;
+            env.forEach((env) => {
+                env.triggerRelease();
+                if (env.release > longest) { longest = env.release; }
+            });
+
+
+            setTimeout(() => {
+                if (Object.keys(activeNoteA).length != 0) {
+                    activeNoteA[key.note].forEach(async (oscTEMP) => {
+                        await oscTEMP.stop();
+                    });
+                    delete activeNoteA[key.note];
+                }
+                if (Object.keys(activeNoteB).length != 0) {
+                    activeNoteB[key.note].forEach(async (oscTEMP) => {
+                        await oscTEMP.stop();
+                    });
+                    delete activeNoteB[key.note];
+                }
+            }, longest * 1000);
         }
 
 
