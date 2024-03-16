@@ -17,6 +17,7 @@ let app = new Vue({
         },
         knobs:
         {
+            //---------------------OSC A-----------------------
             10: {
                 label: 'Unison',
                 osc: "A", knobType: "updown", row: "upper",
@@ -59,7 +60,7 @@ let app = new Vue({
                 active: true, selected: false,
             },
 
-
+            //---------------------OSC B-----------------------
             0: {
                 label: 'Unison',
                 osc: "B", knobType: "updown", row: "upper",
@@ -101,6 +102,41 @@ let app = new Vue({
                 color: '#0060df',
                 active: true, selected: false,
             },
+
+
+            //---------------------ENV-----------------------
+            60: {
+                label: 'Attack',
+                osc: "ENV", knobType: "circle", row: "lower",
+                rotation: 0,
+                value: { cur: 0, low: 0, high: 2000, ratio: 1000 },
+                color: '#0060df',
+                active: true, selected: false,
+            },
+            61: {
+                label: 'Decay',
+                osc: "ENV", knobType: "circle", row: "lower",
+                rotation: 0,
+                value: { cur: 0, low: 0, high: 2000, ratio: 1000 },
+                color: '#0060df',
+                active: true, selected: false,
+            },
+            62: {
+                label: 'Sustain',
+                osc: "ENV", knobType: "circle", row: "lower",
+                rotation: 0,
+                value: { cur: 0, low: 0, high: 2000, ratio: 1000 },
+                color: '#0060df',
+                active: true, selected: false,
+            },
+            63: {
+                label: 'Release',
+                osc: "ENV", knobType: "circle", row: "lower",
+                rotation: 0,
+                value: { cur: 0, low: 0, high: 2000, ratio: 1000 },
+                color: '#0060df',
+                active: true, selected: false,
+            },
         },
         currentY: 0,
         mousemoveFunction: async function (e) {
@@ -113,7 +149,7 @@ let app = new Vue({
                     app.currentY = e.pageY;
                 }
 
-                else {
+                if (selectedKnob.knobType == "circle") {
                     // Knob Rotation
                     if (e.pageY - app.currentY !== 0) { selectedKnob.rotation -= (e.pageY - app.currentY); }
                     app.currentY = e.pageY;
@@ -126,7 +162,8 @@ let app = new Vue({
                     let range = selectedKnob.value.high - selectedKnob.value.low;
                     let rotationRatio = (selectedKnob.rotation + 132) / 264; //[0,1]
 
-                    if (['Blend', 'Pitch'].includes(selectedKnob.label)) {
+                    //apply ratio
+                    if (['Blend', 'Pitch', 'Attack', 'Decay', 'Sustain', 'Release'].includes(selectedKnob.label)) {
                         selectedKnob.value.real = selectedKnob.value.low + rotationRatio * range;
 
                         if (selectedKnob.value.real > selectedKnob.value.high) {

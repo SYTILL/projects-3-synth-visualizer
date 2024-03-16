@@ -23,14 +23,23 @@
 
             </div>
         </div>
+
+
+
+
         <div class="separator mid-body">
+            <!-- ----------sub and noise----------- -->
             <div class="mid-extra">
+
+                <!-- ----------SUB----------- -->
                 <div class="body-inner" id="osc-sub">
                     <div class="title">
                         <input class="title-checkbox" type="checkbox" checked>
                         <span class="title-text">SUB</span>
                     </div>
                 </div>
+
+                <!-- ----------NOISE----------- -->
                 <div class="body-inner" id="osc-noise">
                     <div class="title">
                         <input class="title-checkbox" type="checkbox" checked>
@@ -39,6 +48,9 @@
                 </div>
             </div>
 
+
+
+            <!-- ----------OSC AAAAAAAAAAAAAAAAAA----------- -->
             <div class="body-inner" id="osc-main" data-id="A">
                 <div class="title">
                     <input class="title-checkbox" id="checkbox-osc-A" type="checkbox" checked
@@ -121,23 +133,28 @@
 
 
 
-
+            <!-- ----------OSC AAAAAAAAAAAAAAAAAA----------- -->
             <div class="body-inner" id="osc-main" data-id="B">
+
+                <!-- ----------title ----------- -->
                 <div class="title">
                     <input class="title-checkbox" id="checkbox-osc-B" type="checkbox"
                         @click="osc.B.onOff = !osc.B.onOff">
                     <span class="title-text">OSC B</span>
                 </div>
+
+                <!-- ----------wavetable----------- -->
                 <div class="wavetable-body">
                     <canvas class="wavetable" id="wavetable-canvas-B"></canvas>
                     <div class="wavetable-selection" id="wavetable-selection-B"></div>
                 </div>
 
-
+                <!-- ----------knobs----------- -->
                 <div class="knobs-background">
+
+                    <!-- ----------upper knobs----------- -->
                     <div class="knobs-row" @mouseUp="unselectKnobs">
                         <div class="rela-inline knob">
-
                             <div class="rela-block">
                                 <div class="knob-updown-body">
                                     <div class="knob-updown-text" :style="{'color':osc.B.onOff?'white':'#888'}"
@@ -155,15 +172,11 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="rela-block knob-label" :style="{'color':knobs[0].active?'#E4E8EA':'#888'}">
                                 {{knobs[0].label}}</div>
-
-
                         </div>
 
                         <div v-for="knob in [knobs[1],knobs[2],knobs[3]]" class="rela-inline knob style3">
-
                             <div class="rela-block knob-dial" :style="{'color':osc.B.onOff?knob.color:'#888'}">
                                 <div class="abs-center dial-grip"
                                     :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
@@ -171,28 +184,21 @@
                                 </div>
                                 <svg class="dial-svg" viewBox="0 0 100 100">
                                     <path d="M18,80 A 44 44 0 1 1 82 80" fill="none" stroke="white" />
-
-
                                     <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
-
-
                                     <path d="M20,76 A 40 40 0 1 1 80 76" fill="none"
                                         :stroke="osc.B.onOff?knob.color:'#888'"
                                         :style="{'stroke-dashoffset':184 - 184*((knob.rotation*1 + 132)/264)}" />
-
-
                                 </svg>
                             </div>
-
                             <div class="rela-block knob-label" :style="{'color':osc.B.onOff?'#E4E8EA':'#888'}">
                                 {{knob.label}}</div>
-
                             <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
                         </div>
                     </div>
+
+                    <!-- ----------lower knobs----------- -->
                     <div class="knobs-row">
                         <div v-for="knob in [knobs[4]]" class="rela-inline knob style3">
-
                             <div class="rela-block knob-dial" :style="{'color':osc.B.onOff?knob.color:'#888'}">
                                 <div class="abs-center dial-grip"
                                     :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
@@ -205,15 +211,17 @@
                                         :style="{'stroke-dashoffset':184 - 184*((knob.rotation*1 + 132)/264)}" />
                                 </svg>
                             </div>
-
                             <div class="rela-block knob-label" :style="{'color':osc.B.onOff?'#E4E8EA':'#888'}">
                                 {{knob.label}}</div>
-
                             <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
                         </div>
                     </div>
                 </div>
             </div>
+
+
+
+            <!-- ----------------------FILTER---------------------- -->
             <div class="body-inner filter-body">
                 <div class="title">
                     <input class="title-checkbox" type="checkbox" checked>
@@ -221,21 +229,48 @@
                 </div>
             </div>
         </div>
+
+
+
+
         <div class="separator bot-body">
+            <!-- ----------------------ENV---------------------- -->
             <div class="body-inner ENV-body">
                 <div class="ENV-select-body">
 
                 </div>
-                <div class="ENV-canvas">
-
+                <div class="ENV-canvas-body">
+                    <canvas class="ENV-canvas"></canvas>
+                    
                 </div>
-                <div>
-
+                <div class="ENV-knobs-body">
+                    <div v-for="knob in [knobs[60],knobs[61],knobs[62],knobs[63]]" class="rela-inline knob style3">
+                        <div class="rela-block knob-dial" :style="{'color':knob.color}">
+                            <div class="abs-center dial-grip"
+                                :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
+                                @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
+                            </div>
+                            <svg class="dial-svg" viewBox="0 0 100 100">
+                                <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
+                                <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" :stroke="knob.color"
+                                    :style="{'stroke-dashoffset':184 - 184*((knob.rotation*1 + 132)/264)}" />
+                            </svg>
+                        </div>
+                        <div class="rela-block knob-label" :style="{'color':'#E4E8EA'}">
+                            {{knob.label}}</div>
+                        <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
+                    </div>
                 </div>
             </div>
+
+
+            <!-- ----------------------LFO---------------------- -->
             <div class="body-inner LFO-body">
 
             </div>
+
+
+            <!-- ----------------------EXTRA---------------------- -->
             <div class="body-inner bot-extra">
 
             </div>
@@ -332,7 +367,7 @@
             new Tone.AmplitudeEnvelope(0.5, 0.5, 0.5, 0.5,),
             new Tone.AmplitudeEnvelope(0.5, 0.5, 0.5, 0.5,),
         ]
-            
+
         oscA = createOSC('checkbox-osc-A', 'wavetable-selection-A', 'wavetable-canvas-A');
         oscB = createOSC('checkbox-osc-B', 'wavetable-selection-B', 'wavetable-canvas-B');
 
@@ -445,7 +480,7 @@
 
             oscBody.oscillator.type = selectedImg.alt;
 
-            oscBody.waveform = await oscBody.oscillator.asArray(1024);
+            oscBody.waveform = await oscBody.oscillator.asArray(256);
 
             await drawWaveform(oscBody);
         };
@@ -472,6 +507,13 @@
             await selectWavetable(oscBody, first);
         };
 
+
+
+        //---------------
+
+
+
+
         //add wave tables asynchornously
         (async () => {
             try {
@@ -494,7 +536,7 @@
 
 
 
-        //tone
+        //------------------------------tone-------------------------
         let activeNoteA = {};
         let activeNoteB = {};
         const addOSC = (obj) => {

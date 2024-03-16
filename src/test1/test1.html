@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exponential Envelope Visualization</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <h1>Exponential Envelope Visualization</h1>
+    <canvas id="envelope-canvas" width="400" height="200"></canvas>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.30/Tone.min.js"></script>
+    <script>
+        const canvas = document.getElementById('envelope-canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Create an exponential envelope
+        const envelope = new Tone.Envelope({
+            attack: 0.1,
+            decay: 0.2,
+            sustain: 0.6,
+            release: 1,
+            attackCurve: "exponential",
+            decayCurve: "exponential",
+            releaseCurve: "exponential"
+        });
+
+        // Draw the exponential envelope visualization
+        function drawEnvelope() {
+            const width = canvas.width;
+            const height = canvas.height;
+
+            ctx.clearRect(0, 0, width, height);
+            ctx.beginPath();
+            ctx.moveTo(0, height); // Start from the bottom-left corner
+
+            // Plot exponential envelope points
+            const duration = envelope.attack + envelope.decay + envelope.release;
+            const steps = 100;
+            const stepSize = width / steps;
+
+            for (let i = 0; i <= steps; i++) {
+                const t = i / steps * duration;
+                const value = envelope.getValueAtTime(t);
+                const x = i * stepSize;
+                const y = height - (height * value);
+                ctx.lineTo(x, y);
+            }
+
+            ctx.stroke();
+        }
+
+        // // Monitor changes in envelope parameters and update visualization
+        // envelope.onChange(() => {
+        //     drawEnvelope();
+        // });
+
+        // Start the envelope
+        envelope.triggerAttackRelease(1);
+
+        // Draw initial envelope
+        drawEnvelope();
+    </script>
+</body>
+</html>
