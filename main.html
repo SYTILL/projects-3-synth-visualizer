@@ -124,7 +124,7 @@
 
             <div class="body-inner" id="osc-main" data-id="B">
                 <div class="title">
-                    <input class="title-checkbox" id="checkbox-osc-B" type="checkbox" checked
+                    <input class="title-checkbox" id="checkbox-osc-B" type="checkbox"
                         @click="osc.B.onOff = !osc.B.onOff">
                     <span class="title-text">OSC B</span>
                 </div>
@@ -301,11 +301,11 @@
                 oscillator: new Tone.Oscillator({
                     type: "sine",
                     frequency: 440
-                }).toDestination(),
+                }),
                 volCenter: new Tone.Volume(-12),
                 volSide: new Tone.Volume(-12),
                 blend: 0.5,
-                vol: 0,
+                vol: 0, //for blend in knob
                 env: {
                     detune: 0,
                     vol: 0,
@@ -322,7 +322,7 @@
                 decay: 0.0,
                 sustain: 1.0,
                 release: 0.0,
-            }), ,
+            }),
             new Tone.AmplitudeEnvelope({
                 attack: 0.5,
                 decay: 0.5,
@@ -332,7 +332,7 @@
             new Tone.AmplitudeEnvelope(0.5, 0.5, 0.5, 0.5,),
             new Tone.AmplitudeEnvelope(0.5, 0.5, 0.5, 0.5,),
         ]
-
+            
         oscA = createOSC('checkbox-osc-A', 'wavetable-selection-A', 'wavetable-canvas-A');
         oscB = createOSC('checkbox-osc-B', 'wavetable-selection-B', 'wavetable-canvas-B');
 
@@ -497,7 +497,6 @@
         //tone
         let activeNoteA = {};
         let activeNoteB = {};
-
         const addOSC = (obj) => {
 
             osc = obj.osc;
@@ -536,18 +535,48 @@
                     oscTEMParray.push(oscTEMP);
                 }
 
-                envs.forEach((env) => {
-                    env.triggerAttack();
-                })
-
-
-                Object.keys(obj.osc.env).forEach(function (k) {
-                    setupEnv(env, "volume", "a");
-                });
-
-                obj.activeNote[obj.note] = oscTEMParray;
+                obj.activeNote[obj.note] = {
+                    oscArray: oscTEMParray,
+                    start: Tone.immediate(),
+                    unison: obj.unison,
+                    frequency: obj.frequency,
+                };
             }
         }
+
+        Tone.Transport.scheduleRepeat((time) => {
+
+            //for each pressed KEY
+            Object.keys(activeNoteA).forEach(function (note) {
+                let start = activeNoteA[note];
+
+                //OCS A setup
+                let detune = app.knobs[11].value.cur * envs[oscA.env.detune].getValueAtTime(start - time);
+                //let blend = app.knobs[12].value.cur;
+                let pitch = app.knobs[13].value.cur * envs[oscA.env.pitch].getValueAtTime(start - time);
+                //let volume = app.knobs[14].value.cur;
+
+                unison = activeNoteA[note].unison;
+
+                let mid1 = Math.round((unison - 1) / 2);
+                let mid2 = mid1;
+                if (unison % 2 == 0) {
+                    mid1 = Math.round(unison / 2);
+                    mid2 = Math.round(unison / 2 - 1);
+                }
+
+                frequency = activeNoteA[note].frequency * Math.pow(2, pitch / 12);
+
+                for (let i = 0; i < unison; i++) {
+                    activeNoteA[note].oscArray[i].frequency.value = frequency;
+
+                    if (unison > 1) {
+                        activeNoteA[note].oscArray[i].detune.value = i * (detune * 2 / (unison - 1)) - detune;
+                    }
+                }
+
+            });
+        }, "256n");
 
         Tone.Transport.start();
 
@@ -557,7 +586,7 @@
                 activeNote: activeNoteA,
                 unison: app.knobs[10].value.cur,
                 detune: app.knobs[11].value.cur,
-                blend: app.knobs[12].value.cur,
+                //blend: app.knobs[12].value.cur,
                 pitch: app.knobs[13].value.cur,
                 volume: app.knobs[14].value.cur,
                 frequency: key.frequency,
@@ -569,7 +598,7 @@
                 activeNote: activeNoteB,
                 unison: app.knobs[0].value.cur,
                 detune: app.knobs[1].value.cur,
-                blend: app.knobs[2].value.cur,
+                //blend: app.knobs[2].value.cur,
                 pitch: app.knobs[3].value.cur,
                 volume: app.knobs[4].value.cur,
                 frequency: key.frequency,
@@ -589,13 +618,13 @@
 
             setTimeout(() => {
                 if (Object.keys(activeNoteA).length != 0) {
-                    activeNoteA[key.note].forEach(async (oscTEMP) => {
+                    activeNoteA[key.note].oscArray.forEach(async (oscTEMP) => {
                         await oscTEMP.stop();
                     });
                     delete activeNoteA[key.note];
                 }
                 if (Object.keys(activeNoteB).length != 0) {
-                    activeNoteB[key.note].forEach(async (oscTEMP) => {
+                    activeNoteB[key.note].oscArray.forEach(async (oscTEMP) => {
                         await oscTEMP.stop();
                     });
                     delete activeNoteB[key.note];

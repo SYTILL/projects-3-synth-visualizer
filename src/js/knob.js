@@ -1,4 +1,4 @@
- let app = new Vue({
+let app = new Vue({
     el: '#app',
     data: {
         osc: {
@@ -112,6 +112,7 @@
                     app.updownCounter(selectedKnob.value, -(e.pageY - app.currentY) / 10);
                     app.currentY = e.pageY;
                 }
+
                 else {
                     // Knob Rotation
                     if (e.pageY - app.currentY !== 0) { selectedKnob.rotation -= (e.pageY - app.currentY); }
@@ -123,8 +124,7 @@
 
                     // Calculate value.cur based on rotation
                     let range = selectedKnob.value.high - selectedKnob.value.low;
-                    let valueRange = 264; // 132 (max rotation) - (-132) (min rotation)
-                    let rotationRatio = (selectedKnob.rotation + 132) / valueRange; // Normalize rotation to range [0, 1]
+                    let rotationRatio = (selectedKnob.rotation + 132) / 264; //[0,1]
 
                     if (['Blend', 'Pitch'].includes(selectedKnob.label)) {
                         selectedKnob.value.real = selectedKnob.value.low + rotationRatio * range;
@@ -146,6 +146,7 @@
                             }
                         }
                     }
+
                     else {
                         selectedKnob.value.cur = Math.round(selectedKnob.value.low + rotationRatio * range);
 
