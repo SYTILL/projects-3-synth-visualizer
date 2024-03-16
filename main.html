@@ -170,10 +170,17 @@
                                     @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
                                 </div>
                                 <svg class="dial-svg" viewBox="0 0 100 100">
+                                    <path d="M18,80 A 44 44 0 1 1 82 80" fill="none" stroke="white" />
+
+
                                     <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
+
+
                                     <path d="M20,76 A 40 40 0 1 1 80 76" fill="none"
                                         :stroke="osc.B.onOff?knob.color:'#888'"
                                         :style="{'stroke-dashoffset':184 - 184*((knob.rotation*1 + 132)/264)}" />
+
+
                                 </svg>
                             </div>
 
@@ -287,8 +294,8 @@
                     type: "sine",
                     frequency: 440
                 }).toDestination(),
-                volCenter: new Tone.Volume(-12).toDestination(),
-                volSide: new Tone.Volume(-12).toDestination(),
+                volCenter: new Tone.Volume(-12),
+                volSide: new Tone.Volume(-12),
                 blend: 0.5,
                 vol: 0,
                 env: {
@@ -501,13 +508,15 @@
                     }
 
                     if (mid1 == i || mid2 == i) {
-                        oscTEMP.connect(obj.osc.env);
-                        obj.osc.env.connect(obj.osc.volCenter);
+                        oscTEMP.connect(obj.osc.volCenter);
+                        obj.osc.volCenter.connect(obj.osc.env);
+                        obj.osc.env.toDestination();
                         oscTEMP.start();
                     }
                     else {
                         oscTEMP.connect(obj.osc.env);
                         obj.osc.env.connect(obj.osc.volSide);
+                        obj.osc.volSide.toDestination();
                         oscTEMP.start();
                     }
 
