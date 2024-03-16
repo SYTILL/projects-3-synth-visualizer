@@ -223,7 +223,15 @@
         </div>
         <div class="separator bot-body">
             <div class="body-inner ENV-body">
+                <div class="ENV-select-body">
 
+                </div>
+                <div class="ENV-canvas">
+
+                </div>
+                <div>
+
+                </div>
             </div>
             <div class="body-inner LFO-body">
 
@@ -302,14 +310,19 @@
                     detune: 0,
                     vol: 0,
                     blend: 0,
-                    pitch: 0,
-                    volume: 0,
+                    pitch: 1,
+                    volume: 1,
                 },
             };
         };
 
         envs = [
-            null,
+            new Tone.AmplitudeEnvelope({
+                attack: 0.01,
+                decay: 0.0,
+                sustain: 1.0,
+                release: 0.0,
+            }), ,
             new Tone.AmplitudeEnvelope({
                 attack: 0.5,
                 decay: 0.5,
@@ -509,14 +522,14 @@
 
                     if (mid1 == i || mid2 == i) {
                         oscTEMP.connect(obj.osc.volCenter);
-                        obj.osc.volCenter.connect(obj.osc.env);
-                        obj.osc.env.toDestination();
+                        obj.osc.volCenter.toDestination();
+
                         oscTEMP.start();
                     }
                     else {
-                        oscTEMP.connect(obj.osc.env);
-                        obj.osc.env.connect(obj.osc.volSide);
+                        oscTEMP.connect(obj.osc.volSide);
                         obj.osc.volSide.toDestination();
+
                         oscTEMP.start();
                     }
 
@@ -527,9 +540,16 @@
                     env.triggerAttack();
                 })
 
+
+                Object.keys(obj.osc.env).forEach(function (k) {
+                    setupEnv(env, "volume", "a");
+                });
+
                 obj.activeNote[obj.note] = oscTEMParray;
             }
         }
+
+        Tone.Transport.start();
 
         const startOSC = (key) => {
             addOSC({
@@ -559,8 +579,9 @@
 
 
         const stopOSC = async (key) => {
+
             let longest = 0;
-            env.forEach((env) => {
+            envs.forEach((env) => {
                 env.triggerRelease();
                 if (env.release > longest) { longest = env.release; }
             });
