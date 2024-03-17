@@ -21,7 +21,7 @@ let app = new Vue({
             10: {
                 label: 'Unison',
                 osc: "A", knobType: "updown", row: "upper",
-                value: { real: 1.0, cur: 1, low: 1, high: 16 },
+                value: { real: 1, cur: 1, low: 1, high: 16 },
                 color: '#0060df',
                 active: true,
                 selected: false,
@@ -30,7 +30,7 @@ let app = new Vue({
                 label: 'Detune',
                 osc: "A", knobType: "circle", row: "upper",
                 rotation: -110,
-                value: { cur: 4, low: 0, high: 48 },
+                value: { cur: 4, low: 0, high: 48, ratio: 1, points: 0 },
                 color: '#0060df',
                 active: true,
                 selected: false,
@@ -39,7 +39,7 @@ let app = new Vue({
                 label: 'Blend',
                 osc: "A", knobType: "circle", row: "upper",
                 rotation: 0,
-                value: { real: 50, cur: 0.5, low: 0, high: 100, ratio: 100 },
+                value: { cur: 0.5, low: 0, high: 100, ratio: 100, points: 2 },
                 color: '#0060df',
                 active: true, selected: false,
             },
@@ -47,7 +47,7 @@ let app = new Vue({
                 label: 'Pitch',
                 osc: "A", knobType: "circle", row: "upper",
                 rotation: 0,
-                value: { real: 0, cur: 0, low: -240, high: 240, ratio: 10 },
+                value: { cur: 0, low: -240, high: 240, ratio: 10, points: 2 },
                 color: '#0060df',
                 active: true, selected: false,
             },
@@ -55,7 +55,7 @@ let app = new Vue({
                 label: 'Volume',
                 osc: "A", knobType: "circle", row: "lower",
                 rotation: 0,
-                value: { cur: 0, low: -80, high: 80 },
+                value: { cur: 0, low: -80, high: 80, ratio: 1, points: 0 },
                 color: '#0060df',
                 active: true, selected: false,
             },
@@ -64,7 +64,7 @@ let app = new Vue({
             0: {
                 label: 'Unison',
                 osc: "B", knobType: "updown", row: "upper",
-                value: { real: 1.0, cur: 1, low: 1, high: 16 },
+                value: { real: 1, cur: 1, low: 1, high: 16 },
                 color: '#0060df',
                 active: true,
                 selected: false,
@@ -73,7 +73,7 @@ let app = new Vue({
                 label: 'Detune',
                 osc: "B", knobType: "circle", row: "upper",
                 rotation: -110,
-                value: { cur: 4, low: 0, high: 48 },
+                value: { cur: 4, low: 0, high: 48, ratio: 1, points: 0 },
                 color: '#0060df',
                 active: true,
                 selected: false,
@@ -82,7 +82,7 @@ let app = new Vue({
                 label: 'Blend',
                 osc: "B", knobType: "circle", row: "upper",
                 rotation: 0,
-                value: { real: 50, cur: 0.5, low: 0, high: 100, ratio: 100 },
+                value: { cur: 0.5, low: 0, high: 100, ratio: 100, points: 2 },
                 color: '#0060df',
                 active: true, selected: false,
             },
@@ -90,7 +90,7 @@ let app = new Vue({
                 label: 'Pitch',
                 osc: "B", knobType: "circle", row: "upper",
                 rotation: 0,
-                value: { real: 0, cur: 0, low: -240, high: 240, ratio: 10 },
+                value: { cur: 0, low: -240, high: 240, ratio: 10, points: 2 },
                 color: '#0060df',
                 active: true, selected: false,
             },
@@ -98,7 +98,7 @@ let app = new Vue({
                 label: 'Volume',
                 osc: "B", knobType: "circle", row: "lower",
                 rotation: 0,
-                value: { cur: 0, low: -80, high: 80 },
+                value: { cur: 0, low: -80, high: 80, ratio: 1, points: 0 },
                 color: '#0060df',
                 active: true, selected: false,
             },
@@ -109,7 +109,7 @@ let app = new Vue({
                 label: 'Attack',
                 osc: "ENV", knobType: "circle", row: "lower",
                 rotation: 0,
-                value: { cur: 0, low: 0, high: 2000, ratio: 1000 },
+                value: { cur: 0, low: 0, high: 2000, ratio: 1000, points: 2 },
                 color: '#0060df',
                 active: true, selected: false,
             },
@@ -117,7 +117,7 @@ let app = new Vue({
                 label: 'Decay',
                 osc: "ENV", knobType: "circle", row: "lower",
                 rotation: 0,
-                value: { cur: 0, low: 0, high: 2000, ratio: 1000 },
+                value: { cur: 0, low: 0, high: 2000, ratio: 1000, points: 2 },
                 color: '#0060df',
                 active: true, selected: false,
             },
@@ -125,7 +125,7 @@ let app = new Vue({
                 label: 'Sustain',
                 osc: "ENV", knobType: "circle", row: "lower",
                 rotation: 0,
-                value: { cur: 0, low: 0, high: 2000, ratio: 1000 },
+                value: { cur: 0, low: 0, high: 2000, ratio: 1000, points: 2 },
                 color: '#0060df',
                 active: true, selected: false,
             },
@@ -133,96 +133,56 @@ let app = new Vue({
                 label: 'Release',
                 osc: "ENV", knobType: "circle", row: "lower",
                 rotation: 0,
-                value: { cur: 0, low: 0, high: 2000, ratio: 1000 },
+                value: { cur: 0, low: 0, high: 2000, ratio: 1000, points: 2 },
                 color: '#0060df',
                 active: true, selected: false,
             },
         },
         currentY: 0,
         mousemoveFunction: async function (e) {
+            if (e.pageY - app.currentY == 0) { return; }
+
             let selectedKnob = Object.entries(app.knobs).filter(function (i) { return i[1].selected === true; });
+            if (selectedKnob.length <= 0) { return; }
+            selectedKnob = selectedKnob[0][1];
 
-            if (selectedKnob.length > 0) {
-                selectedKnob = selectedKnob[0][1];
-                if (selectedKnob.knobType == "updown") {
-                    app.updownCounter(selectedKnob.value, -(e.pageY - app.currentY) / 10);
-                    app.currentY = e.pageY;
+            if (selectedKnob.knobType == "updown") {
+                app.updownCounter(selectedKnob.value, -(e.pageY - app.currentY) / 10);
+                app.currentY = e.pageY;
+            }
+            else if (selectedKnob.knobType == "circle") {
+                app.currentY = e.pageY;
+
+                console.log(selectedKnob);
+                setKnob(selectedKnob, (e.pageY - app.currentY));
+            }
+            else { throw Error("Wrong Knob Type"); }
+
+
+
+            //real time volume change
+            if (['Volume', 'Blend'].includes(selectedKnob.label)) {
+                if (selectedKnob.osc == 'A') {
+                    let volume = app.knobs[14].value.cur;
+                    let blend = app.knobs[12].value.cur;
+                    oscA.volCenter.volume.value = 40 * Math.log10(((volume + 80) / 160) * (1 - blend));
+                    oscA.volSide.volume.value = 40 * Math.log10(((volume + 80) / 160) * (blend));
                 }
-
-                if (selectedKnob.knobType == "circle") {
-                    // Knob Rotation
-                    if (e.pageY - app.currentY !== 0) { selectedKnob.rotation -= (e.pageY - app.currentY); }
-                    app.currentY = e.pageY;
-
-                    // Setting Max rotation
-                    if (selectedKnob.rotation >= 132) { selectedKnob.rotation = 132; }
-                    else if (selectedKnob.rotation <= -132) { selectedKnob.rotation = -132; }
-
-                    // Calculate value.cur based on rotation
-                    let range = selectedKnob.value.high - selectedKnob.value.low;
-                    let rotationRatio = (selectedKnob.rotation + 132) / 264; //[0,1]
-
-                    //apply ratio
-                    if (['Blend', 'Pitch', 'Attack', 'Decay', 'Sustain', 'Release'].includes(selectedKnob.label)) {
-                        selectedKnob.value.real = selectedKnob.value.low + rotationRatio * range;
-
-                        if (selectedKnob.value.real > selectedKnob.value.high) {
-                            selectedKnob.value.real = selectedKnob.value.high;
-                        } else if (selectedKnob.value.real < selectedKnob.value.low) {
-                            selectedKnob.value.real = selectedKnob.value.low;
-                        }
-
-                        selectedKnob.value.cur = (selectedKnob.value.real / selectedKnob.value.ratio).toFixed(2);
-
-                        if (['Blend'].includes(selectedKnob.label)) {
-                            if (selectedKnob.osc == 'A') {
-                                oscA.blend = selectedKnob.value.cur;
-                            }
-                            else if (selectedKnob.osc == 'B') {
-                                oscB.blend = selectedKnob.value.cur;
-                            }
-                        }
-                    }
-
-                    else {
-                        selectedKnob.value.cur = Math.round(selectedKnob.value.low + rotationRatio * range);
-
-                        if (selectedKnob.value.cur > selectedKnob.value.high) {
-                            selectedKnob.value.cur = selectedKnob.value.high;
-                        } else if (selectedKnob.value.cur < selectedKnob.value.low) {
-                            selectedKnob.value.cur = selectedKnob.value.low;
-                        }
-
-
-                        if (['Volume'].includes(selectedKnob.label)) {
-                            if (selectedKnob.osc == 'A') {
-                                oscA.vol = selectedKnob.value.cur;
-                            }
-                            else if (selectedKnob.osc == 'B') {
-                                oscB.vol = selectedKnob.value.cur;
-                            }
-                        }
-                    }
+                else if (selectedKnob.osc == 'B') {
+                    let volume = app.knobs[4].value.cur;
+                    let blend = app.knobs[2].value.cur;
+                    oscB.volCenter.volume.value = 40 * Math.log10(((volume + 80) / 160) * (1 - blend));
+                    oscB.volSide.volume.value = 40 * Math.log10(((volume + 80) / 160) * (blend));
                 }
+            }
 
-                if (['Volume', 'Blend'].includes(selectedKnob.label)) {
-                    if (selectedKnob.osc == 'A') {
-                        oscA.volCenter.volume.value = 40 * Math.log10(((oscA.vol + 80) / 160) * (1 - oscA.blend));
-                        oscA.volSide.volume.value = 40 * Math.log10(((oscA.vol + 80) / 160) * (oscA.blend));
-                    }
-                    else if (selectedKnob.osc == 'B') {
-                        oscB.volCenter.volume.value = 40 * Math.log10(((oscB.vol + 80) / 160) * (1 - oscB.blend));
-                        oscB.volSide.volume.value = 40 * Math.log10(((oscB.vol + 80) / 160) * (oscB.blend));
-                    }
+            //show unison bar on canvas
+            if (['Blend', 'Detune', 'Unison'].includes(selectedKnob.label)) {
+                if (selectedKnob.osc == 'A') {
+                    await drawWaveform(oscA, 'A');
                 }
-
-                if (['Blend', 'Detune', 'Unison'].includes(selectedKnob.label)) {
-                    if (selectedKnob.osc == 'A') {
-                        await drawWaveform(oscA, 'A');
-                    }
-                    else if (selectedKnob.osc == 'B') {
-                        await drawWaveform(oscB, 'B');
-                    }
+                else if (selectedKnob.osc == 'B') {
+                    await drawWaveform(oscB, 'B');
                 }
             }
         },
@@ -244,6 +204,35 @@ let app = new Vue({
             }
             await drawWaveform(oscA);
             await drawWaveform(oscB);
+        },
+        setKnob: function (knob, diff) {
+
+            // Knob Rotation
+            knob.rotation -= diff;
+
+            // Setting Max rotation
+            if (knob.rotation >= 132) { knob.rotation = 132; }
+            else if (knob.rotation <= -132) { knob.rotation = -132; }
+
+            // Calculate value.cur based on rotation
+            let range = knob.value.high - knob.value.low;
+            let rotationRatio = (knob.rotation + 132) / 264; //[0,1]
+
+            let temp = knob.value.low + rotationRatio * range;
+
+            if (temp > knob.value.high) { temp = knob.value.high; }
+            else if (temp < knob.value.low) { temp = knob.value.low; }
+
+            knob.value.cur = Number((temp / knob.value.ratio).toFixed(knob.value.points));
+
+
+
+            if (label == "unison") {
+
+            }
+            else if (label == "detune") {
+
+            }
         }
     },
     mounted() {
