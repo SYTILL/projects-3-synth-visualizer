@@ -47,7 +47,7 @@ let app = new Vue({
                 label: 'Pitch',
                 osc: "A", knobType: "circle", row: "upper",
                 rotation: 0,
-                value: { cur: 0, low: -240, high: 240, ratio: 10, points: 2 },
+                value: { cur: 10, low: -240, high: 240, ratio: 10, points: 2 },
                 color: '#0060df',
                 active: true, selected: false,
             },
@@ -146,18 +146,15 @@ let app = new Vue({
             if (selectedKnob.length <= 0) { return; }
             selectedKnob = selectedKnob[0][1];
 
+
             if (selectedKnob.knobType == "updown") {
                 app.updownCounter(selectedKnob.value, -(e.pageY - app.currentY) / 10);
-                app.currentY = e.pageY;
             }
             else if (selectedKnob.knobType == "circle") {
-                app.currentY = e.pageY;
-
-                console.log(selectedKnob);
-                setKnob(selectedKnob, (e.pageY - app.currentY));
+                app.setKnob(selectedKnob, -(e.pageY - app.currentY));
             }
             else { throw Error("Wrong Knob Type"); }
-
+            app.currentY = e.pageY;
 
 
             //real time volume change
@@ -205,12 +202,13 @@ let app = new Vue({
             await drawWaveform(oscA);
             await drawWaveform(oscB);
         },
+
         setKnob: function (knob, diff) {
+            if (knob.label == "unison") {
+                return;
+            }
 
-            // Knob Rotation
-            knob.rotation -= diff;
-
-            // Setting Max rotation
+            knob.rotation += diff;
             if (knob.rotation >= 132) { knob.rotation = 132; }
             else if (knob.rotation <= -132) { knob.rotation = -132; }
 
@@ -224,15 +222,6 @@ let app = new Vue({
             else if (temp < knob.value.low) { temp = knob.value.low; }
 
             knob.value.cur = Number((temp / knob.value.ratio).toFixed(knob.value.points));
-
-
-
-            if (label == "unison") {
-
-            }
-            else if (label == "detune") {
-
-            }
         }
     },
     mounted() {

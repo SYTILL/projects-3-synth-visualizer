@@ -241,7 +241,7 @@
                 </div>
                 <div class="ENV-canvas-body">
                     <canvas class="ENV-canvas"></canvas>
-                    
+
                 </div>
                 <div class="ENV-knobs-body">
                     <div v-for="knob in [knobs[60],knobs[61],knobs[62],knobs[63]]" class="rela-inline knob style3">
@@ -350,16 +350,16 @@
         };
 
         envs = [
-            new Tone.AmplitudeEnvelope({
-                attack: 0.01,
+            new Tone.Envelope({
+                attack: 1,
                 decay: 0.0,
                 sustain: 1.0,
                 release: 0.0,
             }),
-            new Tone.AmplitudeEnvelope({
+            new Tone.Envelope({
                 attack: 0.5,
                 decay: 0.5,
-                sustain: 0.5,
+                sustain: 1,
                 release: 0.5,
             }),
             new Tone.AmplitudeEnvelope(0.5, 0.5, 0.5, 0.5,),
@@ -537,6 +537,21 @@
         //------------------------------tone-------------------------
         let activeNoteA = {};
         let activeNoteB = {};
+
+        const createENVobject = (osc) => {
+            temp = {};
+            Object.keys(osc.env).forEach(function (k) {
+                temp[k] = new Tone.Envelope({
+                    attack: envs[osc.env[k]].attack,
+                    decay: envs[osc.env[k]].decay,
+                    sustain: envs[osc.env[k]].sustain,
+                    release: envs[osc.env[k]].release,
+                }).triggerAttack();
+            })
+            return temp;
+        };
+
+
         const addOSC = (obj) => {
 
             osc = obj.osc;
@@ -580,23 +595,26 @@
                     start: Tone.immediate(),
                     unison: obj.unison,
                     frequency: obj.frequency,
+                    env: createENVobject(osc),
                 };
             }
         }
 
+        //update - ENV
         Tone.Transport.scheduleRepeat((time) => {
 
             //for each pressed KEY
             Object.keys(activeNoteA).forEach(function (note) {
-                let start = activeNoteA[note];
+                let start = activeNoteA[note].start;
+                let unison = activeNoteA[note].unison;
 
                 //OCS A setup
-                let detune = app.knobs[11].value.cur * envs[oscA.env.detune].getValueAtTime(start - time);
+                let detune = app.knobs[11].value.cur * activeNoteA[note].env.detune.value;
                 //let blend = app.knobs[12].value.cur;
-                let pitch = app.knobs[13].value.cur * envs[oscA.env.pitch].getValueAtTime(start - time);
+                let pitch = app.knobs[13].value.cur * activeNoteA[note].env.pitch.value;
                 //let volume = app.knobs[14].value.cur;
 
-                unison = activeNoteA[note].unison;
+                console.log(activeNoteA[note].env.pitch.value);
 
                 let mid1 = Math.round((unison - 1) / 2);
                 let mid2 = mid1;
@@ -607,6 +625,7 @@
 
                 frequency = activeNoteA[note].frequency * Math.pow(2, pitch / 12);
 
+
                 for (let i = 0; i < unison; i++) {
                     activeNoteA[note].oscArray[i].frequency.value = frequency;
 
@@ -614,9 +633,8 @@
                         activeNoteA[note].oscArray[i].detune.value = i * (detune * 2 / (unison - 1)) - detune;
                     }
                 }
-
             });
-        }, "256n");
+        }, "128n");
 
         Tone.Transport.start();
 
@@ -648,28 +666,26 @@
 
 
         const stopOSC = async (key) => {
+            if (Object.keys(activeNoteA).length != 0) {
+                Object.keys(activeNoteA[key.note].env).forEach(function (k) {
+                    activeNoteA[key.note].env[k].triggerRelease();
+                });
 
-            let longest = 0;
-            envs.forEach((env) => {
-                env.triggerRelease();
-                if (env.release > longest) { longest = env.release; }
-            });
-
-
-            setTimeout(() => {
-                if (Object.keys(activeNoteA).length != 0) {
+                setTimeout(async () => {
                     activeNoteA[key.note].oscArray.forEach(async (oscTEMP) => {
                         await oscTEMP.stop();
                     });
-                    delete activeNoteA[key.note];
-                }
-                if (Object.keys(activeNoteB).length != 0) {
-                    activeNoteB[key.note].oscArray.forEach(async (oscTEMP) => {
-                        await oscTEMP.stop();
-                    });
-                    delete activeNoteB[key.note];
-                }
-            }, longest * 1000);
+                    await delete activeNoteA[key.note];
+                }, activeNoteA[key.note].env.volume.release * 1100);
+            }
+
+
+            if (Object.keys(activeNoteB).length != 0) {
+                activeNoteB[key.note].oscArray.forEach(async (oscTEMP) => {
+                    await oscTEMP.stop();
+                });
+                delete activeNoteB[key.note];
+            }
         }
 
 
