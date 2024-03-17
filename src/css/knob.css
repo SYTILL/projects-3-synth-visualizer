@@ -83,8 +83,9 @@
 .knob-container {
   padding: 10px 0;
 }
+
 .knob {
-  border-radius: 3px;
+  border-radius: 10px;
   padding: 5px;
   background-color: #2c2d2f;
 }
