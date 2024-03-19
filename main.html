@@ -241,17 +241,21 @@
 
                 <!-- ----------------------ENV select---------------------- -->
                 <div class="ENV-select-body">
-                    <div class="ENV-select-box">
-                        <span class="ENV-select-text">ENV 1</span>
-                        <span class="material-symbols-outlined">open_with</span>
+                    <div class="ENV-select-box" draggable="true"
+                    @mouseDown="curENV = 0;setENVknobRotation();">
+                        <span class="ENV-select-text" :style="{'color':curENV==0?'white':'#888'}">ENV 1</span>
+                        <span class="material-symbols-outlined" :style="{'color':curENV==0?'white':'#888'}">open_with</span>
                     </div>
-                    <div class="ENV-select-box" style="border-left: 1px solid white; border-right: 1px solid white; ">
-                        <span class="ENV-select-text">ENV 2</span>
-                        <span class="material-symbols-outlined">open_with</span>
+                    <div class="ENV-select-box" draggable="true"
+                    @mouseDown="curENV = 1;setENVknobRotation();"
+                        style="border-left: 1px solid white; border-right: 1px solid white; ">
+                        <span class="ENV-select-text" :style="{'color':curENV==1?'white':'#888'}">ENV 2</span>
+                        <span class="material-symbols-outlined" :style="{'color':curENV==1?'white':'#888'}">open_with</span>
                     </div>
-                    <div class="ENV-select-box">
-                        <span class="ENV-select-text">ENV 3</span>
-                        <span class="material-symbols-outlined">open_with</span>
+                    <div class="ENV-select-box" draggable="true"
+                     @mouseDown="curENV = 2;setENVknobRotation();">
+                        <span class="ENV-select-text" :style="{'color':curENV==2?'white':'#888'}">ENV 3</span>
+                        <span class="material-symbols-outlined" :style="{'color':curENV==2?'white':'#888'}">open_with</span>
                     </div>
                 </div>
 
@@ -387,16 +391,10 @@
 
         oscA = createOSC('checkbox-osc-A', 'wavetable-selection-A', 'wavetable-canvas-A');
         oscB = createOSC('checkbox-osc-B', 'wavetable-selection-B', 'wavetable-canvas-B');
-        envBody = {
-            curENV: 0,
-            canvas: document.getElementById('ENV-canvas'),
-        };
+        
 
 
-
-
-
-        //------------#draw #canvas #OSC ----------------------------
+        //------------#draw #canvas #ENV ----------------------------
         const drawLine = (ctx, x1, y1, x2, y2) => {
             ctx.beginPath();
             ctx.moveTo(x1, y1);
@@ -411,14 +409,19 @@
         }
 
         //canvas env
-        function drawENV(body) {
-            canvas = body.canvas;
+        function drawENV() {
+            canvas = document.getElementById('ENV-canvas'),
             ctx = canvas.getContext('2d');
-            env = envs[body.curENV];
+            env = envs[app.curENV];
 
             let margin = 5; //5%
+            //smaller canvas
             let canvasX = [canvas.width * (margin * 0.005), canvas.width * (1 - margin * 0.005)]
             let canvasY = [canvas.height * (margin * 0.01), canvas.height * (1 - margin * 0.01),]
+
+            
+            ctx.fillStyle = '#2c2d2f';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             ctx.fillStyle = 'black';
             ctx.fillRect(
@@ -489,10 +492,11 @@
             drawLine(ctx, canvasX[0], canvasY[1], canvasX[1], canvasY[1]);
         }
 
-        drawENV(envBody);
+        drawENV();
 
+        app.setENVknobRotation();
 
-        //canvas osc
+        //---------------------canvas osc #draw #canvas #OSC-------------------
         async function drawWaveform(oscBody, blendType = "none") {
             oscillator = oscBody.oscillator;
             canvas = oscBody.canvas;
@@ -616,13 +620,6 @@
             });
             await selectWavetable(oscBody, first);
         };
-
-
-
-        //---------------
-
-
-
 
         //add wave tables asynchornously
         (async () => {

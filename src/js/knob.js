@@ -15,6 +15,7 @@ let app = new Vue({
                 onOff: true,
             }
         },
+        curENV: 0,
         knobs:
         {
             //---------------------OSC A-----------------------
@@ -108,15 +109,15 @@ let app = new Vue({
             60: {
                 label: 'Attack',
                 osc: "ENV", knobType: "circle", row: "lower",
-                rotation: 0,
                 value: { cur: 0, low: 0, high: 1000, ratio: 1000, points: 2 },
+                rotation: -132,
                 color: '#0060df',
                 active: true, selected: false,
             },
             61: {
                 label: 'Decay',
                 osc: "ENV", knobType: "circle", row: "lower",
-                rotation: 0,
+                rotation: -132,
                 value: { cur: 0, low: 0, high: 1000, ratio: 1000, points: 2 },
                 color: '#0060df',
                 active: true, selected: false,
@@ -132,7 +133,7 @@ let app = new Vue({
             63: {
                 label: 'Release',
                 osc: "ENV", knobType: "circle", row: "lower",
-                rotation: 0,
+                rotation: -132,
                 value: { cur: 0, low: 0, high: 1000, ratio: 1000, points: 2 },
                 color: '#0060df',
                 active: true, selected: false,
@@ -155,6 +156,12 @@ let app = new Vue({
             }
             else { throw Error("Wrong Knob Type"); }
             app.currentY = e.pageY;
+
+            //update change on canvas
+            if (['Attack', 'Decay', 'Sustain', 'Release'].includes(selectedKnob.label)) {
+                envs[app.curENV][selectedKnob.label.toLowerCase()] = selectedKnob.value.cur;
+                drawENV();
+            }
 
 
             //real time volume change
@@ -203,7 +210,7 @@ let app = new Vue({
             await drawWaveform(oscB);
         },
 
-        setKnob: function (knob, diff) {
+        setKnob: function (knob, diff = 0) {
             if (knob.label == "unison") {
                 return;
             }
@@ -222,7 +229,28 @@ let app = new Vue({
             else if (temp < knob.value.low) { temp = knob.value.low; }
 
             knob.value.cur = Number((temp / knob.value.ratio).toFixed(knob.value.points));
-        }
+        },
+
+        setENVknobRotation: function () {
+            env = envs[app.curENV];
+
+            attackKnob = app.knobs[60];
+            decayKnob = app.knobs[61];
+            sustainKnob = app.knobs[62];
+            releaseKnob = app.knobs[63];
+
+            attackKnob.rotation = Math.round(264 * env.attack) - 132;
+            decayKnob.rotation = Math.round(264 * env.decay) - 132;
+            sustainKnob.rotation = Math.round(264 * env.sustain) - 132;
+            releaseKnob.rotation = Math.round(264 * env.release) - 132;
+
+            app.setKnob(attackKnob);
+            app.setKnob(decayKnob);
+            app.setKnob(sustainKnob);
+            app.setKnob(releaseKnob);
+
+            drawENV();
+        },
     },
     mounted() {
         // Bind mousemove and mouseup events to the window
