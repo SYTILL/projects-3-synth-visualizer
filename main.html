@@ -241,21 +241,21 @@
 
                 <!-- ----------------------ENV select---------------------- -->
                 <div class="ENV-select-body">
-                    <div class="ENV-select-box" draggable="true"
-                    @mouseDown="curENV = 0;setENVknobRotation();">
+                    <div class="ENV-select-box" draggable="true" @mouseDown="curENV = 0;setENVknobRotation();">
                         <span class="ENV-select-text" :style="{'color':curENV==0?'white':'#888'}">ENV 1</span>
-                        <span class="material-symbols-outlined" :style="{'color':curENV==0?'white':'#888'}">open_with</span>
+                        <span class="material-symbols-outlined"
+                            :style="{'color':curENV==0?'white':'#888'}">open_with</span>
                     </div>
-                    <div class="ENV-select-box" draggable="true"
-                    @mouseDown="curENV = 1;setENVknobRotation();"
+                    <div class="ENV-select-box" draggable="true" @mouseDown="curENV = 1;setENVknobRotation();"
                         style="border-left: 1px solid white; border-right: 1px solid white; ">
                         <span class="ENV-select-text" :style="{'color':curENV==1?'white':'#888'}">ENV 2</span>
-                        <span class="material-symbols-outlined" :style="{'color':curENV==1?'white':'#888'}">open_with</span>
+                        <span class="material-symbols-outlined"
+                            :style="{'color':curENV==1?'white':'#888'}">open_with</span>
                     </div>
-                    <div class="ENV-select-box" draggable="true"
-                     @mouseDown="curENV = 2;setENVknobRotation();">
+                    <div class="ENV-select-box" draggable="true" @mouseDown="curENV = 2;setENVknobRotation();">
                         <span class="ENV-select-text" :style="{'color':curENV==2?'white':'#888'}">ENV 3</span>
-                        <span class="material-symbols-outlined" :style="{'color':curENV==2?'white':'#888'}">open_with</span>
+                        <span class="material-symbols-outlined"
+                            :style="{'color':curENV==2?'white':'#888'}">open_with</span>
                     </div>
                 </div>
 
@@ -345,6 +345,19 @@
 
     <script>
 
+        //--------------#drag & drop----------------------------
+        selectBoxes = document.querySelectorAll(".ENV-select-box");
+
+        selectBoxes.forEach(box => {
+            const img = new Image();
+            img.src = "src/images/drag-image.png";
+            console.log(img);
+            box.addEventListener("dragstart", function (e) {
+                e.dataTransfer.setDragImage(img, 25, 10);
+            }, false);
+        });
+
+
         //-------------------#add wavetable images #images #wavetable------------------
 
         const waveTablesTypes = ['sine', 'triangle', 'sawtooth', 'square'];
@@ -391,7 +404,7 @@
 
         oscA = createOSC('checkbox-osc-A', 'wavetable-selection-A', 'wavetable-canvas-A');
         oscB = createOSC('checkbox-osc-B', 'wavetable-selection-B', 'wavetable-canvas-B');
-        
+
 
 
         //------------#draw #canvas #ENV ----------------------------
@@ -411,7 +424,7 @@
         //canvas env
         function drawENV() {
             canvas = document.getElementById('ENV-canvas'),
-            ctx = canvas.getContext('2d');
+                ctx = canvas.getContext('2d');
             env = envs[app.curENV];
 
             let margin = 5; //5%
@@ -419,7 +432,7 @@
             let canvasX = [canvas.width * (margin * 0.005), canvas.width * (1 - margin * 0.005)]
             let canvasY = [canvas.height * (margin * 0.01), canvas.height * (1 - margin * 0.01),]
 
-            
+
             ctx.fillStyle = '#2c2d2f';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
