@@ -139,11 +139,11 @@
   pointer-events: none;
   position: absolute;
   stroke-width: 8;
-  /* stroke-dasharray: 184 184; */
+  stroke-dasharray: 184 184;
   stroke-linecap: round !important;
 }
 .dial-svg path {
-  transition: 0.3s cubic-bezier(0, 0, 0.24, 1);
+  transition: 0.1s cubic-bezier(0, 0, 0.24, 1);
 }
 
 .knob-label {

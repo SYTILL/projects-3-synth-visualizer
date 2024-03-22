@@ -63,9 +63,9 @@
                     <canvas class="wavetable" id="wavetable-canvas-A"></canvas>
                     <div class="wavetable-selection" id="wavetable-selection-A"></div>
                 </div>
-
                 <div class="knobs-background">
                     <div class="knobs-row" @mouseUp="unselectKnobs">
+                        <!-- ----------OSC A - UNISON ----------- -->
                         <div class="rela-inline knob">
                             <div class="rela-block">
                                 <div class="knob-updown-body">
@@ -84,19 +84,28 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="rela-block knob-label" :style="{'color':osc.A.onOff?'#E4E8EA':'#888'}">
                                 {{knobs[10].label}}</div>
                         </div>
 
+                        <!-- ----------OSC A - DETUNE / BLEND / PITCH ----------- -->
                         <div v-for="knob in [knobs[11],knobs[12],knobs[13]]" class="rela-inline knob style3">
+                            <div v-if="knob.env.target!=-1" class="knob-active-light"
+                                :style="{'background-color': knob.env.target==curENV?'white':'#888'}"></div>
+
                             <div class="rela-block knob-dial" :style="{'color':osc.A.onOff?knob.color:'#888'}">
                                 <div class="abs-center dial-grip"
                                     :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
                                     @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
                                 </div>
+
                                 <svg class="dial-svg" viewBox="0 0 100 100">
+                                    <path v-if="knob.env.target==curENV" d="M18,80 A 44 44 0 1 1 82 80" fill="none"
+                                        stroke="white" style="stroke-dasharray: 205 205;"
+                                        :style="{'stroke-dashoffset':205 - 205*((knob.env.rotation*1 + 132)/264)}" />
+
                                     <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
+
                                     <path d="M20,76 A 40 40 0 1 1 80 76" fill="none"
                                         :stroke="osc.A.onOff?knob.color:'#888'"
                                         :style="{'stroke-dashoffset':184 - 184*((knob.rotation*1 + 132)/264)}" />
@@ -110,6 +119,7 @@
                         </div>
                     </div>
                     <div class="knobs-row">
+                        <!-- ----------OSC A - VOLUME ----------- -->
                         <div v-for="knob in [knobs[14]]" class="rela-inline knob style3">
                             <div class="rela-block knob-dial" :style="{'color':osc.A.onOff?knob.color:'#888'}">
                                 <div class="abs-center dial-grip"
@@ -135,7 +145,7 @@
 
 
 
-            <!-- ----------OSC AAAAAAAAAAAAAAAAAA----------- -->
+            <!-- ----------OSC BBBBBBBBBBBBBBBBBBBBBBBB----------- -->
             <div class="body-inner" id="osc-main" data-id="B">
 
                 <!-- ----------title ----------- -->
@@ -185,7 +195,9 @@
                                     @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
                                 </div>
                                 <svg class="dial-svg" viewBox="0 0 100 100">
-                                    <path d="M18,80 A 44 44 0 1 1 82 80" fill="none" stroke="white" />
+                                    <path d="M18,80 A 44 44 0 1 1 82 80" fill="none" stroke="white"
+                                        style="stroke-dasharray: 205 205;"
+                                        :style="{'stroke-dashoffset':205 - 205*((knob.rotation*1 + 132)/264)}" />
                                     <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
                                     <path d="M20,76 A 40 40 0 1 1 80 76" fill="none"
                                         :stroke="osc.B.onOff?knob.color:'#888'"
@@ -376,11 +388,10 @@
                 volCenter: new Tone.Volume(-12),
                 volSide: new Tone.Volume(-12),
                 env: {
-                    detune: 0,
-                    vol: 0,
-                    blend: 0,
-                    pitch: 1,
-                    volume: 1,
+                    detune: app.knobs[11].env,
+                    blend: app.knobs[12].env,
+                    pitch: app.knobs[13].env,
+                    volume: app.knobs[14].env,
                 },
             };
         };
@@ -663,12 +674,14 @@
         const createENVobject = (osc) => {
             temp = {};
             Object.keys(osc.env).forEach(function (k) {
-                temp[k] = new Tone.Envelope({
-                    attack: envs[osc.env[k]].attack,
-                    decay: envs[osc.env[k]].decay,
-                    sustain: envs[osc.env[k]].sustain,
-                    release: envs[osc.env[k]].release,
-                }).triggerAttack();
+                if (osc.env[k].target != -1) {
+                    temp[k] = new Tone.Envelope({
+                        attack: envs[osc.env[k].target].attack,
+                        decay: envs[osc.env[k].target].decay,
+                        sustain: envs[osc.env[k].target].sustain,
+                        release: envs[osc.env[k].target].release,
+                    }).triggerAttack();
+                }
             })
             return temp;
         };
@@ -722,41 +735,48 @@
             }
         }
 
+
         //update - ENV
         Tone.Transport.scheduleRepeat((time) => {
 
             //for each pressed KEY
             Object.keys(activeNoteA).forEach(function (note) {
-                let start = activeNoteA[note].start;
+                let start = activeNoteA[note].start; //not used
                 let unison = activeNoteA[note].unison;
 
-                //OCS A setup
-                let detune = app.knobs[11].value.cur * activeNoteA[note].env.detune.value;
-                //let blend = app.knobs[12].value.cur;
-                let pitch = app.knobs[13].value.cur * activeNoteA[note].env.pitch.value;
-                //let volume = app.knobs[14].value.cur;
-
-                console.log(activeNoteA[note].env.pitch.value);
-
-                let mid1 = Math.round((unison - 1) / 2);
-                let mid2 = mid1;
-                if (unison % 2 == 0) {
-                    mid1 = Math.round(unison / 2);
-                    mid2 = Math.round(unison / 2 - 1);
-                }
-
-                frequency = activeNoteA[note].frequency * Math.pow(2, pitch / 12);
-
-
-                for (let i = 0; i < unison; i++) {
-                    activeNoteA[note].oscArray[i].frequency.value = frequency;
+                if ("detune" in activeNoteA[note].env) {
+                    let detuneKnob = app.knobs[11];
+                    let detune = (detuneKnob.value.cur - detuneKnob.value.low)/detuneKnob.value.ratio * activeNoteA[note].env.detune.value;
+                    detuneKnob.env.rotation = (detune / ((detuneKnob.value.high - detuneKnob.value.low)/detuneKnob.value.ratio)) * 264 - 132;
 
                     if (unison > 1) {
-                        activeNoteA[note].oscArray[i].detune.value = i * (detune * 2 / (unison - 1)) - detune;
+                        for (let i = 0; i < unison; i++) {
+                            activeNoteA[note].oscArray[i].detune.value = i * (detune * 2 / (unison - 1)) - detune;
+                        }
                     }
                 }
+
+                if ("pitch" in activeNoteA[note].env) {
+                    let pitch = app.knobs[13].value.cur * activeNoteA[note].env.pitch.value;
+                    frequency = activeNoteA[note].frequency * Math.pow(2, pitch / 12);
+
+                    for (let i = 0; i < unison; i++) {
+                        activeNoteA[note].oscArray[i].frequency.value = frequency;
+                    }
+                }
+
+                //let volume = app.knobs[14].value.cur;
+
+                // let mid1 = Math.round((unison - 1) / 2);
+                // let mid2 = mid1;
+                // if (unison % 2 == 0) {
+                //     mid1 = Math.round(unison / 2);
+                //     mid2 = Math.round(unison / 2 - 1);
+                // }
             });
         }, "128n");
+
+
 
         Tone.Transport.start();
 
@@ -794,11 +814,11 @@
                 });
 
                 setTimeout(async () => {
-                    activeNoteA[key.note].oscArray.forEach(async (oscTEMP) => {
-                        await oscTEMP.stop();
+                    await activeNoteA[key.note].oscArray.forEach(async (oscTEMP) => {
+                        oscTEMP.stop();
                     });
                     await delete activeNoteA[key.note];
-                }, activeNoteA[key.note].env.volume.release * 1100);
+                }, 3000);
             }
 
 
