@@ -363,7 +363,6 @@
         selectBoxes.forEach(box => {
             const img = new Image();
             img.src = "src/images/drag-image.png";
-            console.log(img);
             box.addEventListener("dragstart", function (e) {
                 e.dataTransfer.setDragImage(img, 25, 10);
             }, false);
@@ -723,6 +722,7 @@
                     }
 
                     oscTEMParray.push(oscTEMP);
+                    console.log("start");
                 }
 
                 if (obj.note in obj.activeNote) {
@@ -747,29 +747,41 @@
             }
         }
 
-        //update - ENV
-        Tone.Transport.scheduleRepeat(async (time) => {
+        keyToRemoveA = [];
 
-            removeA.forEach((note) => {
+        //update - ENV
+        Tone.Transport.scheduleRepeat((time) => {
+
+            keyToReleaseA.forEach((note) => {
                 e = activeNoteA[note][0];
 
                 Object.keys(e.env).forEach(function (k) {
                     e.env[k].triggerRelease();
                 });
 
-                setTimeout(async () => {
-                    await e.oscArray.forEach(async (oscTEMP) => {
-                        await oscTEMP.stop();
-                    });
-
-                    activeNoteA[note].shift();
-                    if (activeNoteA[note].length == 0) {
-                        delete activeNoteA[note];
-                    }
+                setTimeout(() => {
+                    keyToRemoveA.push(note);
                 }, 3000);
 
+
             });
-            removeA = [];
+            keyToReleaseA = [];
+
+
+            keyToRemoveA.forEach((note) => {
+                e = activeNoteA[note][0];
+
+                e.oscArray.forEach((oscTEMP) => {
+                    oscTEMP.stop();
+                });
+
+                activeNoteA[note].shift();
+                if (activeNoteA[note].length == 0) {
+                    delete activeNoteA[note];
+                }
+            });
+            keyToRemoveA = [];
+
 
             //for each pressed KEY
             Object.keys(activeNoteA).forEach(function (note) {
@@ -849,10 +861,10 @@
         };
 
 
-        var removeA = [];
+        var keyToReleaseA = [];
 
         const stopOSC = async (key) => {
-            removeA.push(key.note);
+            keyToReleaseA.push(key.note);
 
             if (Object.keys(activeNoteB).length != 0) {
                 activeNoteB[key.note].oscArray.forEach(async (oscTEMP) => {
