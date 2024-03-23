@@ -100,6 +100,8 @@
                                 </div>
 
                                 <svg class="dial-svg" viewBox="0 0 100 100">
+
+                                    <!-- ----------KNOB OUTER ENV ----------- -->
                                     <path v-if="knob.env.target==curENV" d="M18,80 A 44 44 0 1 1 82 80" fill="none"
                                         stroke="white" style="stroke-dasharray: 205 205;"
                                         :style="{'stroke-dashoffset':205 - 205*((knob.env.rotation*1 + 132)/264)}" />
@@ -127,6 +129,12 @@
                                     @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
                                 </div>
                                 <svg class="dial-svg" viewBox="0 0 100 100">
+                                    <!-- ----------KNOB OUTER ENV ----------- -->
+                                    <path v-if="knob.env.target==curENV" d="M18,80 A 44 44 0 1 1 82 80" fill="none"
+                                        stroke="white" style="stroke-dasharray: 205 205;"
+                                        :style="{'stroke-dashoffset':205 - 205*((knob.env.rotation*1 + 132)/264)}" />
+
+
                                     <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
                                     <path d="M20,76 A 40 40 0 1 1 80 76" fill="none"
                                         :stroke="osc.A.onOff?knob.color:'#888'"
@@ -342,19 +350,10 @@
         </div>
     </div>
 
-
-
-
-
-
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.37/Tone.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/audiokeys@0.1.1/dist/audiokeys.min.js"></script>
-
-
     <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.1.10/vue.min.js'></script>
     <script src="src/js/knob.js"></script>
-
     <script>
 
         //--------------#drag & drop----------------------------
@@ -370,9 +369,6 @@
 
 
         //-------------------#add wavetable images #images #wavetable------------------
-
-        const waveTablesTypes = ['sine', 'triangle', 'sawtooth', 'square'];
-
         const createOSC = (checkBox, selectionBody, canvasBody) => {
             return {
                 onOff: true,
@@ -386,12 +382,6 @@
                 }),
                 volCenter: new Tone.Volume(-12),
                 volSide: new Tone.Volume(-12),
-                env: {
-                    detune: app.knobs[11].env,
-                    blend: app.knobs[12].env,
-                    pitch: app.knobs[13].env,
-                    volume: app.knobs[14].env,
-                },
             };
         };
 
@@ -402,283 +392,42 @@
                 sustain: 0.8,
                 release: 0.3,
             }),
-            new Tone.Envelope({
-                attack: 0.5,
-                decay: 0.5,
-                sustain: 1,
-                release: 0.5,
-            }),
-            new Tone.AmplitudeEnvelope(0.5, 0.5, 0.5, 0.5,),
+            new Tone.Envelope(0.5, 0.5, 1, 0.5),
             new Tone.AmplitudeEnvelope(0.5, 0.5, 0.5, 0.5,),
         ]
 
         oscA = createOSC('checkbox-osc-A', 'wavetable-selection-A', 'wavetable-canvas-A');
+        oscA["knobs"] = {
+            unison: app.knobs[10],
+            detune: app.knobs[11],
+            blend: app.knobs[12],
+            pitch: app.knobs[13],
+            volume: app.knobs[14],
+        };
+
         oscB = createOSC('checkbox-osc-B', 'wavetable-selection-B', 'wavetable-canvas-B');
-
-
-
-        //------------#draw #canvas #ENV ----------------------------
-        const drawLine = (ctx, x1, y1, x2, y2) => {
-            ctx.beginPath();
-            ctx.moveTo(x1, y1);
-            ctx.lineTo(x2, y2);
-            ctx.stroke();
-        }
-
-        const drawCircle = (ctx, x, y, r) => {
-            ctx.beginPath();
-            ctx.arc(x, y, r, 0, Math.PI * 2);
-            ctx.fill();
-        }
-
-        //canvas env
-        function drawENV() {
-            canvas = document.getElementById('ENV-canvas'),
-                ctx = canvas.getContext('2d');
-            env = envs[app.curENV];
-
-            let margin = 5; //5%
-            //smaller canvas
-            let canvasX = [canvas.width * (margin * 0.005), canvas.width * (1 - margin * 0.005)]
-            let canvasY = [canvas.height * (margin * 0.01), canvas.height * (1 - margin * 0.01),]
-
-
-            ctx.fillStyle = '#2c2d2f';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.fillStyle = 'black';
-            ctx.fillRect(
-                canvasX[0], canvasY[0],
-                canvasX[1] - canvasX[0], canvasY[1] - canvasY[0]
-            );
-
-            // Set grid spacing and line color
-            const gridLines = { height: 5, width: 3 };
-
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = '#535559';
-
-            i = 0.8;
-            for (let y = canvasY[0] + ((canvasY[1] - canvasY[0]) / gridLines.height); y < canvasY[1]; y += (canvasY[1] - canvasY[0]) / gridLines.height) {
-                ctx.font = "14px Anta"; ctx.fillStyle = "#535559"
-                ctx.fillText(i.toFixed(1), canvasX[0] + 5, y - 7);
-                i -= 0.2;
-                drawLine(ctx, canvasX[0], y, canvasX[1], y); //horizontal grid lines
-            }
-            i = 0;
-            for (let x = canvasX[0]; x < canvasX[1]; x += (canvasX[1] - canvasX[0]) / gridLines.width) {
-                ctx.font = "14px Anta"; ctx.fillStyle = "#535559"
-                ctx.fillText(i, x + 5, canvasY[1] - 7);
-                i++;
-                drawLine(ctx, x, canvasY[0], x, canvasY[1]); //vertical grid lines
-            }
-
-            //draw env
-            ctx.strokeStyle = 'rgb(0, 96, 223)';
-            ctx.lineWidth = 3;
-
-            attackPos = {
-                x1: canvasX[0],
-                y1: canvasY[1],
-                x2: (env.attack / gridLines.width) * (canvasX[1] - canvasX[0]) + canvasX[0],
-                y2: canvasY[0],
-            }
-
-            decayPos = {
-                x1: attackPos.x2,
-                y1: attackPos.y2,
-                x2: (env.decay / gridLines.width) * (canvasX[1] - canvasX[0]) + attackPos.x2,
-                y2: canvasY[0] + (canvasY[1] - canvasY[0]) * (1 - env.sustain),
-            }
-
-            releasePos = {
-                x1: decayPos.x2,
-                y1: decayPos.y2,
-                x2: (env.release / gridLines.width) * (canvasX[1] - canvasX[0]) + decayPos.x2,
-                y2: canvasY[1],
-            }
-
-            drawLine(ctx, attackPos.x1, attackPos.y1, attackPos.x2, attackPos.y2);
-            drawLine(ctx, decayPos.x1, decayPos.y1, decayPos.x2, decayPos.y2);
-            drawLine(ctx, releasePos.x1, releasePos.y1, releasePos.x2, releasePos.y2);
-            r = 3;
-            ctx.fillStyle = "white";
-            drawCircle(ctx, attackPos.x1, attackPos.y1, r);
-            drawCircle(ctx, decayPos.x1, decayPos.y1, r);
-            drawCircle(ctx, releasePos.x1, releasePos.y1, r);
-            drawCircle(ctx, releasePos.x2, releasePos.y2, r);
-
-
-            //white outline
-            ctx.strokeStyle = 'white'; ctx.lineWidth = 2;
-            drawLine(ctx, canvasX[0], canvasY[0], canvasX[0], canvasY[1]);
-            drawLine(ctx, canvasX[0], canvasY[1], canvasX[1], canvasY[1]);
-        }
-
-        drawENV();
-
-        app.setENVknobRotation();
-
-        //---------------------canvas osc #draw #canvas #OSC-------------------
-        async function drawWaveform(oscBody, blendType = "none") {
-            oscillator = oscBody.oscillator;
-            canvas = oscBody.canvas;
-            ctx = canvas.getContext('2d');
-            waveform = oscBody.waveform;
-
-            ctx.fillStyle = 'black';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Set grid spacing and line color
-            const gridLines = { height: 4, width: 4 };
-            const gridColor = '#535559';
-
-            ctx.lineWidth = 1;
-            ctx.strokeStyle = gridColor;
-
-            for (let y = 0; y <= canvas.height; y += canvas.height / gridLines.height) {
-                drawLine(ctx, 0, y, canvas.width, y); //horizontal grid lines
-            }
-            for (let x = 0; x <= canvas.width; x += canvas.width / gridLines.width) {
-                drawLine(ctx, x, 0, x, canvas.height); //vertical grid lines
-            }
-
-            // Draw bold X axis
-            ctx.lineWidth = 2;
-            drawLine(ctx, 0, canvas.height / 2, canvas.width, canvas.height / 2);
-
-            ctx.strokeStyle = 'rgb(0, 96, 223)';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.moveTo(0, canvas.height / 2);
-            for (let i = 0; i < waveform.length; i++) {
-                const x = (i / waveform.length) * canvas.width;
-                const y = ((waveform[i] + 1) / 2) * canvas.height;
-                ctx.lineTo(x, y);
-            }
-            ctx.stroke();
-
-            if (blendType != "none") {
-                let [unison, detune, blend] = [null, null, null];
-                if (blendType == "A") {
-                    unison = app.knobs[10].value.cur;
-                    detune = app.knobs[11].value.cur;
-                    blend = app.knobs[12].value.cur;
-                }
-                else if (blendType == "B") {
-                    unison = app.knobs[0].value.cur;
-                    detune = app.knobs[1].value.cur;
-                    blend = app.knobs[2].value.cur;
-                }
-
-
-                let mid1 = Math.round((unison - 1) / 2);
-                let mid2 = mid1;
-                if (unison % 2 == 0) {
-                    mid1 = Math.round(unison / 2);
-                    mid2 = Math.round(unison / 2 - 1);
-                }
-
-                for (let i = 0; i < unison; i++) {
-                    let x = canvas.width / 2;
-                    if (unison != 1) {
-                        x = i * (detune * 2 / (unison - 1)) - detune;
-                        x = x * canvas.width / (100) + canvas.width / 2;
-                    }
-
-                    let y = canvas.height * (1 - blend);
-                    ctx.strokeStyle = 'white';
-
-                    if (mid1 == i || mid2 == i) {
-                        y = canvas.height * blend;
-                        ctx.strokeStyle = 'red';
-                    }
-
-                    drawLine(ctx, x, y, x, canvas.height);
-                }
-            }
-
-        }
-
-        //-----------#disable all --------- if one wavetable is selected----------
-        const selectWavetable = async (oscBody, selectedImg) => {
-            const selectionBody = oscBody.body;
-            const images = selectionBody.querySelectorAll('img');
-
-            images.forEach(img => {
-                img.style.margin = '1px';
-                img.src = `src/images/${img.alt}-wave-off.png`;
-                img.setAttribute('data-onoff', false);
-            });
-
-            selectedImg.style.margin = '0px';
-            selectedImg.src = `src/images/${selectedImg.alt}-wave.png`;
-            selectedImg.setAttribute('data-onoff', true);
-
-            oscBody.oscillator.type = selectedImg.alt;
-
-            oscBody.waveform = await oscBody.oscillator.asArray(256);
-
-            await drawWaveform(oscBody);
+        oscB["knobs"] = {
+            unison: app.knobs[0],
+            detune: app.knobs[1],
+            blend: app.knobs[2],
+            pitch: app.knobs[3],
+            volume: app.knobs[4],
         };
-
-        //------------#create------------ wavetables in selection Body
-        const addWavetablesSelection = async (oscBody) => {
-            let first = true;
-            waveTablesTypes.forEach(name => {
-                const img = document.createElement('img');
-                img.classList.add('wavetable-selection-presets');
-                img.src = `src/images/${name}-off.png`;
-                img.alt = name;
-                img.setAttribute('data-onoff', false);
-
-                img.addEventListener("click", () => {
-                    selectWavetable(oscBody, img);
-                });
-                oscBody.body.appendChild(img);
-
-                if (first === true) {
-                    first = img;
-                }
-            });
-            await selectWavetable(oscBody, first);
-        };
-
-        //add wave tables asynchornously
-        (async () => {
-            try {
-                await addWavetablesSelection(oscA);
-                await addWavetablesSelection(oscB);
-            } catch (error) {
-                console.error('Adding OSC wavetable failed', error);
-            }
-        })();
-
-
-
-
-
-
-
-
-
 
 
 
 
         //------------------------------tone-------------------------
-        let activeNoteA = {};
-        let activeNoteB = {};
 
         const createENVobject = (osc) => {
             temp = {};
-            Object.keys(osc.env).forEach(function (k) {
-                if (osc.env[k].target != -1) {
+            Object.keys(osc.knobs).forEach(function (k) {
+                if (osc.knobs[k].env.target != -1) {
                     temp[k] = new Tone.Envelope({
-                        attack: envs[osc.env[k].target].attack,
-                        decay: envs[osc.env[k].target].decay,
-                        sustain: envs[osc.env[k].target].sustain,
-                        release: envs[osc.env[k].target].release,
+                        attack: envs[osc.knobs[k].env.target].attack,
+                        decay: envs[osc.knobs[k].env.target].decay,
+                        sustain: envs[osc.knobs[k].env.target].sustain,
+                        release: envs[osc.knobs[k].env.target].release,
                     }).triggerAttack();
                 }
             })
@@ -687,108 +436,93 @@
 
 
         const addOSC = (obj) => {
+            unison = obj.osc.knobs["unison"].value.cur;
+            detune = obj.osc.knobs["detune"].value.cur;
+            pitch = obj.osc.knobs["pitch"].value.cur;
+            //volume = obj.osc.knobs["volume"].value.cur;
 
             osc = obj.osc;
+            if (!osc.checkBox.checked) { return; }
 
-            if (osc.checkBox.checked) {
-                const oscTEMParray = [];
+            const oscTEMParray = [];
+            let mid1 = Math.round((unison % 2 == 0 ? (unison) : (unison - 1)) / 2);
+            let mid2 = Math.round(unison % 2 == 0 ? (unison / 2) : (unison / 2 - 1));
 
-                let mid1 = Math.round((obj.unison - 1) / 2);
-                let mid2 = mid1;
-                if (obj.unison % 2 == 0) {
-                    mid1 = Math.round(obj.unison / 2);
-                    mid2 = Math.round(obj.unison / 2 - 1);
-                }
 
-                obj.frequency = obj.frequency * Math.pow(2, obj.pitch / 12);
-                for (let i = 0; i < obj.unison; i++) {
-                    let oscTEMP = new Tone.Oscillator(obj.frequency, osc.oscillator.type);
+            obj.frequency = obj.frequency * Math.pow(2, pitch / 12);
 
-                    if (obj.unison > 1) {
-                        oscTEMP.detune.value = i * (obj.detune * 2 / (obj.unison - 1)) - obj.detune;
-                    }
+            for (let i = 0; i < unison; i++) {
+                let oscTEMP = new Tone.Oscillator(obj.frequency, osc.oscillator.type);
 
-                    if (mid1 == i || mid2 == i) {
-                        oscTEMP.connect(obj.osc.volCenter);
-                        obj.osc.volCenter.toDestination();
+                if (unison > 1) { oscTEMP.detune.value = i * (detune * 2 / (unison - 1)) - detune; }
 
-                        oscTEMP.start();
-                    }
-                    else {
-                        oscTEMP.connect(obj.osc.volSide);
-                        obj.osc.volSide.toDestination();
-
-                        oscTEMP.start();
-                    }
-
-                    oscTEMParray.push(oscTEMP);
-                    console.log("start");
-                }
-
-                if (obj.note in obj.activeNote) {
-                    console.log(obj.activeNote, obj.note);
-                    obj.activeNote[obj.note].push({
-                        oscArray: oscTEMParray,
-                        start: Tone.immediate(),
-                        unison: obj.unison,
-                        frequency: obj.frequency,
-                        env: createENVobject(osc),
-                    });
+                if (mid1 == i || mid2 == i) {
+                    oscTEMP.connect(obj.osc.volCenter);
+                    obj.osc.volCenter.toDestination();
+                    oscTEMP.start();
                 }
                 else {
-                    obj.activeNote[obj.note] = [{
-                        oscArray: oscTEMParray,
-                        start: Tone.immediate(),
-                        unison: obj.unison,
-                        frequency: obj.frequency,
-                        env: createENVobject(osc),
-                    }];
+                    oscTEMP.connect(obj.osc.volSide);
+                    obj.osc.volSide.toDestination();
+                    oscTEMP.start();
                 }
+
+                oscTEMParray.push(oscTEMP);
             }
+
+            activeNoteObj = {
+                oscArray: oscTEMParray,
+                //start: Tone.immediate(),
+                unison: unison,
+                frequency: obj.frequency,
+                env: createENVobject(osc),
+            };
+
+            if (obj.note in obj.activeNote) { obj.activeNote[obj.note].push(activeNoteObj); }
+            else { obj.activeNote[obj.note] = [activeNoteObj]; }
         }
 
-        keyToRemoveA = [];
-
-        //update - ENV
-        Tone.Transport.scheduleRepeat((time) => {
-
-            keyToReleaseA.forEach((note) => {
-                e = activeNoteA[note][0];
-
-                Object.keys(e.env).forEach(function (k) {
-                    e.env[k].triggerRelease();
-                });
-
-                setTimeout(() => {
-                    keyToRemoveA.push(note);
-                }, 3000);
 
 
+        const keySet = () => {
+            return {
+                toRemove: [],
+                toRelease: [],
+                activeNote: {},
+            }
+        };
+
+        keySetA = keySet();
+        keySetB = keySet();
+
+
+
+        const releaseKey = (keyset) => {
+            keyset.toRelease.forEach((note) => {
+                e = keyset.activeNote[note][0];
+                Object.keys(e.env).forEach(function (k) { e.env[k].triggerRelease(); });
+                setTimeout(() => { keyset.toRemove.push(note); }, 1000);
             });
-            keyToReleaseA = [];
+            keyset.toRelease = [];
+        };
 
-
-            keyToRemoveA.forEach((note) => {
-                e = activeNoteA[note][0];
-
-                e.oscArray.forEach((oscTEMP) => {
-                    oscTEMP.stop();
-                });
-
-                activeNoteA[note].shift();
-                if (activeNoteA[note].length == 0) {
-                    delete activeNoteA[note];
-                }
+        const removeKey = (keyset) => {
+            keyset.toRemove.forEach((note) => {
+                e = keyset.activeNote[note][0];
+                e.oscArray.forEach((oscTEMP) => { oscTEMP.stop(); });
+                keyset.activeNote[note].shift();
+                if (keyset.activeNote[note].length == 0) { delete keyset.activeNote[note]; }
             });
-            keyToRemoveA = [];
+            keyset.toRemove = [];
+        }
 
-
+        const adjustSound = (keyset) => {
             //for each pressed KEY
-            Object.keys(activeNoteA).forEach(function (note) {
+            Object.keys(keyset.activeNote).forEach(function (note) {
 
-                e = activeNoteA[note][activeNoteA[note].length - 1];
+                e = keyset.activeNote[note][keyset.activeNote[note].length - 1];
 
-                let start = e.start; //not used
+                //let start = e.start; //not used
                 let unison = e.unison;
 
 
@@ -814,22 +548,29 @@
                     }
                 }
 
+
                 //let volume = app.knobs[14].value.cur;
 
-                // let mid1 = Math.round((unison - 1) / 2);
-                // let mid2 = mid1;
-                // if (unison % 2 == 0) {
-                //     mid1 = Math.round(unison / 2);
-                //     mid2 = Math.round(unison / 2 - 1);
-                // }
 
 
             });
+        }
+
+        //-------------------------------update - ENV----------------------------
+        Tone.Transport.scheduleRepeat((time) => {
+
+            releaseKey(keySetA);
+            //releaseKey(keySetB);
+
+            removeKey(keySetA);
+            //removeKey(keySetB);
+
+            adjustSound(keySetA);
+            //adjustSound(keySetB);
         }, "128n");
 
-
-
         Tone.Transport.start();
+
 
         lastPressed = null;
         const startOSC = (key) => {
@@ -837,99 +578,29 @@
 
             addOSC({
                 osc: oscA,
-                activeNote: activeNoteA,
-                unison: app.knobs[10].value.cur,
-                detune: app.knobs[11].value.cur,
-                //blend: app.knobs[12].value.cur,
-                pitch: app.knobs[13].value.cur,
-                volume: app.knobs[14].value.cur,
+                activeNote: keySetA.activeNote,
                 frequency: key.frequency,
                 note: key.note,
             });
 
-            addOSC({
-                osc: oscB,
-                activeNote: activeNoteB,
-                unison: app.knobs[0].value.cur,
-                detune: app.knobs[1].value.cur,
-                //blend: app.knobs[2].value.cur,
-                pitch: app.knobs[3].value.cur,
-                volume: app.knobs[4].value.cur,
-                frequency: key.frequency,
-                note: key.note,
-            });
+            // addOSC({
+            //     osc: oscB,
+            //     activeNote: keySetB.activeNote,
+            //     frequency: key.frequency,
+            //     note: key.note,
+            // });
         };
-
-
-        var keyToReleaseA = [];
 
         const stopOSC = async (key) => {
-            keyToReleaseA.push(key.note);
-
-            if (Object.keys(activeNoteB).length != 0) {
-                activeNoteB[key.note].oscArray.forEach(async (oscTEMP) => {
-                    await oscTEMP.stop();
-                });
-                delete activeNoteB[key.note];
-            }
+            keySetA.toRelease.push(key.note);
+            //keySetB.toRelease.push(key.note);
         }
 
 
-
-
-
-
-
-
-
-        const keyboard = new AudioKeys({ rows: 1 });
-
-        keyboard.down(async (key) => {
-            await Tone.start();
-            await playSynth(key);
-        });
-
-        keyboard.up(async (key) => {
-            await stopSynth(key);
-        });
-
-        //piano pressed visual + sound
-        const playSynth = (key) => {
-            const clickedKey = document.querySelector(`[data-key="${String.fromCharCode(key.keyCode).toLowerCase()}"]`);
-            clickedKey.classList.add("active");
-            startOSC(key);
-        };
-
-        const stopSynth = (key) => {
-            const clickedKey = document.querySelector(`[data-key="${String.fromCharCode(key.keyCode).toLowerCase()}"]`);
-            clickedKey.classList.remove("active");
-            stopOSC(key);
-        };
-
-
-        //---------------piano visual-------------------
-        const keysCheckbox = document.querySelector(".keys-checkbox input");
-        const pianoKeys = document.querySelectorAll(".piano-keys .key");
-        let allKeys = [];
-
-        //[Show-Keys] checkbox function
-        const showHideKeys = () => {
-            pianoKeys.forEach(key => key.classList.toggle("hide"));
-        }
-        keysCheckbox.addEventListener("click", showHideKeys);
-
-        //piano pressed effect - click
-        pianoKeys.forEach(key => {
-            allKeys.push(key.dataset.key);
-            key.addEventListener("mousedown", () => {
-                keyboard._addKey({ keyCode: key.dataset.key.toUpperCase().charCodeAt(0) });
-            });
-            key.addEventListener("mouseup", () => {
-                keyboard._removeKey({ keyCode: key.dataset.key.toUpperCase().charCodeAt(0) });
-            });
-        });
 
     </script>
+    <script src="src/js/keyboard.js"></script>
+    <script src="src/js/drawCanvas.js"></script>
 
 
 </body>
