@@ -142,9 +142,9 @@
   stroke-dasharray: 184 184;
   stroke-linecap: round !important;
 }
-.dial-svg path {
+/* .dial-svg path {
   transition: 0.1s cubic-bezier(0, 0, 0.24, 1);
-}
+} */
 
 .knob-label {
   font-size: 10px;

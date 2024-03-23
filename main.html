@@ -725,43 +725,80 @@
                     oscTEMParray.push(oscTEMP);
                 }
 
-                obj.activeNote[obj.note] = {
-                    oscArray: oscTEMParray,
-                    start: Tone.immediate(),
-                    unison: obj.unison,
-                    frequency: obj.frequency,
-                    env: createENVobject(osc),
-                };
+                if (obj.note in obj.activeNote) {
+                    console.log(obj.activeNote, obj.note);
+                    obj.activeNote[obj.note].push({
+                        oscArray: oscTEMParray,
+                        start: Tone.immediate(),
+                        unison: obj.unison,
+                        frequency: obj.frequency,
+                        env: createENVobject(osc),
+                    });
+                }
+                else {
+                    obj.activeNote[obj.note] = [{
+                        oscArray: oscTEMParray,
+                        start: Tone.immediate(),
+                        unison: obj.unison,
+                        frequency: obj.frequency,
+                        env: createENVobject(osc),
+                    }];
+                }
             }
         }
 
-
         //update - ENV
-        Tone.Transport.scheduleRepeat((time) => {
+        Tone.Transport.scheduleRepeat(async (time) => {
+
+            removeA.forEach((note) => {
+                e = activeNoteA[note][0];
+
+                Object.keys(e.env).forEach(function (k) {
+                    e.env[k].triggerRelease();
+                });
+
+                setTimeout(async () => {
+                    await e.oscArray.forEach(async (oscTEMP) => {
+                        await oscTEMP.stop();
+                    });
+
+                    activeNoteA[note].shift();
+                    if (activeNoteA[note].length == 0) {
+                        delete activeNoteA[note];
+                    }
+                }, 3000);
+
+            });
+            removeA = [];
 
             //for each pressed KEY
             Object.keys(activeNoteA).forEach(function (note) {
-                let start = activeNoteA[note].start; //not used
-                let unison = activeNoteA[note].unison;
 
-                if ("detune" in activeNoteA[note].env) {
+                e = activeNoteA[note][activeNoteA[note].length - 1];
+
+                let start = e.start; //not used
+                let unison = e.unison;
+
+
+                if ("detune" in e.env) {
                     let detuneKnob = app.knobs[11];
-                    let detune = (detuneKnob.value.cur - detuneKnob.value.low)/detuneKnob.value.ratio * activeNoteA[note].env.detune.value;
-                    detuneKnob.env.rotation = (detune / ((detuneKnob.value.high - detuneKnob.value.low)/detuneKnob.value.ratio)) * 264 - 132;
-
+                    let detune = (detuneKnob.value.cur - detuneKnob.value.low) / detuneKnob.value.ratio * e.env.detune.value;
+                    if (note == lastPressed) {
+                        detuneKnob.env.rotation = (detune / ((detuneKnob.value.high - detuneKnob.value.low) / detuneKnob.value.ratio)) * 264 - 132;
+                    }
                     if (unison > 1) {
                         for (let i = 0; i < unison; i++) {
-                            activeNoteA[note].oscArray[i].detune.value = i * (detune * 2 / (unison - 1)) - detune;
+                            e.oscArray[i].detune.value = i * (detune * 2 / (unison - 1)) - detune;
                         }
                     }
                 }
 
-                if ("pitch" in activeNoteA[note].env) {
-                    let pitch = app.knobs[13].value.cur * activeNoteA[note].env.pitch.value;
-                    frequency = activeNoteA[note].frequency * Math.pow(2, pitch / 12);
+                if ("pitch" in e.env) {
+                    let pitch = app.knobs[13].value.cur * e.env.pitch.value;
+                    frequency = e.frequency * Math.pow(2, pitch / 12);
 
                     for (let i = 0; i < unison; i++) {
-                        activeNoteA[note].oscArray[i].frequency.value = frequency;
+                        e.oscArray[i].frequency.value = frequency;
                     }
                 }
 
@@ -773,6 +810,8 @@
                 //     mid1 = Math.round(unison / 2);
                 //     mid2 = Math.round(unison / 2 - 1);
                 // }
+
+
             });
         }, "128n");
 
@@ -780,7 +819,10 @@
 
         Tone.Transport.start();
 
+        lastPressed = null;
         const startOSC = (key) => {
+            lastPressed = key.note;
+
             addOSC({
                 osc: oscA,
                 activeNote: activeNoteA,
@@ -807,20 +849,10 @@
         };
 
 
+        var removeA = [];
+
         const stopOSC = async (key) => {
-            if (Object.keys(activeNoteA).length != 0) {
-                Object.keys(activeNoteA[key.note].env).forEach(function (k) {
-                    activeNoteA[key.note].env[k].triggerRelease();
-                });
-
-                setTimeout(async () => {
-                    await activeNoteA[key.note].oscArray.forEach(async (oscTEMP) => {
-                        oscTEMP.stop();
-                    });
-                    await delete activeNoteA[key.note];
-                }, 3000);
-            }
-
+            removeA.push(key.note);
 
             if (Object.keys(activeNoteB).length != 0) {
                 activeNoteB[key.note].oscArray.forEach(async (oscTEMP) => {
