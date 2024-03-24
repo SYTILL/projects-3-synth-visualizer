@@ -23,7 +23,7 @@ let app = new Vue({
                 label: 'Unison',
                 osc: "A", knobType: "updown", row: "upper",
                 value: { real: 1, cur: 1, low: 1, high: 16 },
-                env: { target: -1, rotation: 0},
+                env: { target: -1, rotation: -132},
                 color: '#0060df',
                 active: true,
                 selected: false,
@@ -33,7 +33,7 @@ let app = new Vue({
                 osc: "A", knobType: "circle", row: "upper",
                 rotation: -110,
                 value: { cur: 4, low: 0, high: 48, ratio: 1, points: 0 },
-                env: { target: 0, rotation: 0},
+                env: { target: -1, rotation: -132},
                 color: '#0060df',
                 active: true,
                 selected: false,
@@ -43,7 +43,7 @@ let app = new Vue({
                 osc: "A", knobType: "circle", row: "upper",
                 rotation: 0,
                 value: { cur: 0.5, low: 0, high: 100, ratio: 100, points: 2 },
-                env: { target: 1, rotation: 0},
+                env: { target: -1, rotation: -132},
                 color: '#0060df',
                 active: true, selected: false,
             },
@@ -51,8 +51,8 @@ let app = new Vue({
                 label: 'Pitch',
                 osc: "A", knobType: "circle", row: "upper",
                 rotation: 0,
-                value: { cur: 10, low: -240, high: 240, ratio: 10, points: 2 },
-                env: { target: -1, rotation: 0},
+                value: { cur: 0, low: -240, high: 240, ratio: 10, points: 2 },
+                env: { target: -1, rotation: -132},
                 color: '#0060df',
                 active: true, selected: false,
             },
@@ -61,7 +61,7 @@ let app = new Vue({
                 osc: "A", knobType: "circle", row: "lower",
                 rotation: 0,
                 value: { cur: 0, low: -80, high: 80, ratio: 1, points: 0 },
-                env: { target: 0, rotation: 0},
+                env: { target: 3, rotation: -132},
                 color: '#0060df',
                 active: true, selected: false,
             },
@@ -219,6 +219,7 @@ let app = new Vue({
             if (knob.label == "unison") {
                 return;
             }
+            
 
             knob.rotation += diff;
             if (knob.rotation >= 132) { knob.rotation = 132; }
