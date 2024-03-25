@@ -399,12 +399,12 @@
                 }),
                 volCenter: new Tone.Volume(-12),
                 volSide: new Tone.Volume(-12),
-                volENV: envs[0],
+                volENV: 3,
             };
         };
 
         envs = [
-            new Tone.AmplitudeEnvelope({
+            new Tone.Envelope({
                 attack: 0.1,
                 decay: 0.3,
                 sustain: 0.8,
@@ -412,7 +412,7 @@
             }),
             new Tone.Envelope(0.5, 0.5, 1, 0.5),
             new Tone.Envelope(0.5, 0.5, 0.5, 0.5,),
-            new Tone.AmplitudeEnvelope(0, 0, 1, 0),
+            new Tone.Envelope(0, 0, 1, 0),
         ]
 
         oscA = createOSC('checkbox-osc-A', 'wavetable-selection-A', 'wavetable-canvas-A', 'A');
@@ -458,7 +458,8 @@
             unison = obj.osc.knobs["unison"].value.cur;
             detune = obj.osc.knobs["detune"].value.cur;
             pitch = obj.osc.knobs["pitch"].value.cur;
-            //volume = obj.osc.knobs["volume"].value.cur;
+
+            volumeKnob = obj.osc.knobs["volume"];
 
             osc = obj.osc;
             if (!osc.checkBox.checked) { return; }
@@ -472,7 +473,13 @@
 
             start = Tone.immediate() + 0.1;
 
-            obj.osc.volENV.triggerAttack();
+            target = volumeKnob.env.target != -1 ? volumeKnob.env.target : 3;
+            let volENV = new Tone.AmplitudeEnvelope({
+                attack: envs[target].attack,
+                decay: envs[target].decay,
+                sustain: envs[target].sustain,
+                release: envs[target].release,
+            }).triggerAttack(start);
 
             for (let i = 0; i < unison; i++) {
                 let oscTEMP = new Tone.Oscillator(obj.frequency, osc.oscillator.type);
@@ -480,15 +487,15 @@
                 if (unison > 1) { oscTEMP.detune.value = i * (detune * 2 / (unison - 1)) - detune; }
 
                 if (mid1 == i || mid2 == i) {
-                    oscTEMP.connect(obj.osc.volCenter);
-                    obj.osc.volCenter.connect(obj.osc.volENV);
-                    obj.osc.volENV.toDestination();
+                    oscTEMP.connect(volENV);
+                    volENV.connect(obj.osc.volCenter);
+                    obj.osc.volCenter.toDestination();
                     oscTEMP.start(start);
                 }
                 else {
-                    oscTEMP.connect(obj.osc.volSide);
-                    obj.osc.volSide.connect(obj.osc.volENV);
-                    obj.osc.volENV.toDestination();
+                    oscTEMP.connect(volENV);
+                    volENV.connect(obj.osc.volSide);
+                    obj.osc.volSide.toDestination();
                     oscTEMP.start(start);
                 }
 
@@ -501,6 +508,7 @@
                 unison: unison,
                 frequency: obj.frequency,
                 env: createENVobject(osc),
+                volENV: volENV
             };
 
             if (obj.note in obj.activeNote) { obj.activeNote[obj.note].push(activeNoteObj); }
@@ -525,8 +533,9 @@
         const releaseKey = (keyset) => {
             keyset.toRelease.forEach((note) => {
                 e = keyset.activeNote[note][0];
+                e.volENV.triggerRelease();
                 Object.keys(e.env).forEach(function (k) { e.env[k].triggerRelease(); });
-                setTimeout(() => { keyset.toRemove.push(note); }, 1000);
+                setTimeout(() => { keyset.toRemove.push(note); }, e.volENV.release*1000);
             });
             keyset.toRelease = [];
         };
