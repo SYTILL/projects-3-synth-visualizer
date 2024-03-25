@@ -169,21 +169,21 @@ let app = new Vue({
             }
 
 
-            //real time volume change
-            if (['Volume', 'Blend'].includes(selectedKnob.label)) {
-                if (selectedKnob.osc == 'A') {
-                    let volume = app.knobs[14].value.cur;
-                    let blend = app.knobs[12].value.cur;
-                    oscA.volCenter.volume.value = 40 * Math.log10(((volume + 80) / 160) * (1 - blend));
-                    oscA.volSide.volume.value = 40 * Math.log10(((volume + 80) / 160) * (blend));
-                }
-                else if (selectedKnob.osc == 'B') {
-                    let volume = app.knobs[4].value.cur;
-                    let blend = app.knobs[2].value.cur;
-                    oscB.volCenter.volume.value = 40 * Math.log10(((volume + 80) / 160) * (1 - blend));
-                    oscB.volSide.volume.value = 40 * Math.log10(((volume + 80) / 160) * (blend));
-                }
-            }
+            // //real time volume change
+            // if (['Volume', 'Blend'].includes(selectedKnob.label)) {
+            //     if (selectedKnob.osc == 'A') {
+            //         let volume = app.knobs[14].value.cur;
+            //         let blend = app.knobs[12].value.cur;
+            //         oscA.volCenter.volume.value = 40 * Math.log10(((volume + 80) / 160) * (1 - blend));
+            //         oscA.volSide.volume.value = 40 * Math.log10(((volume + 80) / 160) * (blend));
+            //     }
+            //     else if (selectedKnob.osc == 'B') {
+            //         let volume = app.knobs[4].value.cur;
+            //         let blend = app.knobs[2].value.cur;
+            //         oscB.volCenter.volume.value = 40 * Math.log10(((volume + 80) / 160) * (1 - blend));
+            //         oscB.volSide.volume.value = 40 * Math.log10(((volume + 80) / 160) * (blend));
+            //     }
+            // }
 
             //show unison bar on canvas
             if (['Blend', 'Detune', 'Unison'].includes(selectedKnob.label)) {
