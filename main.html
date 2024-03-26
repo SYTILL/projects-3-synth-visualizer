@@ -525,7 +525,6 @@
 
         const keySet = () => {
             return {
-                toRemove: [],
                 toRelease: [],
                 activeNote: {},
             }
@@ -535,30 +534,28 @@
         keySetB = keySet();
 
 
+        let offset = new Array(128).fill(0);
+        const releaseKey = (keyset, note) => {
+            if (!note){
+                return ;
+            }
 
-        const releaseKey = (keyset) => {
-            keyset.toRelease.forEach((note) => {
-                console.log("stop");
-                let e = keyset.activeNote[note][0];
+            let e = keyset.activeNote[note][offset[note]++];
 
-                let start = Tone.immediate() + 0.1;
-                e.volENV.triggerRelease(start);
+            let start = Tone.immediate() + 0.1;
+            e.volENV.triggerRelease(start);
 
-                Object.keys(e.env).forEach(function (k) { e.env[k].triggerRelease(start); });
-                setTimeout(() => { keyset.toRemove.push(note); }, e.volENV.release * 1000);
+            Object.keys(e.env).forEach(function (k) {
+                e.env[k].triggerRelease(start);
             });
-            keyset.toRelease = [];
-        };
-
-        const removeKey = (keyset) => {
-            keyset.toRemove.forEach((note) => {
+            setTimeout(() => {
                 let e = keyset.activeNote[note][0];
                 e.oscArray.forEach((oscTEMP) => { oscTEMP.stop(); });
                 keyset.activeNote[note].shift();
+                offset[note]--;
                 if (keyset.activeNote[note].length == 0) { delete keyset.activeNote[note]; }
-            });
-            keyset.toRemove = [];
-        }
+            }, e.volENV.release * 1000);
+        };
 
         const rotateENV = (knob, envValue, showRotation) => {
             let ratio = knob.value.ratio;
@@ -626,11 +623,8 @@
         //-------------------------------update - ENV----------------------------
 
         let releaseKeyOnce = true;
-        Tone.Transport.scheduleRepeat(async (time) => {
-            await releaseKey(keySetA);
-
-            removeKey(keySetA);
-            //removeKey(keySetB);
+        Tone.Transport.scheduleRepeat((time) => {
+            releaseKey(keySetA, keySetA.toRelease.shift());
 
             adjustSound(keySetA, oscA);
             //adjustSound(keySetB);
