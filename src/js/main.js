@@ -116,7 +116,7 @@ const addOSC = (obj) => {
         decay: envs[target].decay,
         sustain: envs[target].sustain,
         release: envs[target].release,
-    }).triggerAttack(start - 0.01);
+    }).triggerAttack(start);
 
     let volCenter = new Tone.Volume(-12);
     let volSide = new Tone.Volume(-12);

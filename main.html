@@ -104,11 +104,13 @@
 
                     <div class="noise-selection-body">
                         <div class="noise-selection-box">
-                            <div class="noise-selection-arrow">◀</div>
+                            <div class="noise-selection-arrow"
+                            @click="osc.NOISE.type--;">◀</div>
                             <div class="noise-selection-text">
-                                {{osc.NOISE.type}}
+                                {{noiseTypes[osc.NOISE.type%3]}}
                             </div>
-                            <div class="noise-selection-arrow">▶</div>
+                            <div class="noise-selection-arrow"
+                            @click="osc.NOISE.type++;">▶</div>
                         </div>
                     </div>
 

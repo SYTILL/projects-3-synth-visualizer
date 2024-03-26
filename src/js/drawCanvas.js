@@ -166,7 +166,7 @@ async function drawWaveform(oscBody, blendType = "none") {
 }
 
 //-----------#disable all --------- if one wavetable is selected----------
-const selectWavetable = async (oscBody, selectedImg, hasCanvas) => {
+const selectWavetable = async (oscBody, selectedImg, hasCanvas = true) => {
     const selectionBody = oscBody.body;
     const images = selectionBody.querySelectorAll('img');
 

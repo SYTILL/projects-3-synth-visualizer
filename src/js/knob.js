@@ -1,6 +1,7 @@
 let app = new Vue({
     el: '#app',
     data: {
+        noiseTypes: ["PINK","WHITE","BROWN"],
         osc: {
             A: {
                 onOff: true,
@@ -13,7 +14,7 @@ let app = new Vue({
             },
             NOISE: {
                 onOff: false,
-                type: "WHITE",
+                type: 1,
             }
         },
         selectedENV: 1,

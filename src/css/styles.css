@@ -242,6 +242,17 @@ body {
     min-width: 160px;
 }
 
+.logo-text{
+    width: 100%;
+    height: 100%;
+
+    font-family: "Jost";
+    color: white;
+    font-size: 25px;
+    text-align: center;
+    transform: translateY(10px);
+}
+
 
 
 
