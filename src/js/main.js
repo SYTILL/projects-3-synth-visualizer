@@ -36,15 +36,10 @@ const createOSC = (checkBox, selectionBody, canvasBody, type) => {
 };
 
 envs = [
-    new Tone.Envelope(0, 0, 1, 0),
-    new Tone.Envelope({
-        attack: 0.1,
-        decay: 0.3,
-        sustain: 0.8,
-        release: 0.3,
-    }),
-    new Tone.Envelope(0.5, 0.5, 1, 0.5),
-    new Tone.Envelope(0.5, 0.5, 0.5, 0.5,),
+    new Tone.Envelope(0, 0, 1, 0), // 0 - default (not shown)
+    new Tone.Envelope(0.1, 0.3, 0.8, 0.3), // ENV 1
+    new Tone.Envelope(0.5, 0.5, 1, 0.5), // ENV 2
+    new Tone.Envelope(0.5, 0.5, 0.5, 0.5,), // ENV 3
 ]
 
 oscA = createOSC('checkbox-osc-A', 'wavetable-selection-A', 'wavetable-canvas-A', 'A');
@@ -69,6 +64,12 @@ oscSUB = createOSC('checkbox-osc-SUB', 'wavetable-selection-SUB', 'NULL', 'SUB')
 oscSUB["knobs"] = {
     pitch: app.knobs[23],
     volume: app.knobs[24],
+};
+
+oscNOISE = createOSC('checkbox-osc-NOISE', 'NULL', 'NULL', 'SUB');
+oscNOISE["knobs"] = {
+    pitch: app.knobs[33],
+    volume: app.knobs[34],
 };
 
 

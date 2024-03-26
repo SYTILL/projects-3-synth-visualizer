@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="src/css/knob.css">
     <link rel="stylesheet" href="src/css/styles.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Anta">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Jost">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 </head>
@@ -68,8 +69,8 @@
                                     <svg class="dial-svg" viewBox="0 0 100 100">
 
                                         <!-- ----------KNOB OUTER ENV ----------- -->
-                                        <path v-if="knob.env.target==selectedENV" d="M18,80 A 44 44 0 1 1 82 80" fill="none"
-                                            stroke="white" style="stroke-dasharray: 205 205;"
+                                        <path v-if="knob.env.target==selectedENV" d="M18,80 A 44 44 0 1 1 82 80"
+                                            fill="none" stroke="white" style="stroke-dasharray: 205 205;"
                                             :style="{'stroke-dashoffset':205 - 205*((knob.env.rotation*1 + 132)/264)}" />
 
                                         <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
@@ -89,11 +90,64 @@
                     </div>
                 </div>
 
+
+
+
+
                 <!-- ----------NOISE----------- -->
                 <div class="body-inner" id="osc-noise">
                     <div class="title">
-                        <input class="title-checkbox" type="checkbox">
+                        <input class="title-checkbox" type="checkbox"
+                        @click="osc.NOISE.onOff = !osc.NOISE.onOff">
                         <span class="title-text">NOISE</span>
+                    </div>
+
+                    <div class="noise-selection-body">
+                        <div class="noise-selection-box">
+                            <div class="noise-selection-arrow">◀</div>
+                            <div class="noise-selection-text">
+                                {{osc.NOISE.type}}
+                            </div>
+                            <div class="noise-selection-arrow">▶</div>
+                        </div>
+                    </div>
+
+                    <!-- ----------NOISE - knob body----------- -->
+                    <div class="knobs-background">
+                        <div class="knobs-row" @mouseUp="unselectKnobs">
+                            <div v-for="knob in [knobs[33],knobs[34]]" class="rela-inline knob style3"
+                                @drop="knob.env.target = selectedDragItem;" @dragover.prevent @dragenter.prevent>
+
+                                <div v-if="knob.env.target>=1" class="knob-active-light"
+                                    :style="{'background-color': knob.env.target==selectedENV?'white':'#888'}"></div>
+
+                                <div class="rela-block knob-dial" :style="{'color':osc.NOISE.onOff?knob.color:'#888'}">
+                                    <div class="abs-center dial-grip"
+                                        :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
+                                        @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
+                                    </div>
+
+                                    <svg class="dial-svg" viewBox="0 0 100 100">
+
+                                        <!-- ----------KNOB OUTER ENV ----------- -->
+                                        <path v-if="knob.env.target==selectedENV" d="M18,80 A 44 44 0 1 1 82 80"
+                                            fill="none" stroke="white" style="stroke-dasharray: 205 205;"
+                                            :style="{'stroke-dashoffset':205 - 205*((knob.env.rotation*1 + 132)/264)}" />
+
+                                        <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
+
+                                        <path d="M20,76 A 40 40 0 1 1 80 76" fill="none"
+                                            :stroke="osc.NOISE.onOff?knob.color:'#888'"
+                                            :style="{'stroke-dashoffset':184 - 184*((knob.rotation*1 + 132)/264)}" />
+                                    </svg>
+                                </div>
+
+                                <div class="rela-block knob-label" :style="{'color':osc.NOISE.onOff?'#E4E8EA':'#888'}">
+                                    {{knob.label}}</div>
+
+                                <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -306,19 +360,6 @@
                 <div class="title">
                     <input class="title-checkbox" type="checkbox" checked>
                     <span class="title-text">FILTER</span>
-                </div>
-                <div class="noise-selection-body">
-                    <div class="noise-selection-box">
-                        <div class="noise-selection-arrow">
-
-                        </div>
-                        <div class="noise-selection-text">
-
-                        </div>
-                        <div class="noise-selection-arrow">
-
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
