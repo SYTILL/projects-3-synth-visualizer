@@ -18,6 +18,26 @@ let app = new Vue({
         curENV: 0,
         knobs:
         {
+            //---------------------SUB-----------------------
+            23: {
+                label: 'Pitch',
+                osc: "SUB", knobType: "circle", row: "upper",
+                rotation: 0,
+                value: { cur: 0, low: -240, high: 240, ratio: 10, points: 2 },
+                env: { target: -1, rotation: -132},
+                color: '#0060df',
+                active: true, selected: false,
+            },
+            24: {
+                label: 'Volume',
+                osc: "SUB", knobType: "circle", row: "upper",
+                rotation: 0,
+                value: { cur: 0, low: -80, high: 80, ratio: 1, points: 0 },
+                env: { target: 3, rotation: -132},
+                color: '#0060df',
+                active: true, selected: false,
+            },
+
             //---------------------OSC A-----------------------
             10: {
                 label: 'Unison',

@@ -166,7 +166,7 @@ async function drawWaveform(oscBody, blendType = "none") {
 }
 
 //-----------#disable all --------- if one wavetable is selected----------
-const selectWavetable = async (oscBody, selectedImg) => {
+const selectWavetable = async (oscBody, selectedImg, hasCanvas) => {
     const selectionBody = oscBody.body;
     const images = selectionBody.querySelectorAll('img');
 
@@ -181,16 +181,24 @@ const selectWavetable = async (oscBody, selectedImg) => {
     selectedImg.setAttribute('data-onoff', true);
 
     oscBody.oscillator.type = selectedImg.alt;
-    oscBody.waveform = await oscBody.oscillator.asArray(256);
-    await drawWaveform(oscBody);
+
+    if (hasCanvas) {
+        oscBody.waveform = await oscBody.oscillator.asArray(256);
+        await drawWaveform(oscBody);
+    }
 };
 
 //------------#create------------ wavetables in selection Body
-const addWavetablesSelection = async (oscBody) => {
+const addWavetablesSelection = async (oscBody, hasCanvas = true, hor = false) => {
     let first = true;
     waveTablesTypes.forEach(name => {
         const img = document.createElement('img');
-        img.classList.add('wavetable-selection-presets');
+        if(hor){
+            img.classList.add('presets-hor');
+        }
+        else{
+            img.classList.add('wavetable-selection-presets');
+        }
         img.src = `src/images/${name}-off.png`;
         img.alt = name;
         img.setAttribute('data-onoff', false);
@@ -198,7 +206,7 @@ const addWavetablesSelection = async (oscBody) => {
         oscBody.body.appendChild(img);
         if (first === true) { first = img; }
     });
-    await selectWavetable(oscBody, first);
+    await selectWavetable(oscBody, first, hasCanvas);
 };
 
 
@@ -207,6 +215,7 @@ const addWavetablesSelection = async (oscBody) => {
     try {
         await addWavetablesSelection(oscA);
         await addWavetablesSelection(oscB);
+        await addWavetablesSelection(oscSUB, false, true);
     } catch (error) {
         console.error('Adding OSC wavetable failed', error);
     }

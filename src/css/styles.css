@@ -130,9 +130,24 @@ body {
     flex-direction: column;
 }
 
+.selection-hor {
+    max-width: 100%;
+    max-height: 20%;
+    margin-right: 10px;
+
+    flex-direction: row;
+}
+
 .wavetable-selection-presets {
     flex: 1;
     max-width: 100%;
+    margin: 1px;
+    cursor: pointer;
+}
+
+.presets-hor {
+    flex: 1;
+    max-width: 24%;
     margin: 1px;
     cursor: pointer;
 }
