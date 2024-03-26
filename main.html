@@ -16,7 +16,7 @@
     <div class="body-outer" id="app">
         <div class="separator top-body">
             <div class="body-inner logo">
-
+                <span class="logo-text">WEB-SYNTH</span>
             </div>
             <div class="body-inner select-control">
 
@@ -38,7 +38,7 @@
 
                     <!-- ----------SUB - title body----------- -->
                     <div class="title">
-                        <input class="title-checkbox" id="checkbox-osc-SUB" type="checkbox" checked
+                        <input class="title-checkbox" id="checkbox-osc-SUB" type="checkbox"
                             @click="osc.SUB.onOff = !osc.SUB.onOff">
                         <span class="title-text">SUB</span>
                     </div>
@@ -51,38 +51,40 @@
 
 
                     <!-- ----------SUB - knob body----------- -->
-                    <div class="knobs-row" @mouseUp="unselectKnobs">
-                        <div v-for="knob in [knobs[23],knobs[24]]" class="rela-inline knob style3"
-                            @drop="knob.env.target = selectedDragItem;" @dragover.prevent @dragenter.prevent>
+                    <div class="knobs-background">
+                        <div class="knobs-row" @mouseUp="unselectKnobs">
+                            <div v-for="knob in [knobs[23],knobs[24]]" class="rela-inline knob style3"
+                                @drop="knob.env.target = selectedDragItem;" @dragover.prevent @dragenter.prevent>
 
-                            <div v-if="knob.env.target!=-1" class="knob-active-light"
-                                :style="{'background-color': knob.env.target==curENV?'white':'#888'}"></div>
+                                <div v-if="knob.env.target>=1" class="knob-active-light"
+                                    :style="{'background-color': knob.env.target==selectedENV?'white':'#888'}"></div>
 
-                            <div class="rela-block knob-dial" :style="{'color':osc.SUB.onOff?knob.color:'#888'}">
-                                <div class="abs-center dial-grip"
-                                    :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
-                                    @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
+                                <div class="rela-block knob-dial" :style="{'color':osc.SUB.onOff?knob.color:'#888'}">
+                                    <div class="abs-center dial-grip"
+                                        :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
+                                        @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
+                                    </div>
+
+                                    <svg class="dial-svg" viewBox="0 0 100 100">
+
+                                        <!-- ----------KNOB OUTER ENV ----------- -->
+                                        <path v-if="knob.env.target==selectedENV" d="M18,80 A 44 44 0 1 1 82 80" fill="none"
+                                            stroke="white" style="stroke-dasharray: 205 205;"
+                                            :style="{'stroke-dashoffset':205 - 205*((knob.env.rotation*1 + 132)/264)}" />
+
+                                        <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
+
+                                        <path d="M20,76 A 40 40 0 1 1 80 76" fill="none"
+                                            :stroke="osc.SUB.onOff?knob.color:'#888'"
+                                            :style="{'stroke-dashoffset':184 - 184*((knob.rotation*1 + 132)/264)}" />
+                                    </svg>
                                 </div>
 
-                                <svg class="dial-svg" viewBox="0 0 100 100">
+                                <div class="rela-block knob-label" :style="{'color':osc.SUB.onOff?'#E4E8EA':'#888'}">
+                                    {{knob.label}}</div>
 
-                                    <!-- ----------KNOB OUTER ENV ----------- -->
-                                    <path v-if="knob.env.target==curENV" d="M18,80 A 44 44 0 1 1 82 80" fill="none"
-                                        stroke="white" style="stroke-dasharray: 205 205;"
-                                        :style="{'stroke-dashoffset':205 - 205*((knob.env.rotation*1 + 132)/264)}" />
-
-                                    <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
-
-                                    <path d="M20,76 A 40 40 0 1 1 80 76" fill="none"
-                                        :stroke="osc.SUB.onOff?knob.color:'#888'"
-                                        :style="{'stroke-dashoffset':184 - 184*((knob.rotation*1 + 132)/264)}" />
-                                </svg>
+                                <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
                             </div>
-
-                            <div class="rela-block knob-label" :style="{'color':osc.SUB.onOff?'#E4E8EA':'#888'}">
-                                {{knob.label}}</div>
-
-                            <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
                         </div>
                     </div>
                 </div>
@@ -90,7 +92,7 @@
                 <!-- ----------NOISE----------- -->
                 <div class="body-inner" id="osc-noise">
                     <div class="title">
-                        <input class="title-checkbox" type="checkbox" checked>
+                        <input class="title-checkbox" type="checkbox">
                         <span class="title-text">NOISE</span>
                     </div>
                 </div>
@@ -139,8 +141,8 @@
                             @drop="knob.env.target = selectedDragItem;" @dragover.prevent @dragenter.prevent>
 
 
-                            <div v-if="knob.env.target!=-1" class="knob-active-light"
-                                :style="{'background-color': knob.env.target==curENV?'white':'#888'}"></div>
+                            <div v-if="knob.env.target>=1" class="knob-active-light"
+                                :style="{'background-color': knob.env.target==selectedENV?'white':'#888'}"></div>
 
                             <div class="rela-block knob-dial" :style="{'color':osc.A.onOff?knob.color:'#888'}">
                                 <div class="abs-center dial-grip"
@@ -151,7 +153,7 @@
                                 <svg class="dial-svg" viewBox="0 0 100 100">
 
                                     <!-- ----------KNOB OUTER ENV ----------- -->
-                                    <path v-if="knob.env.target==curENV" d="M18,80 A 44 44 0 1 1 82 80" fill="none"
+                                    <path v-if="knob.env.target==selectedENV" d="M18,80 A 44 44 0 1 1 82 80" fill="none"
                                         stroke="white" style="stroke-dasharray: 205 205;"
                                         :style="{'stroke-dashoffset':205 - 205*((knob.env.rotation*1 + 132)/264)}" />
 
@@ -175,8 +177,8 @@
                             @drop="knob.env.target = selectedDragItem;" @dragover.prevent @dragenter.prevent>
 
 
-                            <div v-if="knob.env.target!=-1" class="knob-active-light"
-                                :style="{'background-color': knob.env.target==curENV?'white':'#888'}"></div>
+                            <div v-if="knob.env.target>=1" class="knob-active-light"
+                                :style="{'background-color': knob.env.target==selectedENV?'white':'#888'}"></div>
 
 
                             <div class="rela-block knob-dial" :style="{'color':osc.A.onOff?knob.color:'#888'}">
@@ -185,8 +187,8 @@
                                     @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
                                 </div>
                                 <svg class="dial-svg" viewBox="0 0 100 100">
-                                    <!-- ----------KNOB OUTER ENV ----------- -->
-                                    <path v-if="knob.env.target==curENV" d="M18,80 A 44 44 0 1 1 82 80" fill="none"
+                                    <!-- ----------OSC A - VOLUME -  KNOB OUTER ENV ----------- -->
+                                    <path v-if="knob.env.target==selectedENV" d="M18,80 A 44 44 0 1 1 82 80" fill="none"
                                         stroke="white" style="stroke-dasharray: 205 205;"
                                         :style="{'stroke-dashoffset':205 - 205*((knob.env.rotation*1 + 132)/264)}" />
 
@@ -305,6 +307,19 @@
                     <input class="title-checkbox" type="checkbox" checked>
                     <span class="title-text">FILTER</span>
                 </div>
+                <div class="noise-selection-body">
+                    <div class="noise-selection-box">
+                        <div class="noise-selection-arrow">
+
+                        </div>
+                        <div class="noise-selection-text">
+
+                        </div>
+                        <div class="noise-selection-arrow">
+
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -317,21 +332,21 @@
 
                 <!-- ----------------------ENV select---------------------- -->
                 <div class="ENV-select-body">
-                    <div class="ENV-select-box" draggable="true" @mouseDown="curENV = 0;setENVknobRotation();">
-                        <span class="ENV-select-text" :style="{'color':curENV==0?'white':'#888'}">ENV 1</span>
+                    <div class="ENV-select-box" draggable="true" @mouseDown="selectedENV = 1;setENVknobRotation();">
+                        <span class="ENV-select-text" :style="{'color':selectedENV==1?'white':'#888'}">ENV 1</span>
                         <span class="material-symbols-outlined"
-                            :style="{'color':curENV==0?'white':'#888'}">open_with</span>
+                            :style="{'color':selectedENV==1?'white':'#888'}">open_with</span>
                     </div>
-                    <div class="ENV-select-box" draggable="true" @mouseDown="curENV = 1;setENVknobRotation();"
+                    <div class="ENV-select-box" draggable="true" @mouseDown="selectedENV = 2;setENVknobRotation();"
                         style="border-left: 1px solid white; border-right: 1px solid white; ">
-                        <span class="ENV-select-text" :style="{'color':curENV==1?'white':'#888'}">ENV 2</span>
+                        <span class="ENV-select-text" :style="{'color':selectedENV==2?'white':'#888'}">ENV 2</span>
                         <span class="material-symbols-outlined"
-                            :style="{'color':curENV==1?'white':'#888'}">open_with</span>
+                            :style="{'color':selectedENV==2?'white':'#888'}">open_with</span>
                     </div>
-                    <div class="ENV-select-box" draggable="true" @mouseDown="curENV = 2;setENVknobRotation();">
-                        <span class="ENV-select-text" :style="{'color':curENV==2?'white':'#888'}">ENV 3</span>
+                    <div class="ENV-select-box" draggable="true" @mouseDown="selectedENV = 3;setENVknobRotation();">
+                        <span class="ENV-select-text" :style="{'color':selectedENV==3?'white':'#888'}">ENV 3</span>
                         <span class="material-symbols-outlined"
-                            :style="{'color':curENV==2?'white':'#888'}">open_with</span>
+                            :style="{'color':selectedENV==3?'white':'#888'}">open_with</span>
                     </div>
                 </div>
 

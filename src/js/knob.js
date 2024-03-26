@@ -9,13 +9,13 @@ let app = new Vue({
                 onOff: true,
             },
             SUB: {
-                onOff: true,
+                onOff: false,
             },
             NOISE: {
-                onOff: true,
+                onOff: false,
             }
         },
-        curENV: 0,
+        selectedENV: 1,
         knobs:
         {
             //---------------------SUB-----------------------
@@ -33,7 +33,7 @@ let app = new Vue({
                 osc: "SUB", knobType: "circle", row: "upper",
                 rotation: 0,
                 value: { cur: 0, low: -80, high: 80, ratio: 1, points: 0 },
-                env: { target: 3, rotation: -132},
+                env: { target: 0, rotation: -132},
                 color: '#0060df',
                 active: true, selected: false,
             },
@@ -81,7 +81,7 @@ let app = new Vue({
                 osc: "A", knobType: "circle", row: "lower",
                 rotation: 0,
                 value: { cur: 0, low: -80, high: 80, ratio: 1, points: 0 },
-                env: { target: 3, rotation: -132},
+                env: { target: 0, rotation: -132},
                 color: '#0060df',
                 active: true, selected: false,
             },
@@ -184,7 +184,7 @@ let app = new Vue({
 
             //update change on canvas
             if (['Attack', 'Decay', 'Sustain', 'Release'].includes(selectedKnob.label)) {
-                envs[app.curENV][selectedKnob.label.toLowerCase()] = selectedKnob.value.cur;
+                envs[app.selectedENV][selectedKnob.label.toLowerCase()] = selectedKnob.value.cur;
                 drawENV();
             }
 
@@ -258,7 +258,7 @@ let app = new Vue({
         },
 
         setENVknobRotation: function () {
-            env = envs[app.curENV];
+            env = envs[app.selectedENV];
 
             attackKnob = app.knobs[60];
             decayKnob = app.knobs[61];

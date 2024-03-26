@@ -1,8 +1,10 @@
+
+
 //--------------#drag & drop----------------------------
 selectBoxes = document.querySelectorAll(".ENV-select-box");
 
 let selectedDragItem = null;
-let i = 0;
+let i = 1;
 selectBoxes.forEach(box => {
     box.setAttribute('data-envnum', i++);
 
@@ -29,11 +31,12 @@ const createOSC = (checkBox, selectionBody, canvasBody, type) => {
             type: "sine",
             frequency: 440
         }),
-        volENV: 3,
+        volENV: 0,
     };
 };
 
 envs = [
+    new Tone.Envelope(0, 0, 1, 0),
     new Tone.Envelope({
         attack: 0.1,
         decay: 0.3,
@@ -42,7 +45,6 @@ envs = [
     }),
     new Tone.Envelope(0.5, 0.5, 1, 0.5),
     new Tone.Envelope(0.5, 0.5, 0.5, 0.5,),
-    new Tone.Envelope(0, 0, 1, 0),
 ]
 
 oscA = createOSC('checkbox-osc-A', 'wavetable-selection-A', 'wavetable-canvas-A', 'A');
@@ -94,7 +96,6 @@ const addOSC = (obj) => {
     let unison = obj.osc.knobs["unison"].value.cur;
     let detune = obj.osc.knobs["detune"].value.cur;
     let pitch = obj.osc.knobs["pitch"].value.cur;
-
     let volumeKnob = obj.osc.knobs["volume"];
 
     let osc = obj.osc;
@@ -103,7 +104,6 @@ const addOSC = (obj) => {
     const oscTEMParray = [];
     let mid1 = Math.round((unison % 2 == 0 ? (unison) : (unison - 1)) / 2);
     let mid2 = Math.round(unison % 2 == 0 ? (unison / 2) : (unison / 2 - 1));
-
 
     obj.frequency = obj.frequency * Math.pow(2, pitch / 12);
 
@@ -140,8 +140,6 @@ const addOSC = (obj) => {
         oscTEMParray.push(oscTEMP);
     }
 
-
-
     let activeNoteObj = {
         oscArray: oscTEMParray,
         unison,
@@ -150,30 +148,74 @@ const addOSC = (obj) => {
         volENV,
         volCenter,
         volSide,
+        type: "OSC",
     };
 
     if (obj.note in obj.activeNote) { obj.activeNote[obj.note].push(activeNoteObj); }
     else { obj.activeNote[obj.note] = [activeNoteObj]; }
-}
+};
 
 
+const addSUB = (obj) => {
+    let pitch = obj.osc.knobs["pitch"].value.cur;
+    let volumeKnob = obj.osc.knobs["volume"];
+
+    let osc = obj.osc;
+    if (!osc.checkBox.checked) { return; }
+
+    const oscTEMParray = [];
+    obj.frequency = obj.frequency * Math.pow(2, pitch / 12);
+
+    //ADD ENV
+    let start = Tone.immediate() + 0.1;
+    let target = volumeKnob.env.target != -1 ? volumeKnob.env.target : 3;
+    let volENV = new Tone.AmplitudeEnvelope({
+        attack: envs[target].attack,
+        decay: envs[target].decay,
+        sustain: envs[target].sustain,
+        release: envs[target].release,
+    }).triggerAttack(start - 0.01);
+
+    let volCenter = new Tone.Volume(-12);
+    let oscTEMP = new Tone.Oscillator(obj.frequency, osc.oscillator.type);
+
+    oscTEMP.connect(volENV);
+    volENV.connect(volCenter);
+    volCenter.toDestination();
+
+    oscTEMP.start(start);
+    oscTEMParray.push(oscTEMP);
+
+    let activeNoteObj = {
+        oscArray: oscTEMParray,
+        unison: 1,
+        frequency: obj.frequency,
+        env: createENVobject(osc),
+        volENV,
+        volCenter,
+        type: "SUB",
+    };
+
+    if (obj.note in obj.activeNote) { obj.activeNote[obj.note].push(activeNoteObj); }
+    else { obj.activeNote[obj.note] = [activeNoteObj]; }
+};
 
 const keySet = () => {
     return {
         toRelease: [],
         activeNote: {},
+        offset: new Array(128).fill(0),
     }
 };
 
 keySetA = keySet();
 keySetB = keySet();
+keySetSUB = keySet();
 
-
-let offset = new Array(128).fill(0);
 const releaseKey = (keyset, note) => {
     if (!note) { return; }
-
-    let e = keyset.activeNote[note][offset[note]++];
+    console.log(keyset.offset);
+    let e = keyset.activeNote[note][keyset.offset[note]++];
 
     let start = Tone.immediate() + 0.1;
     e.volENV.triggerRelease(start); // necessary?
@@ -185,7 +227,7 @@ const releaseKey = (keyset, note) => {
         let e = keyset.activeNote[note][0];
         e.oscArray.forEach((oscTEMP) => { oscTEMP.stop(); });
         keyset.activeNote[note].shift();
-        offset[note]--;
+        keyset.offset[note]--;
         if (keyset.activeNote[note].length == 0) { delete keyset.activeNote[note]; }
     }, e.volENV.release * 1000);
 };
@@ -241,12 +283,20 @@ const adjustSound = (keyset, osc) => {
 
         key = "volume";
         if (key in e.env) {
-            let v = rotateENV(osc.knobs[key], e.volENV.value, showRotation);
+            if (e.type == "OSC") {
+                rotateENV(osc.knobs[key], e.volENV.value, showRotation);
 
-            let volume = osc.knobs['volume'].value.cur;
-            let blend = osc.knobs['blend'].value.cur;
-            e.volCenter.volume.value = 40 * Math.log10(((volume + 80) / 160) * (1 - blend));
-            e.volSide.volume.value = 40 * Math.log10(((volume + 80) / 160) * (blend));
+                let volume = osc.knobs['volume'].value.cur;
+                let blend = osc.knobs['blend'].value.cur;
+                e.volCenter.volume.value = 40 * Math.log10(((volume + 80) / 160) * (1 - blend));
+                e.volSide.volume.value = 40 * Math.log10(((volume + 80) / 160) * (blend));
+            }
+            else if (e.type == "SUB") {
+                rotateENV(osc.knobs[key], e.volENV.value, showRotation);
+
+                let volume = osc.knobs['volume'].value.cur;
+                e.volCenter.volume.value = 40 * Math.log10(((volume + 80) / 160));
+            }
         }
 
     });
@@ -257,9 +307,12 @@ const adjustSound = (keyset, osc) => {
 let releaseKeyOnce = true;
 Tone.Transport.scheduleRepeat((time) => {
     releaseKey(keySetA, keySetA.toRelease.shift());
+    //releaseKey(keySetB, keySetB.toRelease.shift());
+    releaseKey(keySetSUB, keySetSUB.toRelease.shift());
 
     adjustSound(keySetA, oscA);
-    //adjustSound(keySetB);
+    //adjustSound(keySetB, oscB);
+    adjustSound(keySetSUB, oscSUB);
 }, "32n");
 
 Tone.Transport.start();
@@ -282,9 +335,21 @@ const startOSC = (key) => {
     //     frequency: key.frequency,
     //     note: key.note,
     // });
+
+    addSUB({
+        osc: oscSUB,
+        activeNote: keySetSUB.activeNote,
+        frequency: key.frequency,
+        note: key.note,
+    });
 };
 
 const stopOSC = async (key) => {
-    keySetA.toRelease.push(key.note);
+    if (oscA.checkBox.checked) {
+        keySetA.toRelease.push(key.note);
+    }
     //keySetB.toRelease.push(key.note);
+    if (oscSUB.checkBox.checked) {
+        keySetSUB.toRelease.push(key.note);
+    }
 }

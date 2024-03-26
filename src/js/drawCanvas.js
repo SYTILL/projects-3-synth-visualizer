@@ -8,7 +8,7 @@ const drawCircle = (ctx, x, y, r) => { ctx.beginPath(); ctx.arc(x, y, r, 0, Math
 function drawENV() {
     canvas = document.getElementById('ENV-canvas');
     ctx = canvas.getContext('2d');
-    env = envs[app.curENV];
+    env = envs[app.selectedENV];
     let margin = 5; //5%
 
     //smaller canvas
