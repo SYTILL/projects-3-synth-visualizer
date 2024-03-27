@@ -3,33 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exponential Envelope Visualization</title>
-    <style>
-        canvas {
-            border: 1px solid black;
-        }
-    </style>
+    <title>Detune PolySynth with Tone.js</title>
+    <!-- Include Tone.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.37/Tone.js"></script>
 </head>
 <body>
-    <h1>Exponential Envelope Visualization</h1>
-    <canvas id="envelope-canvas" width="400" height="200"></canvas>
+    <button onclick="playNote()">Play Note</button>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.30/Tone.min.js"></script>
     <script>
-        
-        var a = {
-            a: 1,
-            b: 2,
+        // Create a PolySynth with 4 voices
+        const polySynth = new Tone.PolySynth({
+            voices: 1,
+            oscillator: {
+                type: "triangle" // or other waveforms
+            }
+        }).toDestination();
+
+        // Detune values for each voice
+        const detuneValues = [10, -5, 15, -20];
+
+        // Function to play a note
+        function playNote() {
+            
+            polySynth.triggerAttackRelease([430,433,436,439], "4n");
         }
-
-        const test = (v) => {
-            v = {a: 2};
-        }
-
-        test(a);
-
-        
-
     </script>
 </body>
 </html>

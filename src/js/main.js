@@ -66,7 +66,7 @@ oscSUB["knobs"] = {
     volume: app.knobs[24],
 };
 
-oscNOISE = createOSC('checkbox-osc-NOISE', 'NULL', 'NULL', 'SUB');
+oscNOISE = createOSC('checkbox-osc-NOISE', 'NULL', 'NULL', 'NOISE');
 oscNOISE["knobs"] = {
     pitch: app.knobs[33],
     volume: app.knobs[34],
@@ -118,8 +118,8 @@ const addOSC = (obj) => {
         release: envs[target].release,
     }).triggerAttack(start);
 
-    let volCenter = new Tone.Volume(-12);
-    let volSide = new Tone.Volume(-12);
+    let volCenter = new Tone.Volume(-800);
+    let volSide = new Tone.Volume(-800);
     for (let i = 0; i < unison; i++) {
         //ADD OSC
         let oscTEMP = new Tone.Oscillator(obj.frequency, osc.oscillator.type);
@@ -175,9 +175,9 @@ const addSUB = (obj) => {
         decay: envs[target].decay,
         sustain: envs[target].sustain,
         release: envs[target].release,
-    }).triggerAttack(start - 0.01);
+    }).triggerAttack(start);
 
-    let volCenter = new Tone.Volume(-12);
+    let volCenter = new Tone.Volume(-800);
     let oscTEMP = new Tone.Oscillator(obj.frequency, osc.oscillator.type);
 
     oscTEMP.connect(volENV);
@@ -201,6 +201,48 @@ const addSUB = (obj) => {
     else { obj.activeNote[obj.note] = [activeNoteObj]; }
 };
 
+const addNOISE = (obj) => {
+    let volumeKnob = obj.osc.knobs["volume"];
+
+    let osc = obj.osc;
+    if (!osc.checkBox.checked) { return; }
+
+    const oscTEMParray = [];
+
+    //ADD ENV
+    let start = Tone.immediate() + 0.1;
+    let target = volumeKnob.env.target != -1 ? volumeKnob.env.target : 3;
+    let volENV = new Tone.AmplitudeEnvelope({
+        attack: envs[target].attack,
+        decay: envs[target].decay,
+        sustain: envs[target].sustain,
+        release: envs[target].release,
+    }).triggerAttack(start - 0.01);
+
+    let volCenter = new Tone.Volume(-800);
+    let noise = ["pink","white","brown"];
+    let oscTEMP = new Tone.Noise(noise[app.osc.NOISE.type]);
+
+    oscTEMP.connect(volENV);
+    volENV.connect(volCenter);
+    volCenter.toDestination();
+
+    oscTEMP.start(start);
+    oscTEMParray.push(oscTEMP);
+
+    let activeNoteObj = {
+        oscArray: oscTEMParray,
+        unison: 1,
+        env: createENVobject(osc),
+        volENV,
+        volCenter,
+        type: "NOISE",
+    };
+
+    if (obj.note in obj.activeNote) { obj.activeNote[obj.note].push(activeNoteObj); }
+    else { obj.activeNote[obj.note] = [activeNoteObj]; }
+};
+
 const keySet = () => {
     return {
         toRelease: [],
@@ -212,10 +254,11 @@ const keySet = () => {
 keySetA = keySet();
 keySetB = keySet();
 keySetSUB = keySet();
+keySetNOISE = keySet();
 
 const releaseKey = (keyset, note) => {
     if (!note) { return; }
-    console.log(keyset.offset);
+    //console.log(note, keyset.offset[note], keyset.activeNote);
     let e = keyset.activeNote[note][keyset.offset[note]++];
 
     let start = Tone.immediate() + 0.1;
@@ -292,7 +335,7 @@ const adjustSound = (keyset, osc) => {
                 e.volCenter.volume.value = 40 * Math.log10(((volume + 80) / 160) * (1 - blend));
                 e.volSide.volume.value = 40 * Math.log10(((volume + 80) / 160) * (blend));
             }
-            else if (e.type == "SUB") {
+            else if (["SUB","NOISE"].includes(e.type)) {
                 rotateENV(osc.knobs[key], e.volENV.value, showRotation);
 
                 let volume = osc.knobs['volume'].value.cur;
@@ -310,11 +353,13 @@ Tone.Transport.scheduleRepeat((time) => {
     releaseKey(keySetA, keySetA.toRelease.shift());
     //releaseKey(keySetB, keySetB.toRelease.shift());
     releaseKey(keySetSUB, keySetSUB.toRelease.shift());
+    releaseKey(keySetNOISE, keySetNOISE.toRelease.shift());
 
     adjustSound(keySetA, oscA);
     //adjustSound(keySetB, oscB);
     adjustSound(keySetSUB, oscSUB);
-}, "32n");
+    adjustSound(keySetNOISE, oscNOISE);
+}, "128n");
 
 Tone.Transport.start();
 
@@ -343,6 +388,12 @@ const startOSC = (key) => {
         frequency: key.frequency,
         note: key.note,
     });
+
+    addNOISE({
+        osc: oscNOISE,
+        activeNote: keySetNOISE.activeNote,
+        note: key.note,
+    });
 };
 
 const stopOSC = async (key) => {
@@ -352,5 +403,8 @@ const stopOSC = async (key) => {
     //keySetB.toRelease.push(key.note);
     if (oscSUB.checkBox.checked) {
         keySetSUB.toRelease.push(key.note);
+    }
+    if (oscNOISE.checkBox.checked) {
+        keySetNOISE.toRelease.push(key.note);
     }
 }
