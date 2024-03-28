@@ -18,6 +18,7 @@ let app = new Vue({
             }
         },
         selectedENV: 1,
+        selectedLFO: 1,
         knobs:
         {
             //---------------------SUB-----------------------

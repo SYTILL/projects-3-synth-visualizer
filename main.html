@@ -98,19 +98,17 @@
                 <div class="body-inner" id="osc-noise">
                     <div class="title">
                         <input class="title-checkbox" id="checkbox-osc-NOISE" type="checkbox"
-                        @click="osc.NOISE.onOff = !osc.NOISE.onOff">
+                            @click="osc.NOISE.onOff = !osc.NOISE.onOff">
                         <span class="title-text">NOISE</span>
                     </div>
 
                     <div class="noise-selection-body">
                         <div class="noise-selection-box">
-                            <div class="noise-selection-arrow"
-                            @click="osc.NOISE.type = (osc.NOISE.type+2)%3;">◀</div>
+                            <div class="noise-selection-arrow" @click="osc.NOISE.type = (osc.NOISE.type+2)%3;">◀</div>
                             <div class="noise-selection-text">
                                 {{noiseTypes[osc.NOISE.type]}}
                             </div>
-                            <div class="noise-selection-arrow"
-                            @click="osc.NOISE.type = (osc.NOISE.type+1)%3;">▶</div>
+                            <div class="noise-selection-arrow" @click="osc.NOISE.type = (osc.NOISE.type+1)%3;">▶</div>
                         </div>
                     </div>
 
@@ -359,9 +357,84 @@
 
             <!-- ----------------------FILTER---------------------- -->
             <div class="body-inner filter-body">
+
+                <!-- ----------------------FILTER  - TITLE---------------------- -->
                 <div class="title">
                     <input class="title-checkbox" type="checkbox" checked>
                     <span class="title-text">FILTER</span>
+                </div>
+
+                <!-- ----------------------FILTER - TYPE SELECTION---------------------- -->
+                <div class="noise-selection-body">
+                    <div class="noise-selection-box">
+                        <div class="noise-selection-arrow" @click="osc.NOISE.type = (osc.NOISE.type+2)%3;">◀</div>
+                        <div class="noise-selection-text">
+                            {{noiseTypes[osc.NOISE.type]}}
+                        </div>
+                        <div class="noise-selection-arrow" @click="osc.NOISE.type = (osc.NOISE.type+1)%3;">▶</div>
+                    </div>
+                </div>
+
+                <!-- ----------------------FILTER - WAVETABLE---------------------- -->
+                <div class="FILTER-canvas-body">
+                    <canvas id="canvas-FILTER"></canvas>
+                </div>
+
+                <div class="FILTER-lower-body">
+                    <!-- ----------------------FILTER - target selection---------------------- -->
+                    <div class="FILTER-target-selection">
+
+                    </div>
+
+                    <!-- ----------------------FILTER - knobs---------------------- -->
+                    <!-- ----------knobs----------- -->
+                    <div class="knobs-background FILTER-knobs">
+
+                        <!-- ----------upper knobs----------- -->
+                        <div class="knobs-row" @mouseUp="unselectKnobs">
+                            <div v-for="knob in [knobs[1],knobs[2],knobs[3]]" class="rela-inline knob style3">
+                                <div class="rela-block knob-dial" :style="{'color':osc.B.onOff?knob.color:'#888'}">
+                                    <div class="abs-center dial-grip"
+                                        :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
+                                        @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
+                                    </div>
+                                    <svg class="dial-svg" viewBox="0 0 100 100">
+                                        <path d="M18,80 A 44 44 0 1 1 82 80" fill="none" stroke="white"
+                                            style="stroke-dasharray: 205 205;"
+                                            :style="{'stroke-dashoffset':205 - 205*((knob.rotation*1 + 132)/264)}" />
+                                        <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
+                                        <path d="M20,76 A 40 40 0 1 1 80 76" fill="none"
+                                            :stroke="osc.B.onOff?knob.color:'#888'"
+                                            :style="{'stroke-dashoffset':184 - 184*((knob.rotation*1 + 132)/264)}" />
+                                    </svg>
+                                </div>
+                                <div class="rela-block knob-label" :style="{'color':osc.B.onOff?'#E4E8EA':'#888'}">
+                                    {{knob.label}}</div>
+                                <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
+                            </div>
+                        </div>
+
+                        <!-- ----------lower knobs----------- -->
+                        <div class="knobs-row">
+                            <div v-for="knob in [knobs[4]]" class="rela-inline knob style3">
+                                <div class="rela-block knob-dial" :style="{'color':osc.B.onOff?knob.color:'#888'}">
+                                    <div class="abs-center dial-grip"
+                                        :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
+                                        @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
+                                    </div>
+                                    <svg class="dial-svg" viewBox="0 0 100 100">
+                                        <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
+                                        <path d="M20,76 A 40 40 0 1 1 80 76" fill="none"
+                                            :stroke="osc.B.onOff?knob.color:'#888'"
+                                            :style="{'stroke-dashoffset':184 - 184*((knob.rotation*1 + 132)/264)}" />
+                                    </svg>
+                                </div>
+                                <div class="rela-block knob-label" :style="{'color':osc.B.onOff?'#E4E8EA':'#888'}">
+                                    {{knob.label}}</div>
+                                <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -423,7 +496,58 @@
 
             <!-- ----------------------LFO---------------------- -->
             <div class="body-inner LFO-body">
+                <!-- ----------------------LFO select---------------------- -->
+                <div class="ENV-select-body">
+                    <div class="ENV-select-box" draggable="true" @mouseDown="selectedLFO = 1;setENVknobRotation();">
+                        <span class="ENV-select-text" :style="{'color':selectedLFO==1?'white':'#888'}">LFO 1</span>
+                        <span class="material-symbols-outlined"
+                            :style="{'color':selectedLFO==1?'white':'#888'}">open_with</span>
+                    </div>
+                    <div class="ENV-select-box" draggable="true" @mouseDown="selectedLFO = 2;setENVknobRotation();"
+                        style="border-left: 1px solid white;">
+                        <span class="ENV-select-text" :style="{'color':selectedLFO==2?'white':'#888'}">LFO 2</span>
+                        <span class="material-symbols-outlined"
+                            :style="{'color':selectedLFO==2?'white':'#888'}">open_with</span>
+                    </div>
+                    <div class="ENV-select-box" draggable="true" @mouseDown="selectedLFO = 3;setENVknobRotation();"
+                    style="border-left: 1px solid white;">
+                        <span class="ENV-select-text" :style="{'color':selectedLFO==3?'white':'#888'}">LFO 3</span>
+                        <span class="material-symbols-outlined"
+                            :style="{'color':selectedLFO==3?'white':'#888'}">open_with</span>
+                    </div>
+                    <div class="ENV-select-box" draggable="true" @mouseDown="selectedLFO = 4;setENVknobRotation();"
+                    style="border-left: 1px solid white;">
+                        <span class="ENV-select-text" :style="{'color':selectedLFO==4?'white':'#888'}">LFO 4</span>
+                        <span class="material-symbols-outlined"
+                            :style="{'color':selectedLFO==4?'white':'#888'}">open_with</span>
+                    </div>
+                </div>
 
+                <!-- ----------------------LFO canvas---------------------- -->
+                <div class="ENV-canvas-body">
+                    <canvas id="ENV-canvas" width="600" height="300"></canvas>
+
+                </div>
+
+                <!-- ----------------------LFO knobs---------------------- -->
+                <div class="ENV-knobs-body">
+                    <div v-for="knob in [knobs[60],knobs[61],knobs[62],knobs[63]]" class="rela-inline knob style3">
+                        <div class="rela-block knob-dial" :style="{'color':knob.color}">
+                            <div class="abs-center dial-grip"
+                                :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
+                                @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
+                            </div>
+                            <svg class="dial-svg" viewBox="0 0 100 100">
+                                <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
+                                <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" :stroke="knob.color"
+                                    :style="{'stroke-dashoffset':184 - 184*((knob.rotation*1 + 132)/264)}" />
+                            </svg>
+                        </div>
+                        <div class="rela-block knob-label" :style="{'color':'#E4E8EA'}">
+                            {{knob.label}}</div>
+                        <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
+                    </div>
+                </div>
             </div>
 
 

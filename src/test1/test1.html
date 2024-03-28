@@ -1,32 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detune PolySynth with Tone.js</title>
-    <!-- Include Tone.js library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.37/Tone.js"></script>
+    <title>Tone.js Filter Visualization</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
 </head>
-<body>
-    <button onclick="playNote()">Play Note</button>
 
+<body>
+    <canvas id="filterCanvas" width="600" height="300"></canvas>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.26/Tone.js"></script>
     <script>
-        // Create a PolySynth with 4 voices
-        const polySynth = new Tone.PolySynth({
-            voices: 1,
-            oscillator: {
-                type: "triangle" // or other waveforms
-            }
+        const canvas = document.getElementById('filterCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Create a BiQuad filter
+        const filter = new Tone.BiquadFilter({
+            type: 'highpass', // Filter type (e.g., lowpass, highpass, bandpass)
+            frequency: 200, // Cutoff frequency in Hz
+            Q: 1, // Quality factor
+            gain: 0 // Gain in decibels
         }).toDestination();
 
-        // Detune values for each voice
-        const detuneValues = [10, -5, 15, -20];
+        // Set the frequency range (20Hz to 20kHz)
+        const minFrequency = 15;
+        const maxFrequency = 25000;
 
-        // Function to play a note
-        function playNote() {
-            
-            polySynth.triggerAttackRelease([430,433,436,439], "4n");
+        // Analyze the frequency response
+        const frequencies = new Float32Array(canvas.width);
+
+        // Convert linear scale to logarithmic scale
+        for (let i = 0; i < canvas.width; i++) {
+            const frequency = minFrequency * Math.pow(maxFrequency / minFrequency, i / canvas.width);
+            frequencies[i] = frequency;
         }
+
+        const magnitudes = filter.getFrequencyResponse(frequencies);
+
+        // Plot frequency response curve
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
+        for (let i = 0; i < frequencies.length; i++) {
+            const x = (Math.log10(frequencies[i] / minFrequency) / Math.log10(maxFrequency / minFrequency)) * canvas.width;
+            const y = canvas.height - (magnitudes[i] * canvas.height / 2); // Adjust scale
+            ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = 'blue';
+        ctx.lineWidth = 2;
+        ctx.stroke();
     </script>
 </body>
+
 </html>
