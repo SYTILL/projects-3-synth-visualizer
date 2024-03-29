@@ -1,7 +1,8 @@
 let app = new Vue({
     el: '#app',
     data: {
-        noiseTypes: ["PINK","WHITE","BROWN"],
+        noiseTypes: ["pink","white","brown"],
+        filterTypes: ["lowpass","highpass","bandpass","lowshelf","highshelf","notch","allpass","peaking"],
         osc: {
             A: {
                 onOff: true,
@@ -13,6 +14,10 @@ let app = new Vue({
                 onOff: false,
             },
             NOISE: {
+                onOff: false,
+                type: 1,
+            },
+            FILTER: {
                 onOff: false,
                 type: 1,
             }
@@ -59,6 +64,35 @@ let app = new Vue({
                 env: { target: 0, rotation: -132},
                 color: '#0060df',
                 active: true, selected: false,
+            },
+            
+            //---------------------FILTER-----------------------
+            40: {
+                label: 'Cutoff',
+                osc: "FILTER", knobType: "circle", row: "upper",
+                rotation: 0,
+                value: { cur: 0, low: -240, high: 240, ratio: 10, points: 2 },
+                env: { target: -1, rotation: -132},
+                color: '#0060df',
+                active: true, selected: false,
+            },
+            41: {
+                label: 'Q',
+                osc: "FILTER", knobType: "circle", row: "upper",
+                rotation: 0,
+                value: { cur: 0, low: -80, high: 80, ratio: 1, points: 0 },
+                env: { target: 0, rotation: -132},
+                color: '#0060df',
+                active: true, selected: false,
+            },
+            42: {
+                label: 'Rolloff',
+                osc: "FILTER", knobType: "updown", row: "upper",
+                value: { real: 1, cur: 1, low: 1, high: 4 },
+                env: { target: -1, rotation: -132},
+                color: '#0060df',
+                active: true,
+                selected: false,
             },
 
             //---------------------OSC A-----------------------

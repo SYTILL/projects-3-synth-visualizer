@@ -367,23 +367,49 @@
                 <!-- ----------------------FILTER - TYPE SELECTION---------------------- -->
                 <div class="noise-selection-body">
                     <div class="noise-selection-box">
-                        <div class="noise-selection-arrow" @click="osc.NOISE.type = (osc.NOISE.type+2)%3;">◀</div>
-                        <div class="noise-selection-text">
-                            {{noiseTypes[osc.NOISE.type]}}
+                        <div class="noise-selection-arrow"
+                            @click="osc.FILTER.type = (osc.FILTER.type+filterTypes.length-1)%filterTypes.length;">◀
                         </div>
-                        <div class="noise-selection-arrow" @click="osc.NOISE.type = (osc.NOISE.type+1)%3;">▶</div>
+                        <div class="noise-selection-text">
+                            {{filterTypes[osc.FILTER.type]}}
+                        </div>
+                        <div class="noise-selection-arrow"
+                            @click="osc.FILTER.type = (osc.FILTER.type+1)%filterTypes.length;">▶</div>
                     </div>
                 </div>
 
                 <!-- ----------------------FILTER - WAVETABLE---------------------- -->
                 <div class="FILTER-canvas-body">
-                    <canvas id="canvas-FILTER"></canvas>
+                    <canvas id="FILTER-canvas" width="600" height="300"></canvas>
                 </div>
 
                 <div class="FILTER-lower-body">
                     <!-- ----------------------FILTER - target selection---------------------- -->
-                    <div class="FILTER-target-selection">
-
+                    <div class="FILTER-target-selection-body">
+                        <div class="FILTER-target-selection-body1">
+                            <div class="FILTER-target-selection-body2">
+                                <input class="title-checkbox" id="checkbox-osc-NOISE" type="checkbox"
+                                    @click="osc.NOISE.onOff = !osc.NOISE.onOff">
+                                <span class="FILTER-target-selection-text">A</span>
+                            </div>
+                            <div class="FILTER-target-selection-body2">
+                                <input class="title-checkbox" id="checkbox-osc-NOISE" type="checkbox"
+                                    @click="osc.NOISE.onOff = !osc.NOISE.onOff">
+                                <span class="FILTER-target-selection-text">B</span>
+                            </div>
+                        </div>
+                        <div class="FILTER-target-selection-body1">
+                            <div class="FILTER-target-selection-body2">
+                                <input class="title-checkbox" id="checkbox-osc-NOISE" type="checkbox"
+                                    @click="osc.NOISE.onOff = !osc.NOISE.onOff">
+                                <span class="FILTER-target-selection-text">S</span>
+                            </div>
+                            <div class="FILTER-target-selection-body2">
+                                <input class="title-checkbox" id="checkbox-osc-NOISE" type="checkbox"
+                                    @click="osc.NOISE.onOff = !osc.NOISE.onOff">
+                                <span class="FILTER-target-selection-text">N</span>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- ----------------------FILTER - knobs---------------------- -->
@@ -392,7 +418,7 @@
 
                         <!-- ----------upper knobs----------- -->
                         <div class="knobs-row" @mouseUp="unselectKnobs">
-                            <div v-for="knob in [knobs[1],knobs[2],knobs[3]]" class="rela-inline knob style3">
+                            <div v-for="knob in [knobs[40],knobs[41]]" class="rela-inline knob style3">
                                 <div class="rela-block knob-dial" :style="{'color':osc.B.onOff?knob.color:'#888'}">
                                     <div class="abs-center dial-grip"
                                         :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
@@ -416,22 +442,28 @@
 
                         <!-- ----------lower knobs----------- -->
                         <div class="knobs-row">
-                            <div v-for="knob in [knobs[4]]" class="rela-inline knob style3">
-                                <div class="rela-block knob-dial" :style="{'color':osc.B.onOff?knob.color:'#888'}">
-                                    <div class="abs-center dial-grip"
-                                        :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
-                                        @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
+                            <div class="rela-inline knob">
+                                <div class="rela-block">
+                                    <div class="knob-updown-body">
+                                        <div class="knob-updown-text" :style="{'color':osc.B.onOff?'white':'#888'}"
+                                            @mouseDown="knobs[0].selected = true; app.currentY = event.pageY; event.preventDefault()">
+                                            {{knobs[0].value.cur}}</div>
+                                        <div class="knob-updown-button-body">
+                                            <div class="knob-updown-button"
+                                                :style="{'color':osc.B.onOff?'white':'#888'}"
+                                                @click="updownCounter(knobs[0].value, 1);">
+                                                <div style="transform: translateY(-4px);">▲</div>
+                                            </div>
+                                            <div class="knob-updown-button"
+                                                :style="{'color':osc.B.onOff?'white':'#888'}"
+                                                @click="updownCounter(knobs[0].value, -1);">
+                                                <div style="transform: translateY(-3px);">▼</div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <svg class="dial-svg" viewBox="0 0 100 100">
-                                        <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
-                                        <path d="M20,76 A 40 40 0 1 1 80 76" fill="none"
-                                            :stroke="osc.B.onOff?knob.color:'#888'"
-                                            :style="{'stroke-dashoffset':184 - 184*((knob.rotation*1 + 132)/264)}" />
-                                    </svg>
                                 </div>
-                                <div class="rela-block knob-label" :style="{'color':osc.B.onOff?'#E4E8EA':'#888'}">
-                                    {{knob.label}}</div>
-                                <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
+                                <div class="rela-block knob-label" :style="{'color':knobs[0].active?'#E4E8EA':'#888'}">
+                                    {{knobs[0].label}}</div>
                             </div>
                         </div>
                     </div>
@@ -467,7 +499,7 @@
                 </div>
 
                 <!-- ----------------------ENV canvas---------------------- -->
-                <div class="ENV-canvas-body">
+                <div class="automation-canvas-body">
                     <canvas id="ENV-canvas" width="600" height="300"></canvas>
 
                 </div>
@@ -510,13 +542,13 @@
                             :style="{'color':selectedLFO==2?'white':'#888'}">open_with</span>
                     </div>
                     <div class="ENV-select-box" draggable="true" @mouseDown="selectedLFO = 3;setENVknobRotation();"
-                    style="border-left: 1px solid white;">
+                        style="border-left: 1px solid white;">
                         <span class="ENV-select-text" :style="{'color':selectedLFO==3?'white':'#888'}">LFO 3</span>
                         <span class="material-symbols-outlined"
                             :style="{'color':selectedLFO==3?'white':'#888'}">open_with</span>
                     </div>
                     <div class="ENV-select-box" draggable="true" @mouseDown="selectedLFO = 4;setENVknobRotation();"
-                    style="border-left: 1px solid white;">
+                        style="border-left: 1px solid white;">
                         <span class="ENV-select-text" :style="{'color':selectedLFO==4?'white':'#888'}">LFO 4</span>
                         <span class="material-symbols-outlined"
                             :style="{'color':selectedLFO==4?'white':'#888'}">open_with</span>
@@ -524,9 +556,8 @@
                 </div>
 
                 <!-- ----------------------LFO canvas---------------------- -->
-                <div class="ENV-canvas-body">
-                    <canvas id="ENV-canvas" width="600" height="300"></canvas>
-
+                <div class="automation-canvas-body">
+                    <canvas id="LFO-canvas" width="818" height="350"></canvas>
                 </div>
 
                 <!-- ----------------------LFO knobs---------------------- -->

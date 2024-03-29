@@ -117,7 +117,7 @@ async function drawWaveform(oscBody, blendType = "none") {
     ctx.moveTo(0, canvas.height / 2);
     for (let i = 0; i < waveform.length; i++) {
         const x = (i / waveform.length) * canvas.width;
-        const y = ((waveform[i] + 1) / 2) * canvas.height;
+        const y = ((waveform[i]+1) / 2) * canvas.height;
         ctx.lineTo(x, y);
     }
     ctx.stroke();
@@ -148,7 +148,7 @@ async function drawWaveform(oscBody, blendType = "none") {
             let x = canvas.width / 2;
             if (unison != 1) {
                 x = i * (detune * 2 / (unison - 1)) - detune;
-                x = x * canvas.width / (100) + canvas.width / 2;
+                x = x * canvas.width / (98) + canvas.width / 2;
             }
 
             let y = canvas.height * (1 - blend);
@@ -209,6 +209,43 @@ const addWavetablesSelection = async (oscBody, hasCanvas = true, hor = false) =>
     await selectWavetable(oscBody, first, hasCanvas);
 };
 
+const visualizeFilter = (oscBody) => {
+    filter = oscBody.filter;
+    canvas = document.getElementById('FILTER-canvas');
+    ctx = canvas.getContext('2d'); 
+
+    const minFrequency = 15;
+    const maxFrequency = 25000;
+
+    const frequencies = new Float32Array(canvas.width);
+
+    // Convert linear scale to logarithmic scale
+    const divideFreq = 50;
+    for (let i = 0; i < divideFreq; i++) {
+        const frequency = minFrequency * Math.pow(maxFrequency / minFrequency, i / divideFreq);
+        frequencies[i] = frequency;
+    }
+
+    const magnitudes = filter.getFrequencyResponse(frequencies);
+
+    //background
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.strokeStyle = '#535559';
+    ctx.lineWidth = 2;
+    drawLine(ctx, 0, canvas.height / 2, canvas.width, canvas.height / 2);
+
+    ctx.strokeStyle = 'blue';
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    for (let i = 0; i < frequencies.length; i++) {
+        const x = (Math.log10(frequencies[i] / minFrequency) / Math.log10(maxFrequency / minFrequency)) * canvas.width;
+        const y = canvas.height - (magnitudes[i] * canvas.height / 2); // Adjust scale
+        ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+};
 
 //add wave tables asynchornously
 (async () => {
@@ -216,6 +253,7 @@ const addWavetablesSelection = async (oscBody, hasCanvas = true, hor = false) =>
         await addWavetablesSelection(oscA);
         await addWavetablesSelection(oscB);
         await addWavetablesSelection(oscSUB, false, true);
+        await visualizeFilter(oscFILTER);
     } catch (error) {
         console.error('Adding OSC wavetable failed', error);
     }

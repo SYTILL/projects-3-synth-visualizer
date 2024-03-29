@@ -19,20 +19,38 @@ selectBoxes.forEach(box => {
 
 
 //-------------------#add wavetable images #images #wavetable------------------
-const createOSC = (checkBox, selectionBody, canvasBody, type) => {
+const createOSC = (type, checkBox) => {
     return {
         type,
         onOff: true,
         checkBox: document.getElementById(checkBox),
-        body: document.getElementById(selectionBody),
-        canvas: document.getElementById(canvasBody),
-        waveform: null,
-        oscillator: new Tone.Oscillator({
-            type: "sine",
-            frequency: 440
-        }),
         volENV: 0,
     };
+};
+
+const createOSCAddOsc = (osc) => {
+    osc["waveform"] = null;
+    osc["oscillator"] = new Tone.Oscillator({
+        type: "sine",
+        frequency: 440
+    });
+};
+
+const createOSCAddBody = (osc, selectionBody) => {
+    osc["body"] = document.getElementById(selectionBody);
+};
+
+const createOSCAddCanvas = (osc, canvasBody) => {
+    osc["canvas"] = document.getElementById(canvasBody);
+};
+
+const createOSCAddFilter = (osc) => {
+    osc["filter"] = new Tone.BiquadFilter({
+        type: 'highpass', // Filter type (e.g., lowpass, highpass, bandpass)
+        frequency: 200, // Cutoff frequency in Hz
+        Q: 1, // Quality factor
+        rolloff: -12,
+    })
 };
 
 envs = [
@@ -42,7 +60,11 @@ envs = [
     new Tone.Envelope(0.5, 0.5, 0.5, 0.5,), // ENV 3
 ]
 
-oscA = createOSC('checkbox-osc-A', 'wavetable-selection-A', 'wavetable-canvas-A', 'A');
+//----------------oscA
+oscA = createOSC('A', 'checkbox-osc-A');
+createOSCAddOsc(oscA);
+createOSCAddBody(oscA, 'wavetable-selection-A');
+createOSCAddCanvas(oscA, 'wavetable-canvas-A');
 oscA["knobs"] = {
     unison: app.knobs[10],
     detune: app.knobs[11],
@@ -51,7 +73,11 @@ oscA["knobs"] = {
     volume: app.knobs[14],
 };
 
-oscB = createOSC('checkbox-osc-B', 'wavetable-selection-B', 'wavetable-canvas-B', 'B');
+//----------------oscB
+oscB = createOSC('B', 'checkbox-osc-B');
+createOSCAddOsc(oscB);
+createOSCAddBody(oscB, 'wavetable-selection-B');
+createOSCAddCanvas(oscB, 'wavetable-canvas-B');
 oscB["knobs"] = {
     unison: app.knobs[0],
     detune: app.knobs[1],
@@ -60,16 +86,29 @@ oscB["knobs"] = {
     volume: app.knobs[4],
 };
 
-oscSUB = createOSC('checkbox-osc-SUB', 'wavetable-selection-SUB', 'NULL', 'SUB');
+//----------------oscSUB
+oscSUB = createOSC('SUB', 'checkbox-osc-SUB');
+createOSCAddOsc(oscSUB);
+createOSCAddBody(oscSUB, 'wavetable-selection-SUB');
 oscSUB["knobs"] = {
     pitch: app.knobs[23],
     volume: app.knobs[24],
 };
 
-oscNOISE = createOSC('checkbox-osc-NOISE', 'NULL', 'NULL', 'NOISE');
+//----------------oscNOISE
+oscNOISE = createOSC('NOISE', 'checkbox-osc-NOISE');
 oscNOISE["knobs"] = {
     pitch: app.knobs[33],
     volume: app.knobs[34],
+};
+
+//----------------oscFILTER
+oscFILTER = createOSC('FILTER', 'checkbox-osc-FILTER');
+createOSCAddFilter(oscFILTER);
+oscFILTER["knobs"] = {
+    cutoff: app.knobs[40],
+    Q: app.knobs[41],
+    rolloff: app.knobs[42],
 };
 
 
@@ -220,7 +259,7 @@ const addNOISE = (obj) => {
     }).triggerAttack(start - 0.01);
 
     let volCenter = new Tone.Volume(-800);
-    let noise = ["pink","white","brown"];
+    let noise = ["pink", "white", "brown"];
     let oscTEMP = new Tone.Noise(noise[app.osc.NOISE.type]);
 
     oscTEMP.connect(volENV);
@@ -335,7 +374,7 @@ const adjustSound = (keyset, osc) => {
                 e.volCenter.volume.value = 40 * Math.log10(((volume + 80) / 160) * (1 - blend));
                 e.volSide.volume.value = 40 * Math.log10(((volume + 80) / 160) * (blend));
             }
-            else if (["SUB","NOISE"].includes(e.type)) {
+            else if (["SUB", "NOISE"].includes(e.type)) {
                 rotateENV(osc.knobs[key], e.volENV.value, showRotation);
 
                 let volume = osc.knobs['volume'].value.cur;

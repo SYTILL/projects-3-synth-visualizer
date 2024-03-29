@@ -160,7 +160,7 @@ body {
 }
 
 
-/* ----------filter body-------------- */
+/* ---------------------------FILTER body-------------------------- */
 .filter-body {
     flex: 0.5;
 }
@@ -171,8 +171,8 @@ body {
     width: 100%;
 }
 
-#canvas-FILTER{
-    width: 100%;
+#FILTER-canvas{
+    width: 99%;
 
     margin: 0;
 }
@@ -187,9 +187,35 @@ body {
     border: 1px solid rgb(255, 255, 255);
 }
 
-.FILTER-target-selection{
-    flex: 0.2;
-    border: 1px solid rgb(255, 255, 255);
+.FILTER-target-selection-body{
+    flex: 0.3;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.FILTER-target-selection-body1{
+    height: 26%;
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.FILTER-target-selection-body2{
+    height: 33%;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.FILTER-target-selection-text{
+    font-size: small;
+    margin-left: 5px;
+    color: white;
 }
 
 .FILTER-knobs{
@@ -349,7 +375,7 @@ body {
 }
 
 
-.ENV-canvas-body {
+.automation-canvas-body {
     flex: 1;
     width: 100%;
 
@@ -363,7 +389,15 @@ body {
     border-bottom: 1px solid rgb(255, 255, 255);
     flex: 1;
     width: 100%;
-    height: 100%;
+    max-height: 100%;
+    margin-bottom: 0;
+}
+
+#LFO-canvas{
+    border-top: 1px solid rgb(255, 255, 255);
+    border-bottom: 1px solid rgb(255, 255, 255);
+    width: 100%;
+    max-height: 100%;
     margin-bottom: 0;
 }
 
