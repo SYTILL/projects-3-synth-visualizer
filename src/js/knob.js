@@ -1,8 +1,8 @@
 let app = new Vue({
     el: '#app',
     data: {
-        noiseTypes: ["pink","white","brown"],
-        filterTypes: ["lowpass","highpass","bandpass","lowshelf","highshelf","notch","allpass","peaking"],
+        noiseTypes: ["pink", "white", "brown"],
+        filterTypes: ["lowpass", "highpass", "bandpass", "lowshelf", "highshelf", "notch", "allpass", "peaking"],
         osc: {
             A: {
                 onOff: true,
@@ -20,6 +20,12 @@ let app = new Vue({
             FILTER: {
                 onOff: false,
                 type: 1,
+                target: {
+                    A: false,
+                    B: false,
+                    S: false,
+                    N: false,
+                }
             }
         },
         selectedENV: 1,
@@ -32,7 +38,7 @@ let app = new Vue({
                 osc: "SUB", knobType: "circle", row: "upper",
                 rotation: 0,
                 value: { cur: 0, low: -240, high: 240, ratio: 10, points: 2 },
-                env: { target: -1, rotation: -132},
+                env: { target: -1, rotation: -132 },
                 color: '#0060df',
                 active: true, selected: false,
             },
@@ -41,18 +47,18 @@ let app = new Vue({
                 osc: "SUB", knobType: "circle", row: "upper",
                 rotation: 0,
                 value: { cur: 0, low: -80, high: 80, ratio: 1, points: 0 },
-                env: { target: 0, rotation: -132},
+                env: { target: 0, rotation: -132 },
                 color: '#0060df',
                 active: true, selected: false,
             },
-            
+
             //---------------------NOISE-----------------------
             33: {
                 label: 'Pitch',
                 osc: "NOISE", knobType: "circle", row: "upper",
                 rotation: 0,
                 value: { cur: 0, low: -240, high: 240, ratio: 10, points: 2 },
-                env: { target: -1, rotation: -132},
+                env: { target: -1, rotation: -132 },
                 color: '#0060df',
                 active: true, selected: false,
             },
@@ -61,38 +67,47 @@ let app = new Vue({
                 osc: "NOISE", knobType: "circle", row: "upper",
                 rotation: 0,
                 value: { cur: 0, low: -80, high: 80, ratio: 1, points: 0 },
-                env: { target: 0, rotation: -132},
+                env: { target: 0, rotation: -132 },
                 color: '#0060df',
                 active: true, selected: false,
             },
-            
+
             //---------------------FILTER-----------------------
             40: {
                 label: 'Cutoff',
                 osc: "FILTER", knobType: "circle", row: "upper",
-                rotation: 0,
-                value: { cur: 0, low: -240, high: 240, ratio: 10, points: 2 },
-                env: { target: -1, rotation: -132},
+                rotation: -15,
+                value: { cur: 440, low: 0, high: 1000, ratio: 1, points: 0 },
+                env: { target: -1, rotation: -132 },
                 color: '#0060df',
                 active: true, selected: false,
             },
             41: {
                 label: 'Q',
                 osc: "FILTER", knobType: "circle", row: "upper",
-                rotation: 0,
-                value: { cur: 0, low: -80, high: 80, ratio: 1, points: 0 },
-                env: { target: 0, rotation: -132},
+                rotation: -132,
+                value: { cur: 0, low: 0, high: 100, ratio: 10, points: 1 },
+                env: { target: 0, rotation: -132 },
                 color: '#0060df',
                 active: true, selected: false,
             },
             42: {
                 label: 'Rolloff',
-                osc: "FILTER", knobType: "updown", row: "upper",
-                value: { real: 1, cur: 1, low: 1, high: 4 },
-                env: { target: -1, rotation: -132},
+                osc: "FILTER1", knobType: "updown", row: "upper",
+                value: { real: 0, cur: -12, low: 0, high: 3 },
+                env: { target: -1, rotation: -132 },
                 color: '#0060df',
                 active: true,
                 selected: false,
+            },
+            43: {
+                label: 'Gain',
+                osc: "FILTER", knobType: "circle", row: "upper",
+                rotation: -132,
+                value: { cur: 0, low: 0, high: 20, ratio: 1, points: 0 },
+                env: { target: 0, rotation: -132 },
+                color: '#0060df',
+                active: true, selected: false,
             },
 
             //---------------------OSC A-----------------------
@@ -100,7 +115,7 @@ let app = new Vue({
                 label: 'Unison',
                 osc: "A", knobType: "updown", row: "upper",
                 value: { real: 1, cur: 1, low: 1, high: 16 },
-                env: { target: -1, rotation: -132},
+                env: { target: -1, rotation: -132 },
                 color: '#0060df',
                 active: true,
                 selected: false,
@@ -110,7 +125,7 @@ let app = new Vue({
                 osc: "A", knobType: "circle", row: "upper",
                 rotation: -110,
                 value: { cur: 4, low: 0, high: 48, ratio: 1, points: 0 },
-                env: { target: -1, rotation: -132},
+                env: { target: -1, rotation: -132 },
                 color: '#0060df',
                 active: true,
                 selected: false,
@@ -120,7 +135,7 @@ let app = new Vue({
                 osc: "A", knobType: "circle", row: "upper",
                 rotation: 0,
                 value: { cur: 0.5, low: 0, high: 100, ratio: 100, points: 2 },
-                env: { target: -1, rotation: -132},
+                env: { target: -1, rotation: -132 },
                 color: '#0060df',
                 active: true, selected: false,
             },
@@ -129,7 +144,7 @@ let app = new Vue({
                 osc: "A", knobType: "circle", row: "upper",
                 rotation: 0,
                 value: { cur: 0, low: -240, high: 240, ratio: 10, points: 2 },
-                env: { target: -1, rotation: -132},
+                env: { target: -1, rotation: -132 },
                 color: '#0060df',
                 active: true, selected: false,
             },
@@ -138,7 +153,7 @@ let app = new Vue({
                 osc: "A", knobType: "circle", row: "lower",
                 rotation: 0,
                 value: { cur: 0, low: -80, high: 80, ratio: 1, points: 0 },
-                env: { target: 0, rotation: -132},
+                env: { target: 0, rotation: -132 },
                 color: '#0060df',
                 active: true, selected: false,
             },
@@ -148,6 +163,7 @@ let app = new Vue({
                 label: 'Unison',
                 osc: "B", knobType: "updown", row: "upper",
                 value: { real: 1, cur: 1, low: 1, high: 16 },
+                env: { target: -1, rotation: -132 },
                 color: '#0060df',
                 active: true,
                 selected: false,
@@ -157,6 +173,7 @@ let app = new Vue({
                 osc: "B", knobType: "circle", row: "upper",
                 rotation: -110,
                 value: { cur: 4, low: 0, high: 48, ratio: 1, points: 0 },
+                env: { target: -1, rotation: -132 },
                 color: '#0060df',
                 active: true,
                 selected: false,
@@ -166,6 +183,7 @@ let app = new Vue({
                 osc: "B", knobType: "circle", row: "upper",
                 rotation: 0,
                 value: { cur: 0.5, low: 0, high: 100, ratio: 100, points: 2 },
+                env: { target: -1, rotation: -132 },
                 color: '#0060df',
                 active: true, selected: false,
             },
@@ -174,6 +192,7 @@ let app = new Vue({
                 osc: "B", knobType: "circle", row: "upper",
                 rotation: 0,
                 value: { cur: 0, low: -240, high: 240, ratio: 10, points: 2 },
+                env: { target: -1, rotation: -132 },
                 color: '#0060df',
                 active: true, selected: false,
             },
@@ -182,6 +201,7 @@ let app = new Vue({
                 osc: "B", knobType: "circle", row: "lower",
                 rotation: 0,
                 value: { cur: 0, low: -80, high: 80, ratio: 1, points: 0 },
+                env: { target: 0, rotation: -132 },
                 color: '#0060df',
                 active: true, selected: false,
             },
@@ -231,7 +251,7 @@ let app = new Vue({
 
 
             if (selectedKnob.knobType == "updown") {
-                app.updownCounter(selectedKnob.value, -(e.pageY - app.currentY) / 10);
+                app.updownCounter(selectedKnob.value, -(e.pageY - app.currentY) / 10, selectedKnob.label);
             }
             else if (selectedKnob.knobType == "circle") {
                 app.setKnob(selectedKnob, -(e.pageY - app.currentY));
@@ -245,23 +265,6 @@ let app = new Vue({
                 drawENV();
             }
 
-
-            // //real time volume change
-            // if (['Volume', 'Blend'].includes(selectedKnob.label)) {
-            //     if (selectedKnob.osc == 'A') {
-            //         let volume = app.knobs[14].value.cur;
-            //         let blend = app.knobs[12].value.cur;
-            //         oscA.volCenter.volume.value = 40 * Math.log10(((volume + 80) / 160) * (1 - blend));
-            //         oscA.volSide.volume.value = 40 * Math.log10(((volume + 80) / 160) * (blend));
-            //     }
-            //     else if (selectedKnob.osc == 'B') {
-            //         let volume = app.knobs[4].value.cur;
-            //         let blend = app.knobs[2].value.cur;
-            //         oscB.volCenter.volume.value = 40 * Math.log10(((volume + 80) / 160) * (1 - blend));
-            //         oscB.volSide.volume.value = 40 * Math.log10(((volume + 80) / 160) * (blend));
-            //     }
-            // }
-
             //show unison bar on canvas
             if (['Blend', 'Detune', 'Unison'].includes(selectedKnob.label)) {
                 if (selectedKnob.osc == 'A') {
@@ -271,8 +274,13 @@ let app = new Vue({
                     await drawWaveform(oscB, 'B');
                 }
             }
+
+            //update FILTER canvas
+            if (['FILTER'].includes(selectedKnob.osc)) {
+                visualizeFilter(oscFILTER);
+            }
         },
-        updownCounter: (value, amount) => {
+        updownCounter: (value, amount, type = null) => {
             value.real += amount;
             if (value.real >= value.high) {
                 value.real = value.high;
@@ -281,9 +289,24 @@ let app = new Vue({
                 value.real = value.low;
             }
             value.cur = Math.round(value.real);
+            if(type == "Rolloff"){
+                value.cur = -12 * (2**value.cur);
+                oscFILTER.filter.rolloff = value.cur;
+                visualizeFilter(oscFILTER);
+            }
         },
     },
     methods: {
+        changeFilterType: function (value) {
+            //adjust filter type by +-value
+            len = app.filterTypes.length;
+            typeValue = (app.osc.FILTER.type + len + value) % len
+            app.osc.FILTER.type = typeValue;
+
+            oscFILTER.filter.type = app.filterTypes[typeValue];
+            visualizeFilter(oscFILTER);
+        },
+
         unselectKnobs: async function () {
             for (var i in this.knobs) {
                 this.knobs[i].selected = false;
@@ -294,9 +317,8 @@ let app = new Vue({
 
         setKnob: function (knob, diff = 0) {
             if (knob.label == "unison") {
-                return;
+                throw Error("It has Circle Knob prop but It is Unison");
             }
-            
 
             knob.rotation += diff;
             if (knob.rotation >= 132) { knob.rotation = 132; }
@@ -311,7 +333,23 @@ let app = new Vue({
             if (temp > knob.value.high) { temp = knob.value.high; }
             else if (temp < knob.value.low) { temp = knob.value.low; }
 
-            knob.value.cur = Number((temp / knob.value.ratio).toFixed(knob.value.points));
+            if (knob.label == "Cutoff") {
+                const logMin = 20;
+                const logMax = 20000;
+                value = Number((Math.exp((temp / knob.value.high) * (Math.log(logMax) - Math.log(logMin)) + Math.log(logMin))).toFixed(0));
+
+                knob.value.cur = value;
+                oscFILTER.filter.frequency.value = value;
+            }
+            else {
+                knob.value.cur = Number((temp / knob.value.ratio).toFixed(knob.value.points));
+
+                if (knob.label == "Q"){
+                    oscFILTER.filter.Q.value = knob.value.cur;
+                }
+            }
+
+
         },
 
         setENVknobRotation: function () {

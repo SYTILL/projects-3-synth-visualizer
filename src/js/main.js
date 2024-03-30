@@ -1,23 +1,3 @@
-
-
-//--------------#drag & drop----------------------------
-selectBoxes = document.querySelectorAll(".ENV-select-box");
-
-let selectedDragItem = null;
-let i = 1;
-selectBoxes.forEach(box => {
-    box.setAttribute('data-envnum', i++);
-
-    const img = new Image();
-    img.src = "src/images/drag-image.png";
-
-    box.addEventListener("dragstart", function (e) {
-        e.dataTransfer.setDragImage(img, 25, 10);
-        selectedDragItem = Number(box.dataset.envnum);
-    }, false);
-});
-
-
 //-------------------#add wavetable images #images #wavetable------------------
 const createOSC = (type, checkBox) => {
     return {
@@ -45,13 +25,23 @@ const createOSCAddCanvas = (osc, canvasBody) => {
 };
 
 const createOSCAddFilter = (osc) => {
-    osc["filter"] = new Tone.BiquadFilter({
+    osc["filter"] = new Tone.Filter({
         type: 'highpass', // Filter type (e.g., lowpass, highpass, bandpass)
-        frequency: 200, // Cutoff frequency in Hz
-        Q: 1, // Quality factor
+        frequency: 440, // Cutoff frequency in Hz
+        Q: 0, // Quality factor
         rolloff: -12,
+        gain: 10,
     })
 };
+
+
+
+
+
+
+
+
+
 
 envs = [
     new Tone.Envelope(0, 0, 1, 0), // 0 - default (not shown)
@@ -110,6 +100,13 @@ oscFILTER["knobs"] = {
     Q: app.knobs[41],
     rolloff: app.knobs[42],
 };
+
+
+
+
+
+
+
 
 
 
@@ -194,7 +191,6 @@ const addOSC = (obj) => {
     if (obj.note in obj.activeNote) { obj.activeNote[obj.note].push(activeNoteObj); }
     else { obj.activeNote[obj.note] = [activeNoteObj]; }
 };
-
 
 const addSUB = (obj) => {
     let pitch = obj.osc.knobs["pitch"].value.cur;
@@ -281,6 +277,16 @@ const addNOISE = (obj) => {
     if (obj.note in obj.activeNote) { obj.activeNote[obj.note].push(activeNoteObj); }
     else { obj.activeNote[obj.note] = [activeNoteObj]; }
 };
+
+
+
+
+
+
+
+
+
+
 
 const keySet = () => {
     return {
@@ -383,19 +389,29 @@ const adjustSound = (keyset, osc) => {
         }
 
     });
+
+    if(oscFILTER.onOff){
+
+    }
 }
+
+
+
+
+
+
 
 //-------------------------------update - ENV----------------------------
 
 let releaseKeyOnce = true;
 Tone.Transport.scheduleRepeat((time) => {
     releaseKey(keySetA, keySetA.toRelease.shift());
-    //releaseKey(keySetB, keySetB.toRelease.shift());
+    releaseKey(keySetB, keySetB.toRelease.shift());
     releaseKey(keySetSUB, keySetSUB.toRelease.shift());
     releaseKey(keySetNOISE, keySetNOISE.toRelease.shift());
 
     adjustSound(keySetA, oscA);
-    //adjustSound(keySetB, oscB);
+    adjustSound(keySetB, oscB);
     adjustSound(keySetSUB, oscSUB);
     adjustSound(keySetNOISE, oscNOISE);
 }, "128n");
@@ -414,12 +430,12 @@ const startOSC = (key) => {
         note: key.note,
     });
 
-    // addOSC({
-    //     osc: oscB,
-    //     activeNote: keySetB.activeNote,
-    //     frequency: key.frequency,
-    //     note: key.note,
-    // });
+    addOSC({
+        osc: oscB,
+        activeNote: keySetB.activeNote,
+        frequency: key.frequency,
+        note: key.note,
+    });
 
     addSUB({
         osc: oscSUB,
@@ -439,7 +455,9 @@ const stopOSC = async (key) => {
     if (oscA.checkBox.checked) {
         keySetA.toRelease.push(key.note);
     }
-    //keySetB.toRelease.push(key.note);
+    if (oscB.checkBox.checked) {
+        keySetB.toRelease.push(key.note);
+    }
     if (oscSUB.checkBox.checked) {
         keySetSUB.toRelease.push(key.note);
     }

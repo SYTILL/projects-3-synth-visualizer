@@ -217,14 +217,15 @@ const visualizeFilter = (oscBody) => {
     const minFrequency = 15;
     const maxFrequency = 25000;
 
-    const frequencies = new Float32Array(canvas.width);
+    const divideFreq = 50;
+    const frequencies = new Float32Array(divideFreq);
 
     // Convert linear scale to logarithmic scale
-    const divideFreq = 50;
     for (let i = 0; i < divideFreq; i++) {
         const frequency = minFrequency * Math.pow(maxFrequency / minFrequency, i / divideFreq);
         frequencies[i] = frequency;
     }
+
 
     const magnitudes = filter.getFrequencyResponse(frequencies);
 
