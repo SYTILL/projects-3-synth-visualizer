@@ -26,11 +26,11 @@ const createOSCAddCanvas = (osc, canvasBody) => {
 
 const createOSCAddFilter = (osc) => {
     osc["filter"] = new Tone.Filter({
-        type: 'highpass', // Filter type (e.g., lowpass, highpass, bandpass)
-        frequency: 440, // Cutoff frequency in Hz
-        Q: 0, // Quality factor
+        type: 'highpass',
+        frequency: 440, 
+        Q: 1, 
         rolloff: -12,
-        gain: 10,
+        gain: 2,
     })
 };
 

@@ -388,7 +388,8 @@
 
                 <!-- ----------------------FILTER  - TITLE---------------------- -->
                 <div class="title">
-                    <input class="title-checkbox" type="checkbox" checked>
+                    <input class="title-checkbox" type="checkbox"
+                    @click="osc.FILTER.onOff = !osc.FILTER.onOff">
                     <span class="title-text">FILTER</span>
                 </div>
 
@@ -449,7 +450,7 @@
 
                                 <div v-if="knob.env.target>=1" class="knob-active-light"
                                     :style="{'background-color': knob.env.target==selectedENV?'white':'#888'}"></div>
-                                <div class="rela-block knob-dial" :style="{'color':osc.A.onOff?knob.color:'#888'}">
+                                <div class="rela-block knob-dial" :style="{'color':osc.FILTER.onOff?knob.color:'#888'}">
                                     <div class="abs-center dial-grip"
                                         :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
                                         @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
@@ -461,12 +462,12 @@
                                             :style="{'stroke-dashoffset':205 - 205*((knob.env.rotation*1 + 132)/264)}" />
                                         <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
                                         <path d="M20,76 A 40 40 0 1 1 80 76" fill="none"
-                                            :stroke="osc.A.onOff?knob.color:'#888'"
+                                            :stroke="osc.FILTER.onOff?knob.color:'#888'"
                                             :style="{'stroke-dashoffset':184 - 184*((knob.rotation*1 + 132)/264)}" />
                                     </svg>
                                 </div>
 
-                                <div class="rela-block knob-label" :style="{'color':osc.A.onOff?'#E4E8EA':'#888'}">
+                                <div class="rela-block knob-label" :style="{'color':osc.FILTER.onOff?'#E4E8EA':'#888'}">
                                     {{knob.label}}</div>
                                 <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
                             </div>
@@ -477,17 +478,17 @@
                             <div class="rela-inline knob">
                                 <div class="rela-block">
                                     <div class="knob-updown-body">
-                                        <div class="knob-updown-text" :style="{'color':osc.B.onOff?'white':'#888'}"
+                                        <div class="knob-updown-text" :style="{'color':osc.FILTER.onOff?'white':'#888'}"
                                             @mouseDown="knobs[42].selected = true; app.currentY = event.pageY; event.preventDefault()">
                                             {{knobs[42].value.cur}}</div>
                                         <div class="knob-updown-button-body">
                                             <div class="knob-updown-button"
-                                                :style="{'color':osc.B.onOff?'white':'#888'}"
+                                                :style="{'color':osc.FILTER.onOff?'white':'#888'}"
                                                 @click="updownCounter(knobs[42].value, 1, 'Rolloff');">
                                                 <div style="transform: translateY(-4px);">▲</div>
                                             </div>
                                             <div class="knob-updown-button"
-                                                :style="{'color':osc.B.onOff?'white':'#888'}"
+                                                :style="{'color':osc.FILTER.onOff?'white':'#888'}"
                                                 @click="updownCounter(knobs[42].value, -1, 'Rolloff');">
                                                 <div style="transform: translateY(-3px);">▼</div>
                                             </div>
@@ -496,6 +497,33 @@
                                 </div>
                                 <div class="rela-block knob-label" :style="{'color':knobs[42].active?'#E4E8EA':'#888'}">
                                     {{knobs[42].label}}</div>
+                            </div>
+
+                            <div v-for="knob in [knobs[43]]" class="rela-inline knob style3"
+                                @drop="knob.env.target = selectedDragItem;" @dragover.prevent @dragenter.prevent>
+
+                                <div v-if="knob.env.target>=1" class="knob-active-light"
+                                    :style="{'background-color': knob.env.target==selectedENV?'white':'#888'}"></div>
+                                <div class="rela-block knob-dial" :style="{'color':osc.FILTER.onOff?knob.color:'#888'}">
+                                    <div class="abs-center dial-grip"
+                                        :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
+                                        @mouseDown="knob.selected = true; app.currentY = event.pageY; event.preventDefault()">
+                                    </div>
+                                    <svg class="dial-svg" viewBox="0 0 100 100">
+                                        <!-- ----------KNOB OUTER ENV ----------- -->
+                                        <path v-if="knob.env.target==selectedENV" d="M18,80 A 44 44 0 1 1 82 80"
+                                            fill="none" stroke="white" style="stroke-dasharray: 205 205;"
+                                            :style="{'stroke-dashoffset':205 - 205*((knob.env.rotation*1 + 132)/264)}" />
+                                        <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
+                                        <path d="M20,76 A 40 40 0 1 1 80 76" fill="none"
+                                            :stroke="osc.FILTER.onOff?knob.color:'#888'"
+                                            :style="{'stroke-dashoffset':184 - 184*((knob.rotation*1 + 132)/264)}" />
+                                    </svg>
+                                </div>
+
+                                <div class="rela-block knob-label" :style="{'color':osc.FILTER.onOff?'#E4E8EA':'#888'}">
+                                    {{knob.label}}</div>
+                                <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
                             </div>
                         </div>
                     </div>

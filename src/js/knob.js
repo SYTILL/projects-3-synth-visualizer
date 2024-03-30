@@ -85,8 +85,8 @@ let app = new Vue({
             41: {
                 label: 'Q',
                 osc: "FILTER", knobType: "circle", row: "upper",
-                rotation: -132,
-                value: { cur: 0, low: 0, high: 100, ratio: 10, points: 1 },
+                rotation: -79,
+                value: { cur: 1.0, low: 0, high: 50, ratio: 10, points: 1 },
                 env: { target: 0, rotation: -132 },
                 color: '#0060df',
                 active: true, selected: false,
@@ -104,7 +104,7 @@ let app = new Vue({
                 label: 'Gain',
                 osc: "FILTER", knobType: "circle", row: "upper",
                 rotation: -132,
-                value: { cur: 0, low: 0, high: 20, ratio: 1, points: 0 },
+                value: { cur: 0, low: 0, high: 10, ratio: 1, points: 0 },
                 env: { target: 0, rotation: -132 },
                 color: '#0060df',
                 active: true, selected: false,
@@ -346,6 +346,9 @@ let app = new Vue({
 
                 if (knob.label == "Q"){
                     oscFILTER.filter.Q.value = knob.value.cur;
+                }
+                else if (knob.label == "Gain"){
+                    oscFILTER.filter.gain.value = knob.value.cur;
                 }
             }
 
