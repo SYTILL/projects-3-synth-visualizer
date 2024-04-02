@@ -16,6 +16,10 @@ const createOSCAddOsc = (osc) => {
     });
 };
 
+const createOSCAddFilterType = (osc, type) => {
+    osc["filterType"] = type;
+}
+
 const createOSCAddBody = (osc, selectionBody) => {
     osc["body"] = document.getElementById(selectionBody);
 };
@@ -27,8 +31,8 @@ const createOSCAddCanvas = (osc, canvasBody) => {
 const createOSCAddFilter = (osc) => {
     osc["filter"] = new Tone.Filter({
         type: 'highpass',
-        frequency: 440, 
-        Q: 1, 
+        frequency: 440,
+        Q: 1,
         rolloff: -12,
         gain: 2,
     })
@@ -55,6 +59,7 @@ oscA = createOSC('A', 'checkbox-osc-A');
 createOSCAddOsc(oscA);
 createOSCAddBody(oscA, 'wavetable-selection-A');
 createOSCAddCanvas(oscA, 'wavetable-canvas-A');
+createOSCAddFilterType(oscA, 'A');
 oscA["knobs"] = {
     unison: app.knobs[10],
     detune: app.knobs[11],
@@ -68,6 +73,7 @@ oscB = createOSC('B', 'checkbox-osc-B');
 createOSCAddOsc(oscB);
 createOSCAddBody(oscB, 'wavetable-selection-B');
 createOSCAddCanvas(oscB, 'wavetable-canvas-B');
+createOSCAddFilterType(oscB, 'B');
 oscB["knobs"] = {
     unison: app.knobs[0],
     detune: app.knobs[1],
@@ -80,6 +86,7 @@ oscB["knobs"] = {
 oscSUB = createOSC('SUB', 'checkbox-osc-SUB');
 createOSCAddOsc(oscSUB);
 createOSCAddBody(oscSUB, 'wavetable-selection-SUB');
+createOSCAddFilterType(oscSUB, 'S');
 oscSUB["knobs"] = {
     pitch: app.knobs[23],
     volume: app.knobs[24],
@@ -87,6 +94,7 @@ oscSUB["knobs"] = {
 
 //----------------oscNOISE
 oscNOISE = createOSC('NOISE', 'checkbox-osc-NOISE');
+createOSCAddFilterType(oscNOISE, 'N');
 oscNOISE["knobs"] = {
     pitch: app.knobs[33],
     volume: app.knobs[34],
@@ -156,26 +164,62 @@ const addOSC = (obj) => {
 
     let volCenter = new Tone.Volume(-800);
     let volSide = new Tone.Volume(-800);
-    for (let i = 0; i < unison; i++) {
-        //ADD OSC
-        let oscTEMP = new Tone.Oscillator(obj.frequency, osc.oscillator.type);
+    let filter = null;
 
-        if (unison > 1) { oscTEMP.detune.value = i * (detune * 2 / (unison - 1)) - detune; }
+    if (app.osc.FILTER.target[osc.filterType] && app.osc.FILTER.onOff) {
+        filter = new Tone.Filter({
+            type: oscFILTER.filter.type,
+            frequency: oscFILTER.filter.frequency.value,
+            Q: oscFILTER.filter.Q.value,
+            rolloff: oscFILTER.filter.rolloff,
+            gain: oscFILTER.filter.gain.value,
+        }).toDestination();
 
-        if (mid1 == i || mid2 == i) {
-            oscTEMP.connect(volENV);
-            volENV.connect(volCenter);
-            volCenter.toDestination();
-            oscTEMP.start(start);
+        for (let i = 0; i < unison; i++) {
+            //ADD OSC
+            let oscTEMP = new Tone.Oscillator(obj.frequency, osc.oscillator.type);
+
+            if (unison > 1) { oscTEMP.detune.value = i * (detune * 2 / (unison - 1)) - detune; }
+
+            if (mid1 == i || mid2 == i) {
+                oscTEMP.connect(volENV);
+                volENV.connect(volCenter);
+                volCenter.connect(filter);
+                oscTEMP.start(start);
+            }
+            else {
+                oscTEMP.connect(volENV);
+                volENV.connect(volSide);
+                volSide.connect(filter);
+                oscTEMP.start(start);
+            }
+            oscTEMParray.push(oscTEMP);
         }
-        else {
-            oscTEMP.connect(volENV);
-            volENV.connect(volSide);
-            volSide.toDestination();
-            oscTEMP.start(start);
-        }
-        oscTEMParray.push(oscTEMP);
     }
+    else {
+        for (let i = 0; i < unison; i++) {
+            //ADD OSC
+            let oscTEMP = new Tone.Oscillator(obj.frequency, osc.oscillator.type);
+
+            if (unison > 1) { oscTEMP.detune.value = i * (detune * 2 / (unison - 1)) - detune; }
+
+            if (mid1 == i || mid2 == i) {
+                oscTEMP.connect(volENV);
+                volENV.connect(volCenter);
+                volCenter.toDestination();
+                oscTEMP.start(start);
+            }
+            else {
+                oscTEMP.connect(volENV);
+                volENV.connect(volSide);
+                volSide.toDestination();
+                oscTEMP.start(start);
+            }
+            oscTEMParray.push(oscTEMP);
+        }
+    }
+
+
 
     let activeNoteObj = {
         oscArray: oscTEMParray,
@@ -185,6 +229,7 @@ const addOSC = (obj) => {
         volENV,
         volCenter,
         volSide,
+        filter,
         type: "OSC",
     };
 
@@ -215,9 +260,9 @@ const addSUB = (obj) => {
     let volCenter = new Tone.Volume(-800);
     let oscTEMP = new Tone.Oscillator(obj.frequency, osc.oscillator.type);
 
-    oscTEMP.connect(volENV);
-    volENV.connect(volCenter);
-    volCenter.toDestination();
+    //connect all
+    isFilterOn = app.osc.FILTER.target[osc.filterType];
+    let filter = connectFilter(oscTEMP, volENV, volCenter, isFilterOn);
 
     oscTEMP.start(start);
     oscTEMParray.push(oscTEMP);
@@ -229,6 +274,7 @@ const addSUB = (obj) => {
         env: createENVobject(osc),
         volENV,
         volCenter,
+        filter,
         type: "SUB",
     };
 
@@ -258,9 +304,9 @@ const addNOISE = (obj) => {
     let noise = ["pink", "white", "brown"];
     let oscTEMP = new Tone.Noise(noise[app.osc.NOISE.type]);
 
-    oscTEMP.connect(volENV);
-    volENV.connect(volCenter);
-    volCenter.toDestination();
+    //connect all
+    isFilterOn = app.osc.FILTER.target[osc.filterType];
+    let filter = connectFilter(oscTEMP, volENV, volCenter, isFilterOn);
 
     oscTEMP.start(start);
     oscTEMParray.push(oscTEMP);
@@ -271,11 +317,36 @@ const addNOISE = (obj) => {
         env: createENVobject(osc),
         volENV,
         volCenter,
+        filter,
         type: "NOISE",
     };
 
     if (obj.note in obj.activeNote) { obj.activeNote[obj.note].push(activeNoteObj); }
     else { obj.activeNote[obj.note] = [activeNoteObj]; }
+};
+
+const connectFilter = (oscTEMP, ENV, vol, isFilterOn) => {
+
+    oscTEMP.connect(ENV);
+    ENV.connect(vol);
+
+    let filter = null;
+    if (isFilterOn && app.osc.FILTER.onOff) {
+        filter = new Tone.Filter({
+            type: oscFILTER.filter.type,
+            frequency: oscFILTER.filter.frequency.value,
+            Q: oscFILTER.filter.Q.value,
+            rolloff: oscFILTER.filter.rolloff,
+            gain: oscFILTER.filter.gain.value,
+        });
+        vol.connect(filter);
+        filter.toDestination();
+    }
+    else{
+        vol.toDestination();
+    }
+
+    return filter;
 };
 
 
@@ -390,7 +461,7 @@ const adjustSound = (keyset, osc) => {
 
     });
 
-    if(oscFILTER.onOff){
+    if (oscFILTER.onOff) {
 
     }
 }
