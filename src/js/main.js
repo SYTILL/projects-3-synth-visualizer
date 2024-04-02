@@ -109,7 +109,8 @@ oscFILTER["knobs"] = {
     rolloff: app.knobs[42],
 };
 
-
+//meter
+const meter = new Tone.Meter();
 
 
 
@@ -135,7 +136,6 @@ const createENVobject = (osc) => {
     })
     return temp;
 };
-
 
 const addOSC = (obj) => {
     let unison = obj.osc.knobs["unison"].value.cur;
@@ -218,8 +218,6 @@ const addOSC = (obj) => {
             oscTEMParray.push(oscTEMP);
         }
     }
-
-
 
     let activeNoteObj = {
         oscArray: oscTEMParray,
@@ -383,12 +381,28 @@ const releaseKey = (keyset, note) => {
     Object.keys(e.env).forEach(function (k) {
         e.env[k].triggerRelease(start);
     });
+
     setTimeout(() => {
         let e = keyset.activeNote[note][0];
-        e.oscArray.forEach((oscTEMP) => { oscTEMP.stop(); });
+
+        //dispose all
+        e.oscArray.forEach((oscTEMP) => { 
+            oscTEMP.stop();
+            oscTEMP.dispose();
+        });
+        Object.keys(e.env).forEach(function (k) {
+            e.env[k].dispose();
+        });
+        if(e.volENV) e.volENV.dispose();
+        if(e.volCenter) e.volCenter.dispose();
+        if(e.volSide) e.volSide.dispose();
+        if(e.filter) e.filter.dispose();
+
         keyset.activeNote[note].shift();
         keyset.offset[note]--;
-        if (keyset.activeNote[note].length == 0) { delete keyset.activeNote[note]; }
+        if (keyset.activeNote[note].length == 0) { 
+            delete keyset.activeNote[note]; 
+        }
     }, e.volENV.release * 1000);
 };
 

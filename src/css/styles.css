@@ -318,6 +318,25 @@ body {
     transform: translateY(10px);
 }
 
+.volume-control{
+    flex-direction: row;
+    align-items: stretch;
+
+    padding: 5px;
+}
+
+.spectrum-body{
+    flex: 1;
+    margin-right: 10px;
+
+    border: 1px solid white;
+}
+
+.meter-body{
+    width: 50px;
+
+    border: 1px solid white;
+}
 
 
 
