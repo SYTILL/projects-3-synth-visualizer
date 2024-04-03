@@ -111,6 +111,10 @@ oscFILTER["knobs"] = {
 
 //meter
 const meter = new Tone.Meter();
+Tone.Master.connect(meter);
+
+const fft = new Tone.Analyser('fft', 1024);
+Tone.Master.connect(fft);
 
 
 
@@ -490,6 +494,10 @@ const adjustSound = (keyset, osc) => {
 
 let releaseKeyOnce = true;
 Tone.Transport.scheduleRepeat((time) => {
+    drawMeter(meter.getValue());
+    drawFFT(fft);
+    //console.log(meter.getValue(), meter.smoothing);
+
     releaseKey(keySetA, keySetA.toRelease.shift());
     releaseKey(keySetB, keySetB.toRelease.shift());
     releaseKey(keySetSUB, keySetSUB.toRelease.shift());

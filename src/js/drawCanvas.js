@@ -117,7 +117,7 @@ async function drawWaveform(oscBody, blendType = "none") {
     ctx.moveTo(0, canvas.height / 2);
     for (let i = 0; i < waveform.length; i++) {
         const x = (i / waveform.length) * canvas.width;
-        const y = ((waveform[i]+1) / 2) * canvas.height;
+        const y = ((waveform[i] + 1) / 2) * canvas.height;
         ctx.lineTo(x, y);
     }
     ctx.stroke();
@@ -165,6 +165,123 @@ async function drawWaveform(oscBody, blendType = "none") {
 
 }
 
+function drawMeter(level) {
+    canvas = document.getElementById("canvas-meter");
+    ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const minDb = -60; // Minimum dB value to visualize
+    const maxDb = 10;   // Maximum dB value to visualize
+
+    if (level > minDb) {
+        const dbRange = maxDb - minDb;
+        const dbHeight = (level - minDb) / dbRange * canvas.height;
+
+        ctx.fillStyle = '#0000cc';
+        ctx.fillRect(0, canvas.height - dbHeight, canvas.width, dbHeight);
+    }
+
+
+    // Set grid spacing and line color
+    const gridLines = { height: 14, width: 2 };
+    const gridColor = '#535559';
+
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = gridColor;
+
+    i = 10;
+    for (let y = 0; y <= canvas.height; y += canvas.height / gridLines.height) {
+        ctx.font = "25px Anta"; ctx.fillStyle = "#535559"
+        ctx.fillText(i, 5, y - 7);
+        i -= 5;
+        if (i == -5) {
+            ctx.strokeStyle = 'white';
+            drawLine(ctx, 0, y, canvas.width, y); //horizontal grid lines
+            ctx.strokeStyle = gridColor;
+        }
+        else {
+            drawLine(ctx, 0, y, canvas.width, y); //horizontal grid lines
+        }
+    }
+    for (let x = 0; x <= canvas.width; x += canvas.width / gridLines.width) {
+        drawLine(ctx, x, 0, x, canvas.height); //vertical grid lines
+    }
+
+}
+
+
+function logarithmicArraySize(size, length) {
+    const result = [];
+    for (let i = 0; i < size; i++) {
+        const logIndex = Math.pow(10, (i / size) * Math.log10(length));
+        result.push(Math.floor(logIndex));
+    }
+    return result;
+}
+const fftLength = 1024;
+const numBands = 64;
+const bandIndexes = logarithmicArraySize(numBands, fftLength);
+console.log(bandIndexes);
+
+
+function drawFFT(fft) {
+    canvas = document.getElementById("canvas-spectrum");
+    ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+
+    ctx.fillStyle = 'white';
+    // Get the frequency data from the analyser
+    const frequencyData = fft.getValue();
+    console.log(frequencyData);
+
+    const minDb = -100; // Minimum dB value to visualize
+    const maxDb = 10;   // Maximum dB value to visualize
+
+    const barWidth = canvas.width / numBands;
+    for (let i = 0; i < numBands; i++) {
+
+        if (frequencyData[bandIndexes[i]] > minDb) {
+            const dbRange = maxDb - minDb;
+            const dbHeight = (frequencyData[bandIndexes[i]] - minDb) / dbRange * canvas.height;
+            const x = i * barWidth;
+            ctx.fillStyle = '#0000cc';
+            ctx.fillRect(x, canvas.height - dbHeight, barWidth, dbHeight);
+        }
+    }
+
+
+    // // Set grid spacing and line color
+    // const gridLines = { height: 14, width: 2 };
+    // const gridColor = '#535559';
+
+    // ctx.lineWidth = 3;
+    // ctx.strokeStyle = gridColor;
+
+    // i = 10;
+    // for (let y = 0; y <= canvas.height; y += canvas.height / gridLines.height) {
+    //     ctx.font = "25px Anta"; ctx.fillStyle = "#535559"
+    //     ctx.fillText(i, 5, y - 7);
+    //     i -= 5;
+    //     if (i == -5) {
+    //         ctx.strokeStyle = 'white';
+    //         drawLine(ctx, 0, y, canvas.width, y); //horizontal grid lines
+    //         ctx.strokeStyle = gridColor;
+    //     }
+    //     else {
+    //         drawLine(ctx, 0, y, canvas.width, y); //horizontal grid lines
+    //     }
+    // }
+    // for (let x = 0; x <= canvas.width; x += canvas.width / gridLines.width) {
+    //     drawLine(ctx, x, 0, x, canvas.height); //vertical grid lines
+    // }
+
+}
+
 //-----------#disable all --------- if one wavetable is selected----------
 const selectWavetable = async (oscBody, selectedImg, hasCanvas = true) => {
     const selectionBody = oscBody.body;
@@ -193,10 +310,10 @@ const addWavetablesSelection = async (oscBody, hasCanvas = true, hor = false) =>
     let first = true;
     waveTablesTypes.forEach(name => {
         const img = document.createElement('img');
-        if(hor){
+        if (hor) {
             img.classList.add('presets-hor');
         }
-        else{
+        else {
             img.classList.add('wavetable-selection-presets');
         }
         img.src = `src/images/${name}-off.png`;
@@ -212,7 +329,7 @@ const addWavetablesSelection = async (oscBody, hasCanvas = true, hor = false) =>
 const visualizeFilter = (oscBody) => {
     filter = oscBody.filter;
     canvas = document.getElementById('FILTER-canvas');
-    ctx = canvas.getContext('2d'); 
+    ctx = canvas.getContext('2d');
 
     const minFrequency = 15;
     const maxFrequency = 25000;
@@ -255,6 +372,7 @@ const visualizeFilter = (oscBody) => {
         await addWavetablesSelection(oscB);
         await addWavetablesSelection(oscSUB, false, true);
         await visualizeFilter(oscFILTER);
+        await drawMeter(-60);
     } catch (error) {
         console.error('Adding OSC wavetable failed', error);
     }
