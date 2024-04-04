@@ -16,7 +16,7 @@
 <body>
     <div class="body-outer" id="app">
         <div class="separator top-body">
-            
+
             <!-- ----------WEB SYNTH LOGO----------- -->
             <div class="body-inner logo">
                 <span class="logo-text">WEB-SYNTH</span>
@@ -58,7 +58,7 @@
                     <div class="knobs-background">
                         <div class="knobs-row" @mouseUp="unselectKnobs">
                             <div v-for="knob in [knobs[23],knobs[24]]" class="rela-inline knob style3"
-                                @drop="knob.env.target = selectedDragItem;" @dragover.prevent @dragenter.prevent>
+                                @drop="setENVtype(knob,selectedDragItem);" @dragover.prevent @dragenter.prevent>
 
                                 <div v-if="knob.env.target>=1" class="knob-active-light"
                                     :style="{'background-color': knob.env.target==selectedENV?'white':'#888'}"></div>
@@ -119,7 +119,7 @@
                     <div class="knobs-background">
                         <div class="knobs-row" @mouseUp="unselectKnobs">
                             <div v-for="knob in [knobs[33],knobs[34]]" class="rela-inline knob style3"
-                                @drop="knob.env.target = selectedDragItem;" @dragover.prevent @dragenter.prevent>
+                                @drop="setENVtype(knob,selectedDragItem);" @dragover.prevent @dragenter.prevent>
 
                                 <div v-if="knob.env.target>=1" class="knob-active-light"
                                     :style="{'background-color': knob.env.target==selectedENV?'white':'#888'}"></div>
@@ -195,11 +195,13 @@
 
                         <!-- ----------OSC A - DETUNE / BLEND / PITCH ----------- -->
                         <div v-for="knob in [knobs[11],knobs[12],knobs[13]]" class="rela-inline knob style3"
-                            @drop="knob.env.target = selectedDragItem;" @dragover.prevent @dragenter.prevent>
+                            @drop="setENVtype(knob,selectedDragItem);" @dragover.prevent @dragenter.prevent>
 
 
                             <div v-if="knob.env.target>=1" class="knob-active-light"
-                                :style="{'background-color': knob.env.target==selectedENV?'white':'#888'}"></div>
+                                :style="{'background-color': knob.env.target==selectedENV?'white':'#888'}"
+                                @mouseDown="knob.selected = true; knob.automation.selected = true; app.currentY = event.pageY; event.preventDefault()">
+                            </div>
 
                             <div class="rela-block knob-dial" :style="{'color':osc.A.onOff?knob.color:'#888'}">
                                 <div class="abs-center dial-grip"
@@ -212,7 +214,7 @@
                                     <!-- ----------KNOB OUTER ENV ----------- -->
                                     <path v-if="knob.env.target==selectedENV" d="M18,80 A 44 44 0 1 1 82 80" fill="none"
                                         stroke="white" style="stroke-dasharray: 205 205;"
-                                        :style="{'stroke-dashoffset':205 - 205*((knob.env.rotation*1 + 132)/264)}" />
+                                        :style="{'stroke-dashoffset':205 - 205*((knob.env.rotation*1 + 132 )/264)}" />
 
                                     <path d="M20,76 A 40 40 0 1 1 80 76" fill="none" stroke="#55595C" />
 
@@ -225,13 +227,15 @@
                             <div class="rela-block knob-label" :style="{'color':osc.A.onOff?'#E4E8EA':'#888'}">
                                 {{knob.label}}</div>
 
-                            <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
+                            <div class="knob-hover-text" v-if="knob.selected">
+                                {{knob.automation.selected ? knob.automation.percent + "%": knob.value.cur}}
+                            </div>
                         </div>
                     </div>
                     <div class="knobs-row">
                         <!-- ----------OSC A - VOLUME ----------- -->
                         <div v-for="knob in [knobs[14]]" class="rela-inline knob style3"
-                            @drop="knob.env.target = selectedDragItem;" @dragover.prevent @dragenter.prevent>
+                            @drop="setENVtype(knob,selectedDragItem);" @dragover.prevent @dragenter.prevent>
 
 
                             <div v-if="knob.env.target>=1" class="knob-active-light"
@@ -306,7 +310,7 @@
 
                         <!-- ----------OSC B - DETUNE / BLEND / PITCH ----------- -->
                         <div v-for="knob in [knobs[1],knobs[2],knobs[3]]" class="rela-inline knob style3"
-                            @drop="knob.env.target = selectedDragItem;" @dragover.prevent @dragenter.prevent>
+                            @drop="setENVtype(knob,selectedDragItem);" @dragover.prevent @dragenter.prevent>
 
 
                             <div v-if="knob.env.target>=1" class="knob-active-light"
@@ -342,7 +346,7 @@
                     <div class="knobs-row">
                         <!-- ----------OSC B - VOLUME ----------- -->
                         <div v-for="knob in [knobs[4]]" class="rela-inline knob style3"
-                            @drop="knob.env.target = selectedDragItem;" @dragover.prevent @dragenter.prevent>
+                            @drop="setENVtype(knob,selectedDragItem);" @dragover.prevent @dragenter.prevent>
 
 
                             <div v-if="knob.env.target>=1" class="knob-active-light"
@@ -384,8 +388,7 @@
 
                 <!-- ----------------------FILTER  - TITLE---------------------- -->
                 <div class="title">
-                    <input class="title-checkbox" type="checkbox"
-                    @click="osc.FILTER.onOff = !osc.FILTER.onOff">
+                    <input class="title-checkbox" type="checkbox" @click="osc.FILTER.onOff = !osc.FILTER.onOff">
                     <span class="title-text">FILTER</span>
                 </div>
 
@@ -442,7 +445,7 @@
                         <!-- ----------upper knobs----------- -->
                         <div class="knobs-row" @mouseUp="unselectKnobs">
                             <div v-for="knob in [knobs[40],knobs[41]]" class="rela-inline knob style3"
-                                @drop="knob.env.target = selectedDragItem;" @dragover.prevent @dragenter.prevent>
+                                @drop="setENVtype(knob,selectedDragItem);" @dragover.prevent @dragenter.prevent>
 
                                 <div v-if="knob.env.target>=1" class="knob-active-light"
                                     :style="{'background-color': knob.env.target==selectedENV?'white':'#888'}"></div>
@@ -496,7 +499,7 @@
                             </div>
 
                             <div v-for="knob in [knobs[43]]" class="rela-inline knob style3"
-                                @drop="knob.env.target = selectedDragItem;" @dragover.prevent @dragenter.prevent>
+                                @drop="setENVtype(knob,selectedDragItem);" @dragover.prevent @dragenter.prevent>
 
                                 <div v-if="knob.env.target>=1" class="knob-active-light"
                                     :style="{'background-color': knob.env.target==selectedENV?'white':'#888'}"></div>

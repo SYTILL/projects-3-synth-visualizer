@@ -223,7 +223,6 @@ function logarithmicArraySize(size, length) {
 const fftLength = 1024;
 const numBands = 64;
 const bandIndexes = logarithmicArraySize(numBands, fftLength);
-console.log(bandIndexes);
 
 
 function drawFFT(fft) {
@@ -237,7 +236,6 @@ function drawFFT(fft) {
     ctx.fillStyle = 'white';
     // Get the frequency data from the analyser
     const frequencyData = fft.getValue();
-    console.log(frequencyData);
 
     const minDb = -100; // Minimum dB value to visualize
     const maxDb = 10;   // Maximum dB value to visualize

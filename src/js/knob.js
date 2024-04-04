@@ -146,6 +146,7 @@ let app = new Vue({
                 value: { cur: 0, low: -240, high: 240, ratio: 10, points: 2 },
                 env: { target: -1, rotation: -132 },
                 color: '#0060df',
+                automation: { selected: false, percent: -100 },
                 active: true, selected: false,
             },
             14: {
@@ -155,6 +156,7 @@ let app = new Vue({
                 value: { cur: 0, low: -80, high: 80, ratio: 1, points: 0 },
                 env: { target: 0, rotation: -132 },
                 color: '#0060df',
+                automation: { selected: false, percent: -100 },
                 active: true, selected: false,
             },
 
@@ -249,6 +251,14 @@ let app = new Vue({
             if (selectedKnob.length <= 0) { return; }
             selectedKnob = selectedKnob[0][1];
 
+            //automation apply percentage change
+            if (selectedKnob.automation.selected){
+                selectedKnob.automation.percent -= Math.round((e.pageY - app.currentY)/10);
+
+                if(selectedKnob.automation.percent < -100) selectedKnob.automation.percent = -100;
+                else if(selectedKnob.automation.percent > 100) selectedKnob.automation.percent = 100;
+                return;
+            }
 
             if (selectedKnob.knobType == "updown") {
                 app.updownCounter(selectedKnob.value, -(e.pageY - app.currentY) / 10, selectedKnob.label);
@@ -289,8 +299,8 @@ let app = new Vue({
                 value.real = value.low;
             }
             value.cur = Math.round(value.real);
-            if(type == "Rolloff"){
-                value.cur = -12 * (2**value.cur);
+            if (type == "Rolloff") {
+                value.cur = -12 * (2 ** value.cur);
                 oscFILTER.filter.rolloff = value.cur;
                 visualizeFilter(oscFILTER);
             }
@@ -310,6 +320,8 @@ let app = new Vue({
         unselectKnobs: async function () {
             for (var i in this.knobs) {
                 this.knobs[i].selected = false;
+                if ("automation" in this.knobs[i])
+                    this.knobs[i].automation.selected = false;
             }
             await drawWaveform(oscA);
             await drawWaveform(oscB);
@@ -344,10 +356,10 @@ let app = new Vue({
             else {
                 knob.value.cur = Number((temp / knob.value.ratio).toFixed(knob.value.points));
 
-                if (knob.label == "Q"){
+                if (knob.label == "Q") {
                     oscFILTER.filter.Q.value = knob.value.cur;
                 }
-                else if (knob.label == "Gain"){
+                else if (knob.label == "Gain") {
                     oscFILTER.filter.gain.value = knob.value.cur;
                 }
             }
@@ -375,6 +387,15 @@ let app = new Vue({
 
             drawENV();
         },
+
+        setENVtype: function (knob, value) {
+            if (knob.env.target == value) {
+                knob.env.target = (knob.label == 'Volume' ? 0 : -1);
+            }
+            else {
+                knob.env.target = value;
+            }
+        }
     },
     mounted() {
         // Bind mousemove and mouseup events to the window

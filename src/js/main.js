@@ -344,7 +344,7 @@ const connectFilter = (oscTEMP, ENV, vol, isFilterOn) => {
         vol.connect(filter);
         filter.toDestination();
     }
-    else{
+    else {
         vol.toDestination();
     }
 
@@ -390,30 +390,36 @@ const releaseKey = (keyset, note) => {
         let e = keyset.activeNote[note][0];
 
         //dispose all
-        e.oscArray.forEach((oscTEMP) => { 
+        e.oscArray.forEach((oscTEMP) => {
             oscTEMP.stop();
             oscTEMP.dispose();
         });
         Object.keys(e.env).forEach(function (k) {
             e.env[k].dispose();
         });
-        if(e.volENV) e.volENV.dispose();
-        if(e.volCenter) e.volCenter.dispose();
-        if(e.volSide) e.volSide.dispose();
-        if(e.filter) e.filter.dispose();
+        if (e.volENV) e.volENV.dispose();
+        if (e.volCenter) e.volCenter.dispose();
+        if (e.volSide) e.volSide.dispose();
+        if (e.filter) e.filter.dispose();
 
         keyset.activeNote[note].shift();
         keyset.offset[note]--;
-        if (keyset.activeNote[note].length == 0) { 
-            delete keyset.activeNote[note]; 
+        if (keyset.activeNote[note].length == 0) {
+            delete keyset.activeNote[note];
         }
     }, e.volENV.release * 1000);
 };
 
 const rotateENV = (knob, envValue, showRotation) => {
     let ratio = knob.value.ratio;
-    let v = ((knob.value.cur * ratio) - knob.value.low) / ratio * envValue;
-    if (showRotation) { knob.env.rotation = (v / ((knob.value.high - knob.value.low) / ratio)) * 264 - 132; }
+    let cur_low = (((knob.value.cur * ratio) - knob.value.low) / ratio);
+
+    let v = (cur_low * envValue) - cur_low;
+    if (showRotation) { knob.env.rotation = ((v+cur_low) / ((knob.value.high - knob.value.low) / ratio)) * 264 - 132; }
+    //console.log(knob.env.rotation / 264);
+
+    // let v = (knob.value.cur - knob.value.low) * envValue;
+    // if (showRotation) { knob.env.rotation = (v / (knob.value.high - knob.value.low)) * 264 - 132; }
     return v;
 }
 
@@ -441,7 +447,7 @@ const adjustSound = (keyset, osc) => {
         key = "pitch";
         if (key in e.env) {
             let v = rotateENV(osc.knobs[key], e.env[key].value, showRotation);
-
+            //console.log(v);
             frequency = e.frequency * Math.pow(2, v / 12);
             for (let i = 0; i < unison; i++) {
                 e.oscArray[i].frequency.value = frequency;
