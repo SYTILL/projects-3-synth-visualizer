@@ -155,6 +155,7 @@ const addOSC = (obj) => {
     let mid2 = Math.round(unison % 2 == 0 ? (unison / 2) : (unison / 2 - 1));
 
     obj.frequency = obj.frequency * Math.pow(2, pitch / 12);
+    console.log(obj.frequency);
 
     //ADD ENV
     let start = Tone.immediate() + 0.1;
@@ -411,16 +412,23 @@ const releaseKey = (keyset, note) => {
 };
 
 const rotateENV = (knob, envValue, showRotation) => {
-    let ratio = knob.value.ratio;
-    let cur_low = (((knob.value.cur * ratio) - knob.value.low) / ratio);
 
-    let v = (cur_low * envValue) - cur_low;
-    if (showRotation) { knob.env.rotation = ((v+cur_low) / ((knob.value.high - knob.value.low) / ratio)) * 264 - 132; }
+    //knob = {cur = -12, low = -240, high = 240, ratio = 10}
+    //
+
+
+    let ratio = knob.value.ratio;
+    let x = (((knob.value.cur * ratio) - knob.value.low) / ratio); //LENGTH of low~cur -> in cur value
+
+    let v = (x * (knob.automation.percent/-100));
+    if (showRotation) { 
+        knob.env.rotation = ((v*envValue ) / ((knob.value.high - knob.value.low) / ratio)) * 264 - 132; 
+    }
     //console.log(knob.env.rotation / 264);
 
     // let v = (knob.value.cur - knob.value.low) * envValue;
     // if (showRotation) { knob.env.rotation = (v / (knob.value.high - knob.value.low)) * 264 - 132; }
-    return v;
+    return v*envValue - v;
 }
 
 const adjustSound = (keyset, osc) => {
@@ -447,8 +455,8 @@ const adjustSound = (keyset, osc) => {
         key = "pitch";
         if (key in e.env) {
             let v = rotateENV(osc.knobs[key], e.env[key].value, showRotation);
-            //console.log(v);
             frequency = e.frequency * Math.pow(2, v / 12);
+            console.log(frequency);
             for (let i = 0; i < unison; i++) {
                 e.oscArray[i].frequency.value = frequency;
             }

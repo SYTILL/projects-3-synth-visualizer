@@ -253,7 +253,7 @@ let app = new Vue({
 
             //automation apply percentage change
             if (selectedKnob.automation.selected){
-                selectedKnob.automation.percent -= Math.round((e.pageY - app.currentY)/10);
+                selectedKnob.automation.percent -= (e.pageY - app.currentY)/10;
 
                 if(selectedKnob.automation.percent < -100) selectedKnob.automation.percent = -100;
                 else if(selectedKnob.automation.percent > 100) selectedKnob.automation.percent = 100;

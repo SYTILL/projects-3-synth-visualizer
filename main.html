@@ -228,7 +228,7 @@
                                 {{knob.label}}</div>
 
                             <div class="knob-hover-text" v-if="knob.selected">
-                                {{knob.automation.selected ? knob.automation.percent + "%": knob.value.cur}}
+                                {{knob.automation.selected ? Math.round(knob.automation.percent) + "%": knob.value.cur}}
                             </div>
                         </div>
                     </div>
