@@ -40,6 +40,7 @@ let app = new Vue({
                 value: { cur: 0, low: -240, high: 240, ratio: 10, points: 2 },
                 env: { target: -1, rotation: -132 },
                 color: '#0060df',
+                automation: { selected: false, percent: -100 },
                 active: true, selected: false,
             },
             24: {
@@ -49,6 +50,7 @@ let app = new Vue({
                 value: { cur: 0, low: -80, high: 80, ratio: 1, points: 0 },
                 env: { target: 0, rotation: -132 },
                 color: '#0060df',
+                automation: { selected: false, percent: -100 },
                 active: true, selected: false,
             },
 
@@ -60,6 +62,7 @@ let app = new Vue({
                 value: { cur: 0, low: -240, high: 240, ratio: 10, points: 2 },
                 env: { target: -1, rotation: -132 },
                 color: '#0060df',
+                automation: { selected: false, percent: -100 },
                 active: true, selected: false,
             },
             34: {
@@ -69,6 +72,7 @@ let app = new Vue({
                 value: { cur: 0, low: -80, high: 80, ratio: 1, points: 0 },
                 env: { target: 0, rotation: -132 },
                 color: '#0060df',
+                automation: { selected: false, percent: -100 },
                 active: true, selected: false,
             },
 
@@ -80,6 +84,7 @@ let app = new Vue({
                 value: { cur: 440, low: 0, high: 1000, ratio: 1, points: 0 },
                 env: { target: -1, rotation: -132 },
                 color: '#0060df',
+                automation: { selected: false, percent: -100 },
                 active: true, selected: false,
             },
             41: {
@@ -89,6 +94,7 @@ let app = new Vue({
                 value: { cur: 1.0, low: 0, high: 50, ratio: 10, points: 1 },
                 env: { target: 0, rotation: -132 },
                 color: '#0060df',
+                automation: { selected: false, percent: -100 },
                 active: true, selected: false,
             },
             42: {
@@ -107,6 +113,7 @@ let app = new Vue({
                 value: { cur: 0, low: 0, high: 10, ratio: 1, points: 0 },
                 env: { target: 0, rotation: -132 },
                 color: '#0060df',
+                automation: { selected: false, percent: -100 },
                 active: true, selected: false,
             },
 
@@ -117,8 +124,7 @@ let app = new Vue({
                 value: { real: 1, cur: 1, low: 1, high: 16 },
                 env: { target: -1, rotation: -132 },
                 color: '#0060df',
-                active: true,
-                selected: false,
+                active: true, selected: false,
             },
             11: {
                 label: 'Detune',
@@ -127,8 +133,8 @@ let app = new Vue({
                 value: { cur: 4, low: 0, high: 48, ratio: 1, points: 0 },
                 env: { target: -1, rotation: -132 },
                 color: '#0060df',
-                active: true,
-                selected: false,
+                automation: { selected: false, percent: -100 },
+                active: true, selected: false,
             },
             12: {
                 label: 'Blend',
@@ -137,6 +143,7 @@ let app = new Vue({
                 value: { cur: 0.5, low: 0, high: 100, ratio: 100, points: 2 },
                 env: { target: -1, rotation: -132 },
                 color: '#0060df',
+                automation: { selected: false, percent: -100 },
                 active: true, selected: false,
             },
             13: {
@@ -167,8 +174,7 @@ let app = new Vue({
                 value: { real: 1, cur: 1, low: 1, high: 16 },
                 env: { target: -1, rotation: -132 },
                 color: '#0060df',
-                active: true,
-                selected: false,
+                active: true, selected: false,
             },
             1: {
                 label: 'Detune',
@@ -177,8 +183,8 @@ let app = new Vue({
                 value: { cur: 4, low: 0, high: 48, ratio: 1, points: 0 },
                 env: { target: -1, rotation: -132 },
                 color: '#0060df',
-                active: true,
-                selected: false,
+                automation: { selected: false, percent: -100 },
+                active: true, selected: false,
             },
             2: {
                 label: 'Blend',
@@ -187,6 +193,7 @@ let app = new Vue({
                 value: { cur: 0.5, low: 0, high: 100, ratio: 100, points: 2 },
                 env: { target: -1, rotation: -132 },
                 color: '#0060df',
+                automation: { selected: false, percent: -100 },
                 active: true, selected: false,
             },
             3: {
@@ -196,6 +203,7 @@ let app = new Vue({
                 value: { cur: 0, low: -240, high: 240, ratio: 10, points: 2 },
                 env: { target: -1, rotation: -132 },
                 color: '#0060df',
+                automation: { selected: false, percent: -100 },
                 active: true, selected: false,
             },
             4: {
@@ -205,6 +213,7 @@ let app = new Vue({
                 value: { cur: 0, low: -80, high: 80, ratio: 1, points: 0 },
                 env: { target: 0, rotation: -132 },
                 color: '#0060df',
+                automation: { selected: false, percent: -100 },
                 active: true, selected: false,
             },
 
@@ -252,7 +261,7 @@ let app = new Vue({
             selectedKnob = selectedKnob[0][1];
 
             //automation apply percentage change
-            if (selectedKnob.automation.selected){
+            if ("automation" in selectedKnob && selectedKnob.automation.selected){
                 selectedKnob.automation.percent -= (e.pageY - app.currentY)/10;
 
                 if(selectedKnob.automation.percent < -100) selectedKnob.automation.percent = -100;

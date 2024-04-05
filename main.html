@@ -61,7 +61,9 @@
                                 @drop="setENVtype(knob,selectedDragItem);" @dragover.prevent @dragenter.prevent>
 
                                 <div v-if="knob.env.target>=1" class="knob-active-light"
-                                    :style="{'background-color': knob.env.target==selectedENV?'white':'#888'}"></div>
+                                    :style="{'background-color': knob.env.target==selectedENV?'white':'#888'}"
+                                    @mouseDown="knob.selected = true; knob.automation.selected = true; app.currentY = event.pageY; event.preventDefault()">
+                                </div>
 
                                 <div class="rela-block knob-dial" :style="{'color':osc.SUB.onOff?knob.color:'#888'}">
                                     <div class="abs-center dial-grip"
@@ -87,7 +89,9 @@
                                 <div class="rela-block knob-label" :style="{'color':osc.SUB.onOff?'#E4E8EA':'#888'}">
                                     {{knob.label}}</div>
 
-                                <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
+                                <div class="knob-hover-text" v-if="knob.selected">
+                                    {{knob.automation.selected ? Math.round(knob.automation.percent) + "%": knob.value.cur}}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -122,7 +126,9 @@
                                 @drop="setENVtype(knob,selectedDragItem);" @dragover.prevent @dragenter.prevent>
 
                                 <div v-if="knob.env.target>=1" class="knob-active-light"
-                                    :style="{'background-color': knob.env.target==selectedENV?'white':'#888'}"></div>
+                                    :style="{'background-color': knob.env.target==selectedENV?'white':'#888'}"
+                                    @mouseDown="knob.selected = true; knob.automation.selected = true; app.currentY = event.pageY; event.preventDefault()">
+                                </div>
 
                                 <div class="rela-block knob-dial" :style="{'color':osc.NOISE.onOff?knob.color:'#888'}">
                                     <div class="abs-center dial-grip"
@@ -148,7 +154,9 @@
                                 <div class="rela-block knob-label" :style="{'color':osc.NOISE.onOff?'#E4E8EA':'#888'}">
                                     {{knob.label}}</div>
 
-                                <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
+                                <div class="knob-hover-text" v-if="knob.selected">
+                                    {{knob.automation.selected ? Math.round(knob.automation.percent) + "%": knob.value.cur}}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -239,7 +247,9 @@
 
 
                             <div v-if="knob.env.target>=1" class="knob-active-light"
-                                :style="{'background-color': knob.env.target==selectedENV?'white':'#888'}"></div>
+                                :style="{'background-color': knob.env.target==selectedENV?'white':'#888'}"
+                                @mouseDown="knob.selected = true; knob.automation.selected = true; app.currentY = event.pageY; event.preventDefault()">
+                            </div>
 
 
                             <div class="rela-block knob-dial" :style="{'color':osc.A.onOff?knob.color:'#888'}">
@@ -264,7 +274,9 @@
                             <div class="rela-block knob-label" :style="{'color':osc.A.onOff?'#E4E8EA':'#888'}">
                                 {{knob.label}}</div>
 
-                            <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
+                            <div class="knob-hover-text" v-if="knob.selected">
+                                {{knob.automation.selected ? Math.round(knob.automation.percent) + "%": knob.value.cur}}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -314,7 +326,9 @@
 
 
                             <div v-if="knob.env.target>=1" class="knob-active-light"
-                                :style="{'background-color': knob.env.target==selectedENV?'white':'#888'}"></div>
+                                :style="{'background-color': knob.env.target==selectedENV?'white':'#888'}"
+                                @mouseDown="knob.selected = true; knob.automation.selected = true; app.currentY = event.pageY; event.preventDefault()">
+                            </div>
 
                             <div class="rela-block knob-dial" :style="{'color':osc.B.onOff?knob.color:'#888'}">
                                 <div class="abs-center dial-grip"
@@ -340,7 +354,9 @@
                             <div class="rela-block knob-label" :style="{'color':osc.B.onOff?'#E4E8EA':'#888'}">
                                 {{knob.label}}</div>
 
-                            <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
+                            <div class="knob-hover-text" v-if="knob.selected">
+                                {{knob.automation.selected ? Math.round(knob.automation.percent) + "%": knob.value.cur}}
+                            </div>
                         </div>
                     </div>
                     <div class="knobs-row">
@@ -350,7 +366,9 @@
 
 
                             <div v-if="knob.env.target>=1" class="knob-active-light"
-                                :style="{'background-color': knob.env.target==selectedENV?'white':'#888'}"></div>
+                                :style="{'background-color': knob.env.target==selectedENV?'white':'#888'}"
+                                @mouseDown="knob.selected = true; knob.automation.selected = true; app.currentY = event.pageY; event.preventDefault()">
+                            </div>
 
 
                             <div class="rela-block knob-dial" :style="{'color':osc.B.onOff?knob.color:'#888'}">
@@ -375,7 +393,9 @@
                             <div class="rela-block knob-label" :style="{'color':osc.B.onOff?'#E4E8EA':'#888'}">
                                 {{knob.label}}</div>
 
-                            <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
+                            <div class="knob-hover-text" v-if="knob.selected">
+                                {{knob.automation.selected ? Math.round(knob.automation.percent) + "%": knob.value.cur}}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -448,7 +468,10 @@
                                 @drop="setENVtype(knob,selectedDragItem);" @dragover.prevent @dragenter.prevent>
 
                                 <div v-if="knob.env.target>=1" class="knob-active-light"
-                                    :style="{'background-color': knob.env.target==selectedENV?'white':'#888'}"></div>
+                                    :style="{'background-color': knob.env.target==selectedENV?'white':'#888'}"
+                                    @mouseDown="knob.selected = true; knob.automation.selected = true; app.currentY = event.pageY; event.preventDefault()">
+                                </div>
+
                                 <div class="rela-block knob-dial" :style="{'color':osc.FILTER.onOff?knob.color:'#888'}">
                                     <div class="abs-center dial-grip"
                                         :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
@@ -468,7 +491,9 @@
 
                                 <div class="rela-block knob-label" :style="{'color':osc.FILTER.onOff?'#E4E8EA':'#888'}">
                                     {{knob.label}}</div>
-                                <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
+                                <div class="knob-hover-text" v-if="knob.selected">
+                                    {{knob.automation.selected ? Math.round(knob.automation.percent) + "%": knob.value.cur}}
+                                </div>
                             </div>
                         </div>
 
@@ -502,7 +527,10 @@
                                 @drop="setENVtype(knob,selectedDragItem);" @dragover.prevent @dragenter.prevent>
 
                                 <div v-if="knob.env.target>=1" class="knob-active-light"
-                                    :style="{'background-color': knob.env.target==selectedENV?'white':'#888'}"></div>
+                                    :style="{'background-color': knob.env.target==selectedENV?'white':'#888'}"
+                                    @mouseDown="knob.selected = true; knob.automation.selected = true; app.currentY = event.pageY; event.preventDefault()">
+                                </div>
+
                                 <div class="rela-block knob-dial" :style="{'color':osc.FILTER.onOff?knob.color:'#888'}">
                                     <div class="abs-center dial-grip"
                                         :style="{'transform': 'translate(-50%,-50%) rotate('+knob.rotation+'deg)'}"
@@ -522,7 +550,9 @@
 
                                 <div class="rela-block knob-label" :style="{'color':osc.FILTER.onOff?'#E4E8EA':'#888'}">
                                     {{knob.label}}</div>
-                                <div class="knob-hover-text" v-if="knob.selected">{{knob.value.cur}}</div>
+                                <div class="knob-hover-text" v-if="knob.selected">
+                                    {{knob.automation.selected ? Math.round(knob.automation.percent) + "%": knob.value.cur}}
+                                </div>
                             </div>
                         </div>
                     </div>
