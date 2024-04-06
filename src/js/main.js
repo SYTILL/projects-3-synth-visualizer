@@ -171,7 +171,7 @@ const addOSC = (obj) => {
 
     volCenter.volume.value = 40 * Math.log10(((volumeKnob.value.cur + 80) / 160) * (1 - blend));
     volSide.volume.value = 40 * Math.log10(((volumeKnob.value.cur + 80) / 160) * (blend));
-    
+
 
     if (app.osc.FILTER.target[osc.filterType] && app.osc.FILTER.onOff) {
         for (let i = 0; i < unison; i++) {
@@ -312,6 +312,19 @@ const addNOISE = (obj) => {
     else { obj.activeNote[obj.note] = [activeNoteObj]; }
 };
 
+const addFILTER = (obj) => {
+    let osc = obj.osc;
+    if (!osc.checkBox.checked) { return; }
+
+    let activeNoteObj = {
+        env: createENVobject(osc),
+        type: "FILTER",
+    };
+
+    if (obj.note in obj.activeNote) { obj.activeNote[obj.note].push(activeNoteObj); }
+    else { obj.activeNote[obj.note] = [activeNoteObj]; }
+};
+
 const connectFilter = (oscTEMP, ENV, vol, isFilterOn) => {
     oscTEMP.connect(ENV);
     ENV.connect(vol);
@@ -345,6 +358,7 @@ keySetA = keySet();
 keySetB = keySet();
 keySetSUB = keySet();
 keySetNOISE = keySet();
+keySetFILTER = keySet();
 
 const releaseKey = (keyset, note) => {
     if (!note) { return; }
@@ -381,15 +395,39 @@ const releaseKey = (keyset, note) => {
     }, e.volENV.release * 1000);
 };
 
+const releaseFILTER = (keyset, note) => {
+    if (!note) { return; }
+    let e = keyset.activeNote[note][keyset.offset[note]++];
+    let start = Tone.immediate() + 0.1;
+    let longest = 0;
+    Object.keys(e.env).forEach(function (k) {
+        if (e.env[k].release > longest) longest = e.env[k].release;
+        e.env[k].triggerRelease(start);
+    });
+    setTimeout(() => {
+        let e = keyset.activeNote[note][0];
+
+        //dispose all
+        Object.keys(e.env).forEach(function (k) {
+            e.env[k].dispose();
+        });
+        keyset.activeNote[note].shift();
+        keyset.offset[note]--;
+        if (keyset.activeNote[note].length == 0) {
+            delete keyset.activeNote[note];
+        }
+    }, longest * 1000);
+};
+
 const rotateENV = (knob, envValue, showRotation) => {
     let ratio = knob.value.ratio;
     let x = (((knob.value.cur * ratio) - knob.value.low) / ratio); //LENGTH of low~cur -> in cur value
 
-    let v = (x * (knob.automation.percent/-100));
-    if (showRotation) { 
-        knob.env.rotation = ((v*envValue ) / ((knob.value.high - knob.value.low) / ratio)) * 264 - 132; 
+    let v = (x * (knob.automation.percent / -100));
+    if (showRotation) {
+        knob.env.rotation = ((v * envValue) / ((knob.value.high - knob.value.low) / ratio)) * 264 - 132;
     }
-    return v*envValue-v;
+    return v * envValue - v;
 }
 
 const adjustSound = (keyset, osc) => {
@@ -456,6 +494,26 @@ const adjustSound = (keyset, osc) => {
     }
 }
 
+const adjustFILTER = (keyset, osc) => {
+    Object.keys(keyset.activeNote).forEach(function (note) {
+        let showRotation = (note == lastPressed);
+        e = keyset.activeNote[note][keyset.activeNote[note].length - 1];
+
+        console.log('hi');
+
+        key = "Cutoff";
+        if (key in e.env) {
+            let v = rotateENV(osc.knobs[key], e.env[key].value, showRotation);
+            v += osc.knobs[key].value.cur;
+            if (unison > 1) {
+                for (let i = 0; i < unison; i++) {
+                    e.oscArray[i][key].value = i * (v * 2 / (unison - 1)) - v;
+                }
+            }
+        }
+    });
+}
+
 
 
 
@@ -468,17 +526,18 @@ let releaseKeyOnce = true;
 Tone.Transport.scheduleRepeat((time) => {
     drawMeter(meter.getValue());
     drawFFT(fft);
-    //console.log(meter.getValue(), meter.smoothing);
 
     releaseKey(keySetA, keySetA.toRelease.shift());
     releaseKey(keySetB, keySetB.toRelease.shift());
     releaseKey(keySetSUB, keySetSUB.toRelease.shift());
     releaseKey(keySetNOISE, keySetNOISE.toRelease.shift());
+    releaseFILTER(keySetFILTER, keySetFILTER.toRelease.shift());
 
     adjustSound(keySetA, oscA);
     adjustSound(keySetB, oscB);
     adjustSound(keySetSUB, oscSUB);
     adjustSound(keySetNOISE, oscNOISE);
+    adjustFILTER(keySetFILTER, oscFILTER);
 }, "128n");
 
 Tone.Transport.start();
@@ -514,6 +573,12 @@ const startOSC = (key) => {
         activeNote: keySetNOISE.activeNote,
         note: key.note,
     });
+
+    addFILTER({
+        osc: oscFILTER,
+        activeNote: keySetFILTER.activeNote,
+        note: key.note,
+    });
 };
 
 const stopOSC = async (key) => {
@@ -528,5 +593,8 @@ const stopOSC = async (key) => {
     }
     if (oscNOISE.checkBox.checked) {
         keySetNOISE.toRelease.push(key.note);
+    }
+    if (oscFILTER.checkBox.checked) {
+        keySetFILTER.toRelease.push(key.note);
     }
 }
