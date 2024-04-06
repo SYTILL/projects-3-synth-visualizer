@@ -1,86 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tone.js Filter Visualization</title>
-    <style>
-        canvas {
-            border: 1px solid black;
-        }
-    </style>
+    <title>Dynamic Arc Path</title>
 </head>
-
 <body>
-    <canvas id="filterCanvas" width="600" height="300"></canvas>
+    <svg width="100" height="150">
+        <path id="arcPath" fill="none" stroke="black" stroke-width="2"/>
+    </svg>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.26/Tone.js"></script>
     <script>
-        const start = () => {
+        function createArcPath(startDegree) {
+            const radius = 40;
+            const centerX = 80; // Assuming the center of the arc is at x-coordinate 50
+            const centerY = 80;
 
-            const canvas = document.getElementById('filterCanvas');
-            const ctx = canvas.getContext('2d');
+            // Convert degree to radians
+            const startAngle = (startDegree + 132) * Math.PI / 180; // Adding 132 to make the top point 0 degree
 
-            // Create a BiQuad filter
-            const filter = new Tone.BiquadFilter({
-                type: 'lowshelf', // Filter type (e.g., lowshelf, highshelf, allpass, peaking)
-                frequency: 200, // Cutoff frequency in Hz
-                Q: 1, // Quality factor
-                gain: 0 // Gain in decibels
-            }).toDestination();
+            // Calculate the start point of the arc
+            const startX = centerX + radius * Math.cos(startAngle);
+            const startY = centerY + radius * Math.sin(startAngle);
 
-            // Set the frequency range (20Hz to 20kHz)
-            const minFrequency = 20;
-            const maxFrequency = 20000;
+            // Construct the SVG path command
+            const arcPath = `M${startX},${startY} A ${radius} ${radius} 0 1 1 80 76`;
 
-            // Analyze the frequency response manually
-            const numPoints = canvas.width;
-            const frequencies = new Float32Array(numPoints);
-            const magnitudes = new Float32Array(numPoints);
-
-            for (let i = 0; i < numPoints; i++) {
-                const frequency = minFrequency * Math.pow(maxFrequency / minFrequency, i / numPoints);
-                frequencies[i] = frequency;
-
-                // Generate a test signal at the current frequency
-                const oscillator = new Tone.Oscillator(frequency, 'sine').toDestination();
-                oscillator.start();
-                oscillator.stop('+0.1'); // Adjust duration as needed
-
-                // Apply the filter to the test signal
-                const signal = new Tone.Signal(1);
-                const filteredSignal = signal.connect(filter);
-                filteredSignal.toDestination();
-
-                // Analyze the output signal to determine the magnitude
-                // You might want to average or otherwise process the signal to get a magnitude value
-                // For simplicity, let's assume the peak amplitude represents the magnitude
-                const amplitude = filteredSignal.getValueAtTime('+0.05'); // Adjust analysis time as needed
-                magnitudes[i] = amplitude;
-
-                // Clean up
-                oscillator.dispose();
-            }
-
-            // Find maximum magnitude for scaling
-            const maxMagnitude = Math.max(...magnitudes);
-            const minMagnitude = Math.min(...magnitudes);
-
-            // Plot frequency response curve
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.beginPath();
-            for (let i = 0; i < frequencies.length; i++) {
-                const x = (Math.log10(frequencies[i] / minFrequency) / Math.log10(maxFrequency / minFrequency)) * canvas.width;
-                const y = canvas.height - ((magnitudes[i] - minMagnitude) / (maxMagnitude - minMagnitude) * canvas.height); // Adjust scale
-                ctx.lineTo(x, y);
-            }
-            ctx.strokeStyle = 'blue';
-            ctx.lineWidth = 2;
-            ctx.stroke();
+            return arcPath;
         }
 
+        // Example usage:
+        const startDegree = 0; // Change this value as needed
+        const path = createArcPath(startDegree);
+        document.getElementById('arcPath').setAttribute('d', path);
     </script>
 </body>
-
 </html>

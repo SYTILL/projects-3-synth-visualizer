@@ -21,8 +21,8 @@ let app = new Vue({
                 onOff: false,
                 type: 1,
                 target: {
-                    A: false,
-                    B: false,
+                    A: true,
+                    B: true,
                     S: false,
                     N: false,
                 }
@@ -48,7 +48,7 @@ let app = new Vue({
                 osc: "SUB", knobType: "circle", row: "upper",
                 rotation: 0,
                 value: { cur: 0, low: -80, high: 80, ratio: 1, points: 0 },
-                env: { target: 0, rotation: -132 },
+                env: { target: 1, rotation: -132 },
                 color: '#0060df',
                 automation: { selected: false, percent: -100 },
                 active: true, selected: false,
@@ -70,7 +70,7 @@ let app = new Vue({
                 osc: "NOISE", knobType: "circle", row: "upper",
                 rotation: 0,
                 value: { cur: 0, low: -80, high: 80, ratio: 1, points: 0 },
-                env: { target: 0, rotation: -132 },
+                env: { target: 1, rotation: -132 },
                 color: '#0060df',
                 automation: { selected: false, percent: -100 },
                 active: true, selected: false,
@@ -161,7 +161,7 @@ let app = new Vue({
                 osc: "A", knobType: "circle", row: "lower",
                 rotation: 0,
                 value: { cur: 0, low: -80, high: 80, ratio: 1, points: 0 },
-                env: { target: 0, rotation: -132 },
+                env: { target: 1, rotation: -132 },
                 color: '#0060df',
                 automation: { selected: false, percent: -100 },
                 active: true, selected: false,
@@ -211,7 +211,7 @@ let app = new Vue({
                 osc: "B", knobType: "circle", row: "lower",
                 rotation: 0,
                 value: { cur: 0, low: -80, high: 80, ratio: 1, points: 0 },
-                env: { target: 0, rotation: -132 },
+                env: { target: 1, rotation: -132 },
                 color: '#0060df',
                 automation: { selected: false, percent: -100 },
                 active: true, selected: false,
@@ -261,11 +261,12 @@ let app = new Vue({
             selectedKnob = selectedKnob[0][1];
 
             //automation apply percentage change
-            if ("automation" in selectedKnob && selectedKnob.automation.selected){
-                selectedKnob.automation.percent -= (e.pageY - app.currentY)/10;
+            if ("automation" in selectedKnob && selectedKnob.automation.selected) {
+                selectedKnob.automation.percent -= (e.pageY - app.currentY) / 3;
 
-                if(selectedKnob.automation.percent < -100) selectedKnob.automation.percent = -100;
-                else if(selectedKnob.automation.percent > 100) selectedKnob.automation.percent = 100;
+                if (selectedKnob.automation.percent < -100) selectedKnob.automation.percent = -100;
+                else if (selectedKnob.automation.percent > 100) selectedKnob.automation.percent = 100;
+                app.currentY = e.pageY;
                 return;
             }
 

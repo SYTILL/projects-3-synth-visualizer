@@ -35,7 +35,7 @@ const createOSCAddFilter = (osc) => {
         Q: 1,
         rolloff: -12,
         gain: 2,
-    })
+    }).toDestination();
 };
 
 
@@ -123,7 +123,6 @@ Tone.Master.connect(fft);
 
 
 
-
 //------------------------------tone-------------------------
 
 const createENVobject = (osc) => {
@@ -145,6 +144,7 @@ const addOSC = (obj) => {
     let unison = obj.osc.knobs["unison"].value.cur;
     let detune = obj.osc.knobs["detune"].value.cur;
     let pitch = obj.osc.knobs["pitch"].value.cur;
+    let blend = obj.osc.knobs["blend"].value.cur;
     let volumeKnob = obj.osc.knobs["volume"];
 
     let osc = obj.osc;
@@ -155,7 +155,6 @@ const addOSC = (obj) => {
     let mid2 = Math.round(unison % 2 == 0 ? (unison / 2) : (unison / 2 - 1));
 
     obj.frequency = obj.frequency * Math.pow(2, pitch / 12);
-    console.log(obj.frequency);
 
     //ADD ENV
     let start = Tone.immediate() + 0.1;
@@ -169,17 +168,12 @@ const addOSC = (obj) => {
 
     let volCenter = new Tone.Volume(-800);
     let volSide = new Tone.Volume(-800);
-    let filter = null;
+
+    volCenter.volume.value = 40 * Math.log10(((volumeKnob.value.cur + 80) / 160) * (1 - blend));
+    volSide.volume.value = 40 * Math.log10(((volumeKnob.value.cur + 80) / 160) * (blend));
+    
 
     if (app.osc.FILTER.target[osc.filterType] && app.osc.FILTER.onOff) {
-        filter = new Tone.Filter({
-            type: oscFILTER.filter.type,
-            frequency: oscFILTER.filter.frequency.value,
-            Q: oscFILTER.filter.Q.value,
-            rolloff: oscFILTER.filter.rolloff,
-            gain: oscFILTER.filter.gain.value,
-        }).toDestination();
-
         for (let i = 0; i < unison; i++) {
             //ADD OSC
             let oscTEMP = new Tone.Oscillator(obj.frequency, osc.oscillator.type);
@@ -187,21 +181,18 @@ const addOSC = (obj) => {
             if (unison > 1) { oscTEMP.detune.value = i * (detune * 2 / (unison - 1)) - detune; }
 
             if (mid1 == i || mid2 == i) {
-                oscTEMP.connect(volENV);
-                volENV.connect(volCenter);
-                volCenter.connect(filter);
+                oscTEMP.chain(volCenter, volENV, oscFILTER.filter);
                 oscTEMP.start(start);
             }
             else {
-                oscTEMP.connect(volENV);
-                volENV.connect(volSide);
-                volSide.connect(filter);
+                oscTEMP.chain(volSide, volENV, oscFILTER.filter);
                 oscTEMP.start(start);
             }
             oscTEMParray.push(oscTEMP);
         }
     }
     else {
+        volENV.toDestination();
         for (let i = 0; i < unison; i++) {
             //ADD OSC
             let oscTEMP = new Tone.Oscillator(obj.frequency, osc.oscillator.type);
@@ -209,15 +200,11 @@ const addOSC = (obj) => {
             if (unison > 1) { oscTEMP.detune.value = i * (detune * 2 / (unison - 1)) - detune; }
 
             if (mid1 == i || mid2 == i) {
-                oscTEMP.connect(volENV);
-                volENV.connect(volCenter);
-                volCenter.toDestination();
+                oscTEMP.chain(volCenter, volENV);
                 oscTEMP.start(start);
             }
             else {
-                oscTEMP.connect(volENV);
-                volENV.connect(volSide);
-                volSide.toDestination();
+                oscTEMP.chain(volSide, volENV);
                 oscTEMP.start(start);
             }
             oscTEMParray.push(oscTEMP);
@@ -232,7 +219,6 @@ const addOSC = (obj) => {
         volENV,
         volCenter,
         volSide,
-        filter,
         type: "OSC",
     };
 
@@ -265,7 +251,7 @@ const addSUB = (obj) => {
 
     //connect all
     isFilterOn = app.osc.FILTER.target[osc.filterType];
-    let filter = connectFilter(oscTEMP, volENV, volCenter, isFilterOn);
+    connectFilter(oscTEMP, volENV, volCenter, isFilterOn);
 
     oscTEMP.start(start);
     oscTEMParray.push(oscTEMP);
@@ -277,7 +263,6 @@ const addSUB = (obj) => {
         env: createENVobject(osc),
         volENV,
         volCenter,
-        filter,
         type: "SUB",
     };
 
@@ -309,7 +294,7 @@ const addNOISE = (obj) => {
 
     //connect all
     isFilterOn = app.osc.FILTER.target[osc.filterType];
-    let filter = connectFilter(oscTEMP, volENV, volCenter, isFilterOn);
+    connectFilter(oscTEMP, volENV, volCenter, isFilterOn);
 
     oscTEMP.start(start);
     oscTEMParray.push(oscTEMP);
@@ -320,7 +305,6 @@ const addNOISE = (obj) => {
         env: createENVobject(osc),
         volENV,
         volCenter,
-        filter,
         type: "NOISE",
     };
 
@@ -329,27 +313,14 @@ const addNOISE = (obj) => {
 };
 
 const connectFilter = (oscTEMP, ENV, vol, isFilterOn) => {
-
     oscTEMP.connect(ENV);
     ENV.connect(vol);
-
-    let filter = null;
     if (isFilterOn && app.osc.FILTER.onOff) {
-        filter = new Tone.Filter({
-            type: oscFILTER.filter.type,
-            frequency: oscFILTER.filter.frequency.value,
-            Q: oscFILTER.filter.Q.value,
-            rolloff: oscFILTER.filter.rolloff,
-            gain: oscFILTER.filter.gain.value,
-        });
-        vol.connect(filter);
-        filter.toDestination();
+        vol.connect(oscFILTER.filter);
     }
     else {
         vol.toDestination();
     }
-
-    return filter;
 };
 
 
@@ -401,7 +372,6 @@ const releaseKey = (keyset, note) => {
         if (e.volENV) e.volENV.dispose();
         if (e.volCenter) e.volCenter.dispose();
         if (e.volSide) e.volSide.dispose();
-        if (e.filter) e.filter.dispose();
 
         keyset.activeNote[note].shift();
         keyset.offset[note]--;
@@ -412,11 +382,6 @@ const releaseKey = (keyset, note) => {
 };
 
 const rotateENV = (knob, envValue, showRotation) => {
-
-    //knob = {cur = -12, low = -240, high = 240, ratio = 10}
-    //
-
-
     let ratio = knob.value.ratio;
     let x = (((knob.value.cur * ratio) - knob.value.low) / ratio); //LENGTH of low~cur -> in cur value
 
@@ -424,27 +389,21 @@ const rotateENV = (knob, envValue, showRotation) => {
     if (showRotation) { 
         knob.env.rotation = ((v*envValue ) / ((knob.value.high - knob.value.low) / ratio)) * 264 - 132; 
     }
-    //console.log(knob.env.rotation / 264);
-
-    // let v = (knob.value.cur - knob.value.low) * envValue;
-    // if (showRotation) { knob.env.rotation = (v / (knob.value.high - knob.value.low)) * 264 - 132; }
-    return v*envValue - v;
+    return v*envValue-v;
 }
 
 const adjustSound = (keyset, osc) => {
     //for each pressed KEY
     Object.keys(keyset.activeNote).forEach(function (note) {
         let showRotation = (note == lastPressed);
-
         e = keyset.activeNote[note][keyset.activeNote[note].length - 1];
 
-        //let start = e.start; //not used
         let unison = e.unison;
 
         key = "detune";
         if (key in e.env) {
             let v = rotateENV(osc.knobs[key], e.env[key].value, showRotation);
-
+            v += osc.knobs[key].value.cur;
             if (unison > 1) {
                 for (let i = 0; i < unison; i++) {
                     e.oscArray[i][key].value = i * (v * 2 / (unison - 1)) - v;
@@ -456,23 +415,22 @@ const adjustSound = (keyset, osc) => {
         if (key in e.env) {
             let v = rotateENV(osc.knobs[key], e.env[key].value, showRotation);
             frequency = e.frequency * Math.pow(2, v / 12);
-            console.log(frequency);
             for (let i = 0; i < unison; i++) {
                 e.oscArray[i].frequency.value = frequency;
             }
         }
 
-        // key = "blend";
-        // if (key in e.env) {
-        //     let v = rotateENV(osc.knobs[key], e.env[key].value, showRotation);
+        key = "blend";
+        if (key in e.env) {
+            rotateENV(osc.knobs[key], e.env[key].value, showRotation);
 
-        //     let volume = osc.knobs['volume'].value.cur;
-        //     let blend = osc.knobs['blend'].value.cur;
-        //     e.volCenter.volume.value = 40 * Math.log10(((volume + 80) / 160) * (1 - blend));
-        //     e.volSide.volume.value = 40 * Math.log10(((volume + 80) / 160) * (blend));
-        //     console.log('???');
-        // }
+            let volume = osc.knobs['volume'].value.cur;
+            let blend = osc.knobs['blend'].value.cur;
+            e.volCenter.volume.value = 40 * Math.log10(((volume + 80) / 160) * (1 - blend));
+            e.volSide.volume.value = 40 * Math.log10(((volume + 80) / 160) * (blend));
+        }
 
+        //always active (since volume has env of 0)
         key = "volume";
         if (key in e.env) {
             if (e.type == "OSC") {
