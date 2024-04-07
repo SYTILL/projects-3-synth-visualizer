@@ -46,13 +46,19 @@ const createOSCAddFilter = (osc) => {
 
 
 
-
 envs = [
     new Tone.Envelope(0, 0, 1, 0), // 0 - default (not shown)
     new Tone.Envelope(0.1, 0.3, 0.8, 0.3), // ENV 1
     new Tone.Envelope(0.5, 0.5, 1, 0.5), // ENV 2
     new Tone.Envelope(0.5, 0.5, 0.5, 0.5,), // ENV 3
 ]
+
+lfos = [
+    new Tone.LFO(2, 0, 1),
+    new Tone.LFO(2, 0, 1),
+    new Tone.LFO(2, 0, 1),
+    new Tone.LFO(2, 0, 1),
+];
 
 //----------------oscA
 oscA = createOSC('A', 'checkbox-osc-A');

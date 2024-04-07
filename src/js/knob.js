@@ -251,6 +251,39 @@ let app = new Vue({
                 color: '#0060df',
                 active: true, selected: false,
             },
+            //---------------------LFO-----------------------
+            70: {
+                label: 'Attack',
+                osc: "LFO", knobType: "circle", row: "lower",
+                value: { cur: 0, low: 0, high: 1000, ratio: 1000, points: 2 },
+                rotation: -132,
+                color: '#0060df',
+                active: true, selected: false,
+            },
+            71: {
+                label: 'Decay',
+                osc: "LFO", knobType: "circle", row: "lower",
+                rotation: -132,
+                value: { cur: 0, low: 0, high: 1000, ratio: 1000, points: 2 },
+                color: '#0060df',
+                active: true, selected: false,
+            },
+            72: {
+                label: 'Sustain',
+                osc: "LFO", knobType: "circle", row: "lower",
+                rotation: 0,
+                value: { cur: 500, low: 0, high: 1000, ratio: 1000, points: 2 },
+                color: '#0060df',
+                active: true, selected: false,
+            },
+            73: {
+                label: 'Release',
+                osc: "LFO", knobType: "circle", row: "lower",
+                rotation: -132,
+                value: { cur: 0, low: 0, high: 1000, ratio: 1000, points: 2 },
+                color: '#0060df',
+                active: true, selected: false,
+            },
         },
         currentY: 0,
         mousemoveFunction: async function (e) {
@@ -279,10 +312,16 @@ let app = new Vue({
             else { throw Error("Wrong Knob Type"); }
             app.currentY = e.pageY;
 
-            //update change on canvas
-            if (['Attack', 'Decay', 'Sustain', 'Release'].includes(selectedKnob.label)) {
+            //ENV update change on canvas
+            if ('ENV' == selectedKnob.osc) {
                 envs[app.selectedENV][selectedKnob.label.toLowerCase()] = selectedKnob.value.cur;
                 drawENV();
+            }
+
+            //LFO update change on canvas
+            if ('LFO' == selectedKnob.osc) {
+                lfos[app.selectedLFO][selectedKnob.label.toLowerCase()] = selectedKnob.value.cur;
+                drawLFO();
             }
 
             //show unison bar on canvas

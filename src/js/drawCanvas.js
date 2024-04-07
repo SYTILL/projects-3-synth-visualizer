@@ -83,6 +83,65 @@ function drawENV() {
 drawENV();
 app.setENVknobRotation();
 
+function drawLFO() {
+    canvas = document.getElementById('LFO-canvas');
+    ctx = canvas.getContext('2d');
+    lfo = lfos[app.selectedLFO];
+    let margin = 5; //5%
+
+    //smaller canvas
+    let canvasX = [canvas.width * (margin * 0.005), canvas.width * (1 - margin * 0.005)]
+    let canvasY = [canvas.height * (margin * 0.01), canvas.height * (1 - margin * 0.01),]
+    let widthX = canvasX[1] - canvasX[0];
+    let heightY = canvasY[1] - canvasY[0];
+
+
+    ctx.fillStyle = '#2c2d2f';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = 'black';
+    ctx.fillRect(
+        canvasX[0], canvasY[0],
+        widthX, heightY
+    );
+
+    // Set grid spacing and line color
+    const gridLines = { height: 4, width: 8 };
+    const gridColor = '#535559';
+
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = gridColor;
+
+    for (let y = canvasY[0]; y <= heightY + (heightY / gridLines.height); y += (heightY / gridLines.height)) {
+        drawLine(ctx, canvasX[0], y, canvasX[1], y); //horizontal grid lines
+    }
+    for (let x = canvasX[0]; x <= widthX + (widthX / gridLines.width); x += (widthX / gridLines.width)) {
+        drawLine(ctx, x, canvasY[0], x, canvasY[1]); //vertical grid lines
+    }
+
+    // Draw bold X axis
+    ctx.lineWidth = 4;
+    drawLine(ctx, canvasX[0], canvas.height / 2, canvasX[1], canvas.height / 2);
+
+
+    const numSamples = 200;
+    const amplitude = heightY / 2;
+    const frequency = 1; // Hz
+    const phase = 0; // Phase offset in radians
+
+    ctx.strokeStyle = 'rgb(0, 96, 223)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(0, canvas.height / 2);
+    for (let i = 0; i < widthX; i++) {
+        const x = (i / numSamples) * numSamples;
+        const y = amplitude * Math.sin((2 * Math.PI * frequency * i) / numSamples + phase) + heightY / 2;
+        ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+}
+drawLFO();
+
 //---------------------canvas osc #draw #canvas #OSC-------------------
 async function drawWaveform(oscBody, blendType = "none") {
     oscillator = oscBody.oscillator;
@@ -251,32 +310,6 @@ function drawFFT(fft) {
             ctx.fillRect(x, canvas.height - dbHeight, barWidth, dbHeight);
         }
     }
-
-
-    // // Set grid spacing and line color
-    // const gridLines = { height: 14, width: 2 };
-    // const gridColor = '#535559';
-
-    // ctx.lineWidth = 3;
-    // ctx.strokeStyle = gridColor;
-
-    // i = 10;
-    // for (let y = 0; y <= canvas.height; y += canvas.height / gridLines.height) {
-    //     ctx.font = "25px Anta"; ctx.fillStyle = "#535559"
-    //     ctx.fillText(i, 5, y - 7);
-    //     i -= 5;
-    //     if (i == -5) {
-    //         ctx.strokeStyle = 'white';
-    //         drawLine(ctx, 0, y, canvas.width, y); //horizontal grid lines
-    //         ctx.strokeStyle = gridColor;
-    //     }
-    //     else {
-    //         drawLine(ctx, 0, y, canvas.width, y); //horizontal grid lines
-    //     }
-    // }
-    // for (let x = 0; x <= canvas.width; x += canvas.width / gridLines.width) {
-    //     drawLine(ctx, x, 0, x, canvas.height); //vertical grid lines
-    // }
 
 }
 
