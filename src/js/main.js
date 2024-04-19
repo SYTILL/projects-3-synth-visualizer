@@ -38,7 +38,9 @@ const createOSCAddFilter = (osc) => {
     }).toDestination();
 };
 
-
+const createLFO = () => {
+    
+};
 
 
 
@@ -53,8 +55,10 @@ envs = [
     new Tone.Envelope(0.5, 0.5, 0.5, 0.5,), // ENV 3
 ]
 
+
+
 lfos = [
-    new Tone.LFO(2, 0, 1),
+    new Tone.LFO(3, 0, 2),
     new Tone.LFO(2, 0, 1),
     new Tone.LFO(2, 0, 1),
     new Tone.LFO(2, 0, 1),

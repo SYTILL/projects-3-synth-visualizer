@@ -14,3 +14,4 @@ selectBoxes.forEach(box => {
         selectedDragItem = Number(box.dataset.envnum);
     }, false);
 });
+

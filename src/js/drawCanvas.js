@@ -124,21 +124,21 @@ function drawLFO() {
     drawLine(ctx, canvasX[0], canvas.height / 2, canvasX[1], canvas.height / 2);
 
 
-    const numSamples = 200;
     const amplitude = heightY / 2;
     const frequency = 1; // Hz
-    const phase = 0; // Phase offset in radians
 
     ctx.strokeStyle = 'rgb(0, 96, 223)';
     ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.moveTo(0, canvas.height / 2);
-    for (let i = 0; i < widthX; i++) {
-        const x = (i / numSamples) * numSamples;
-        const y = amplitude * Math.sin((2 * Math.PI * frequency * i) / numSamples + phase) + heightY / 2;
-        ctx.lineTo(x, y);
+    ctx.moveTo(0 + canvasX[0], canvas.height / 2);
+
+    var c = widthX / Math.PI / (frequency * 2);
+    for (let i = 0; i < widthX; i += 4) {
+        var x = amplitude * Math.sin(i / c);
+        ctx.lineTo(i + canvasX[0], heightY/2 + x + canvasY[0]);
     }
     ctx.stroke();
+
 }
 drawLFO();
 
